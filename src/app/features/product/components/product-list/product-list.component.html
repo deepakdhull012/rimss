@@ -17,13 +17,21 @@
       <!-- col .// -->
       <main class="col-lg-9">
         <header class="d-sm-flex align-items-center border-bottom mb-4 pb-3">
-         
           <div class="ms-auto fl">
-            <select class="form-select d-inline-block w-auto me-1">
-              <option value="0">Best match</option>
-              <option value="1">Recommended</option>
-              <option value="2">High rated</option>
-              <option value="3">Randomly</option>
+            <select
+              class="form-select d-inline-block w-auto me-1"
+              (change)="onSortByChange($event)"
+            >
+            <option value="null">
+              Default
+            </option>
+              <option value="{{ SortBy.PRICE_LOW_TO_HIGH }}">
+                Price (Low To High)
+              </option>
+              <option value="{{ SortBy.PRICE_HIGH_TO_LOW }}">
+                Price (High To Low)
+              </option>
+              <option value="{{ SortBy.HIGH_RATED }}">High rated</option>
             </select>
             <div class="btn-group grid-btns">
               <a
@@ -43,30 +51,47 @@
             </div>
             <!-- btn-group end.// -->
           </div>
-          <strong *ngIf="products.length" class="fr py-2">{{products.length}} Product<span *ngIf="products.length > 1">s</span> found </strong>
-          <strong *ngIf="!products.length" class="fr py-2">No Product found </strong>
+          <strong *ngIf="products.length" class="fr py-2"
+            >{{ products.length }} Product<span *ngIf="products.length > 1"
+              >s</span
+            >
+            found
+          </strong>
+          <strong *ngIf="!products.length" class="fr py-2"
+            >No Product found
+          </strong>
           <div class="clearfix"></div>
         </header>
         <div class="clearfix"></div>
 
         <!-- ========= content items ========= -->
         <div class="row">
-            <ng-container *ngIf="!products.length">
-              <img class="img-fluid big-img" src="./../../../../../assets/my-images/no-products.jpg"/>
-            </ng-container>
-            <ng-container *ngFor="let product of products | paginate: { itemsPerPage: 10, currentPage: page }">
-              <div class="col-lg-4 col-md-6 col-sm-6">
-                <rimss-product-info [productInfo]="product"></rimss-product-info>
-              </div>
-            </ng-container>
-          
+          <ng-container *ngIf="!products.length">
+            <img
+              class="img-fluid big-img"
+              src="./../../../../../assets/my-images/no-products.jpg"
+            />
+          </ng-container>
+          <ng-container
+            *ngFor="
+              let product of products
+                | paginate : { itemsPerPage: 10, currentPage: page }
+            "
+          >
+            <div class="col-lg-4 col-md-6 col-sm-6">
+              <rimss-product-info [productInfo]="product"></rimss-product-info>
+            </div>
+          </ng-container>
+
           <!-- col end.// -->
         </div>
         <!-- row end.// -->
 
         <hr />
         <footer class="d-flex mt-4">
-          <pagination-controls (pageChange)="page = $event"></pagination-controls>
+          <pagination-controls
+            (pageChange)="page = $event"
+          ></pagination-controls>
         </footer>
       </main>
     </div>

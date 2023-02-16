@@ -124,7 +124,9 @@ export class LandingComponent extends BaseComponent implements OnInit {
       cats = ["Women's"];
     }
     this.productsService
-        .fetchCategoryProducts(cats)
+        .filterProductsByCriteria({
+          category: cats
+        })
         .pipe(takeUntil(this.componentDestroyed$))
         .subscribe((recommendedProducts) => {
           this.recommendedProducts = recommendedProducts;

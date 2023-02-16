@@ -49,7 +49,6 @@ export class SignupComponent extends BaseComponent implements OnInit {
     if (this.signupForm.valid) {
       const userToPost = this.mapToUserInfo();
       this.authService.signup(userToPost).pipe(takeUntil(this.componentDestroyed$)).subscribe(res => {
-        alert('success')
       })
     }
   }

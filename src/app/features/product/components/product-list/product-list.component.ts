@@ -1,42 +1,47 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { filter, takeUntil } from 'rxjs';
+import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
 import { ProductsService } from 'src/app/shared/services/products.service';
+import { SortBy } from '../../interfaces/product-info.interface';
 
 @Component({
   selector: 'rimss-product-list',
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.scss'],
 })
-export class ProductListComponent implements OnInit {
+export class ProductListComponent extends BaseComponent implements OnInit {
+  private saleId?: number;
+  private categories: Array<string> = [];
+  private filterString?: string;
+  private sortByValue?: SortBy;
   constructor(
     private productsService: ProductsService,
     private route: ActivatedRoute,
     private router: Router
-  ) {}
+  ) {
+    super();
+  }
 
   public products: Array<IProductInfo> = [];
   public page: number = 1;
+  public SortBy = SortBy;
 
   ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
       const mode: "banner-sale" | "category" | "search"  = params['mode'];
-      const saleId = params['saleId'];
+      this.saleId = params['saleId'];
       const searchText = params['search'];
       const categoryParam = params['category'];
-      let categories: Array<string> = [];
+      this.categories = [];
       if (typeof categoryParam === 'string') {
-        categories.push(categoryParam);
-        console.error(categories, typeof categories);
+        this.categories.push(categoryParam);
       } else {
-        categories = categoryParam;
+        this.categories = categoryParam;
       }
       if (mode === "banner-sale") {
-        this.productsService
-        .getSaleProducts(saleId)
-        .subscribe((products) => {
-          this.products = products;
-        });
+        this.fetchproductsBasedOnCriteria();
       } else if (mode === "search") {
         this.productsService
         .getProductsBySearch(searchText)
@@ -44,11 +49,7 @@ export class ProductListComponent implements OnInit {
           this.products = products;
         });
       }  else {
-        this.productsService
-        .fetchCategoryProducts(categories)
-        .subscribe((products) => {
-          this.products = products;
-        });
+        this.fetchproductsBasedOnCriteria();
       }
       
       
@@ -61,13 +62,28 @@ export class ProductListComponent implements OnInit {
   }
 
   onFilterChange(filterString: string): void {
+    this.filterString = filterString;
+    this.fetchproductsBasedOnCriteria();
+  }
+
+  onSortByChange(sortEvent: Event) {
+    if (sortEvent.target) {
+      const sortBy: SortBy = (sortEvent.target as any).value;
+      this.sortByValue = sortBy;
+      this.fetchproductsBasedOnCriteria();
+    }
+    
+  }
+
+  private fetchproductsBasedOnCriteria(): void {
     this.productsService
-    .filterProductsByCriteria({
-      category: [],
-      filterString
-    })
-    .subscribe((products) => {
-      this.products = products;
-    });
+        .filterProductsByCriteria({
+          category: this.categories,
+          filterString: this.filterString,
+          saleId: this.saleId
+        }, this.sortByValue)
+        .subscribe((products) => {
+          this.products = products;
+        });
   }
 }

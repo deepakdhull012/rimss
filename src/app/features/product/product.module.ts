@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { MatSelectModule } from '@angular/material';
 import { StarRatingModule } from 'angular-star-rating';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { FilterModule } from '../filter/filter.module';
@@ -23,6 +24,7 @@ import { ProductRoutingModule } from './product.routes';
     ProductRoutingModule,
     NgxPaginationModule,
     StarRatingModule.forRoot(),
+    MatSelectModule
   ],
   exports: [
     ProductInfoComponent
