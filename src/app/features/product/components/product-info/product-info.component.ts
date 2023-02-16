@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Route, Router } from '@angular/router';
+import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { AuthService } from 'src/app/features/authentication/services/auth.service';
 import { CartWishlistService } from 'src/app/features/cart-wishlist/services/cart-wishlist.service';
@@ -30,14 +31,18 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const productInCart = this.cartWishListService.cartProducts.find(p => {
-      return p.id === this.productInfo.id
-    });
-    const productInWishList = this.cartWishListService.wishListProducts.find(p => {
-      return p.id === this.productInfo.id
-    });
-    this.productInfo.isInCart = !!productInCart;
-    this.productInfo.isInWishList = !!productInWishList;
+    this.updateCartStatus();
+    this.updateWishListStatus();
+    this.cartWishListService.cartUpdated.pipe(takeUntil(this.componentDestroyed$)).subscribe(_ => {
+      this.cartWishListService.getCartProducts().subscribe(_ => {
+        this.updateCartStatus();
+      });
+    })
+    this.cartWishListService.wishListUpdated.pipe(takeUntil(this.componentDestroyed$)).subscribe(_ => {
+      this.cartWishListService.getWishListProducts().subscribe(_ => {
+        this.updateWishListStatus();
+      });
+    })
   }
 
   addToWishList(): void {
@@ -45,7 +50,14 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
     if (loggedInUserEmail) {
     this.cartWishListService
       .addProductToWishList(this.productInfo.id, loggedInUserEmail)
-      .subscribe();
+      .subscribe(_ => {
+        this.bannerService.displayBanner.next({
+          closeIcon: true,
+          closeTime: 1000,
+          message: "Product added to wishlist",
+          type: BannerType.SUCCESS
+        })
+      });
     } else {
       this.bannerService.displayBanner.next({
         closeIcon: true,
@@ -78,7 +90,12 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
         userEmail: loggedInUserEmail,
       })
       .subscribe((res) => {
-        this.router.navigate(['user', 'cart']);
+        this.bannerService.displayBanner.next({
+          closeIcon: true,
+          closeTime: 1000,
+          message: "Product added to cart",
+          type: BannerType.SUCCESS
+        })
       }); 
     } else {
 
@@ -92,7 +109,26 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
     
   }
 
-  removeFromCart(): void {
+  updateCartStatus(): void {
+    const productInCart = this.cartWishListService.cartProducts.find(p => {
+      return p.id === this.productInfo.id
+    });
+    this.productInfo.isInCart = !!productInCart;
+  }
 
+  updateWishListStatus(): void {
+    const productInWishList = this.cartWishListService.wishListProducts.find(p => {
+      return p.id === this.productInfo.id
+    });
+    this.productInfo.isInWishList = !!productInWishList;
+  }
+
+  removeFromCart(): void {
+    const cartProductId = this.cartWishListService.cartProducts.find(cartP => {
+      return cartP.productId === this.productInfo.id
+    })?.id;
+    if (cartProductId) {
+      this.cartWishListService.removeFromCart(cartProductId).subscribe();
+    }
   }
 }

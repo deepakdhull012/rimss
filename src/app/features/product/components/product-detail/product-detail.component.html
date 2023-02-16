@@ -109,8 +109,11 @@
           <!-- row.// -->
           <div class="button-holder">
             <button class="btn btn-warning" [disabled]="!(noOfUnitsInStock > 0)" (click)="gotoCheckout()"> Buy now </button>
-          <button class="btn btn-primary" [disabled]="!(noOfUnitsInStock > 0)" (click)="addToCart()">
+          <button *ngIf="!product.isInCart" class="btn btn-primary" [disabled]="!(noOfUnitsInStock > 0)" (click)="addToCart()">
             <i class="me-1 fa fa-shopping-basket"></i> Add to cart
+          </button>
+          <button *ngIf="product.isInCart" (click)="removeFromCart()" class="btn btn-danger">
+            Remove from cart
           </button>
           <button (click)="addToWishList()" class="btn btn-light">
             <i class="me-1 fa fa-heart"></i> Save to WishList

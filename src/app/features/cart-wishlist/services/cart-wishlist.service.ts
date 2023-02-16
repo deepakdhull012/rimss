@@ -56,7 +56,9 @@ export class CartWishlistService implements OnDestroy {
       .get<Array<IWishList>>(
         `${this.BASE_URL}/wish-list?email=${loggedInUserEmail}`
       )
-      .pipe(takeUntil(this.serviceDestroyed$));
+      .pipe(takeUntil(this.serviceDestroyed$), tap(wishListProducts => {
+        this.wishListProducts = wishListProducts;
+      }));
   }
 
   getCartProducts(): Observable<Array<ICartProduct>> {
@@ -65,19 +67,25 @@ export class CartWishlistService implements OnDestroy {
       .get<Array<ICartProduct>>(
         `${this.BASE_URL}/cart?userEmail=${loggedInUserEmail}`
       )
-      .pipe(takeUntil(this.serviceDestroyed$));
+      .pipe(takeUntil(this.serviceDestroyed$), tap(cartProducts => {
+        this.cartProducts = cartProducts;
+      }));
   }
 
   removeFromCart(cartProductId: number): Observable<any> {
     return this.httpClient
       .delete(`${this.BASE_URL}/cart/${cartProductId}`)
-      .pipe(takeUntil(this.serviceDestroyed$));
+      .pipe(takeUntil(this.serviceDestroyed$), tap(_ => {
+        this.cartUpdated.next();
+      }));
   }
 
   removeFromWishList(wishListProductId: number): Observable<any> {
     return this.httpClient
       .delete(`${this.BASE_URL}/wish-list/${wishListProductId}`)
-      .pipe(takeUntil(this.serviceDestroyed$));
+      .pipe(takeUntil(this.serviceDestroyed$), tap(_ => {
+        this.wishListUpdated.next();
+      }));
   }
 
   ngOnDestroy(): void {

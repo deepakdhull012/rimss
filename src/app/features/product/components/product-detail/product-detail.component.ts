@@ -32,45 +32,68 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
 
   ngOnInit(): void {
     this.product = this.productService.productSelected;
-    
+
+    this.cartWishlistService.cartUpdated
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe((_) => {
+        this.cartWishlistService.getCartProducts().subscribe((_) => {
+          this.updateCartStatus();
+        });
+      });
+    this.cartWishlistService.wishListUpdated
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe((_) => {
+        this.cartWishlistService.getWishListProducts().subscribe((_) => {
+          this.updateWishListStatus();
+        });
+      });
+
     if (!this.product?.id) {
       const pId = this.route.snapshot.params['id'];
-      
+
       this.productService
         .fetchProductById(pId)
         .pipe(takeUntil(this.componentDestroyed$))
         .subscribe((product) => {
           this.product = product;
+          this.updateCartStatus();
+          this.updateWishListStatus();
           this.updateStockQty();
           console.error('this.route', this.route, this.product);
           const categories = this.product.productCategory?.length
             ? [this.product.productCategory[0]]
             : [];
-            console.error("categories", categories)
+          console.error('categories', categories);
           this.productService
-            .fetchCategoryProducts(categories)
-            .pipe(takeUntil(this.componentDestroyed$)).subscribe(products => {
+            .filterProductsByCriteria({
+              category: categories
+            })
+            .pipe(takeUntil(this.componentDestroyed$))
+            .subscribe((products) => {
               this.similarProducts = products;
             });
         });
     } else {
       this.updateStockQty();
       const categories = this.product.productCategory?.length
-            ? [this.product.productCategory[0]]
-            : [];
-            console.error("categories", categories)
-          this.productService
-            .fetchCategoryProducts(categories)
-            .pipe(takeUntil(this.componentDestroyed$)).subscribe(products => {
-              this.similarProducts = products;
-            });
+        ? [this.product.productCategory[0]]
+        : [];
+      console.error('categories', categories);
+      this.productService
+        .filterProductsByCriteria({
+          category: categories
+        })
+        .pipe(takeUntil(this.componentDestroyed$))
+        .subscribe((products) => {
+          this.similarProducts = products;
+        });
     }
   }
 
   updateStockQty(): void {
     let noOfQty = 0;
-    this.product.sku?.forEach(sku => {
-      noOfQty+= sku.units_in_stock;
+    this.product.sku?.forEach((sku) => {
+      noOfQty += sku.units_in_stock;
     });
     this.noOfUnitsInStock = noOfQty;
   }
@@ -95,7 +118,12 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
           userEmail: loggedInUserEmail,
         })
         .subscribe((res) => {
-          this.router.navigate(['user', 'cart']);
+          this.bannerService.displayBanner.next({
+            closeIcon: true,
+            closeTime: 1000,
+            message: 'Product added to cart successfully',
+            type: BannerType.SUCCESS,
+          });
         });
     } else {
       this.bannerService.displayBanner.next({
@@ -116,10 +144,37 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
     } else {
       this.bannerService.displayBanner.next({
         closeIcon: true,
-        closeTime: 300000000,
+        closeTime: 1000,
         message: 'Please login to perform the action',
         type: BannerType.WARN,
       });
     }
+  }
+
+  removeFromCart(): void {
+    const cartProductId = this.cartWishlistService.cartProducts.find(
+      (cartP) => {
+        return cartP.productId === this.product.id;
+      }
+    )?.id;
+    if (cartProductId) {
+      this.cartWishlistService.removeFromCart(cartProductId).subscribe();
+    }
+  }
+
+  updateCartStatus(): void {
+    const productInCart = this.cartWishlistService.cartProducts.find((p) => {
+      return p.id === this.product.id;
+    });
+    this.product.isInCart = !!productInCart;
+  }
+
+  updateWishListStatus(): void {
+    const productInWishList = this.cartWishlistService.wishListProducts.find(
+      (p) => {
+        return p.id === this.product.id;
+      }
+    );
+    this.product.isInWishList = !!productInWishList;
   }
 }

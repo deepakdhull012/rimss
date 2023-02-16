@@ -4,6 +4,7 @@ import { map, Observable, Subject, takeUntil } from 'rxjs';
 import { IFilterCriteria, IProductInfo, IProductServer } from '../interfaces/client/product.interface';
 import { ICategory } from '../interfaces/client/category.interface';
 import { IBannerSale } from 'src/app/features/landing/interfaces/banner-sale.interface';
+import { SortBy } from 'src/app/features/product/interfaces/product-info.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -24,9 +25,9 @@ export class ProductsService implements OnDestroy {
       map((productsFromServer: Array<IProductServer>) => this.mapServerToClient(productsFromServer)));
   }
 
-  filterProductsByCriteria(filterCriteria: IFilterCriteria):  Observable<Array<IProductInfo>> {
+  filterProductsByCriteria(filterCriteria: IFilterCriteria, sortBy?: SortBy):  Observable<Array<IProductInfo>> {
     return this.http
-      .get<Array<IProductInfo>>(`${this.BASE_URL}/products?${filterCriteria.filterString}`)
+      .get<Array<IProductInfo>>(`${this.BASE_URL}/products?${this.getFilterSortString(filterCriteria, sortBy)}`)
       .pipe(takeUntil(this.serviceDestroyed$));
 
   }
@@ -43,23 +44,9 @@ export class ProductsService implements OnDestroy {
       .pipe(takeUntil(this.serviceDestroyed$));
   }
 
-  fetchCategoryProducts(category: Array<string>): Observable<Array<IProductInfo>> {
-    return this.http
-      .post<Array<IProductInfo>>(`${this.BASE_URL}/products/searchBycategory`, {
-        category
-      })
-      .pipe(takeUntil(this.serviceDestroyed$));
-  }
-
   fetchAllBannerSales(): Observable<Array<IBannerSale>> {
     return this.http
       .get<Array<IBannerSale>>(`${this.BASE_URL}/banner-sales`)
-      .pipe(takeUntil(this.serviceDestroyed$));
-  }
-
-  getSaleProducts(saleId: number): Observable<Array<IProductInfo>> {
-    return this.http
-      .get<Array<IProductInfo>>(`${this.BASE_URL}/products?saleId=${saleId}`)
       .pipe(takeUntil(this.serviceDestroyed$));
   }
 
@@ -71,6 +58,52 @@ export class ProductsService implements OnDestroy {
 
   private mapServerToClient(products: Array<IProductServer>): Array<IProductInfo> {
     return products as Array<IProductInfo>;
+  }
+
+  private getFilterSortString(filterCriteria: IFilterCriteria, sortBy?: SortBy): string {
+    let filterString = "";
+    if (filterCriteria.filterString) {
+      filterString = this.appendNext(filterString);
+      filterString += filterCriteria.filterString;
+    }
+    if (filterCriteria.saleId) {
+      filterString = this.appendNext(filterString);
+      filterString+= `saleId=${filterCriteria.saleId}`;
+    }
+    if (filterCriteria.category) {
+      filterString = this.appendNext(filterString);
+      for (const cat of filterCriteria.category) {
+        filterString+= `&productCategory_like=${cat}`
+      }
+    }
+    if (sortBy) {
+      filterString = this.appendSort(filterString, sortBy);
+    }
+    return filterString;
+  }
+
+  private appendSort(filterString: string, sortBy: SortBy): string {
+    filterString = this.appendNext(filterString);
+    switch(sortBy) {
+      
+      case SortBy.PRICE_LOW_TO_HIGH: 
+        filterString+= "_sort=priceAfterDiscount&_order=asc";
+        break;
+      case SortBy.PRICE_HIGH_TO_LOW:
+        filterString+= "_sort=priceAfterDiscount&_order=desc";
+        break;
+      case SortBy.HIGH_RATED:
+        filterString+= "_sort=rating&_order=desc";
+        break;
+    }
+    return filterString;
+  }
+
+  private appendNext(filterString: string): string {
+    if (filterString.length) {
+      filterString+= "&"; 
+    }
+    return filterString;
   }
 
   ngOnDestroy(): void {
