@@ -1,0 +1,21 @@
+<section class="padding-y border-top">
+    <div class="container">
+      <header class="section-heading">
+        <h4 class="section-title">Your wishlist</h4>
+      </header> 
+    
+      <div class="row">
+        <ng-container *ngIf="!products.length">
+          <img class="img-fluid big-img" src="./../../../../../assets/my-images/no-products.jpg"/>
+        </ng-container>
+        <ng-container *ngFor="let product of products">
+          <div class="col-lg-4 col-md-6 col-sm-6">
+            
+             <rimss-product-info [productInfoConfig]="productInfoConfig" [productInfo]="product"></rimss-product-info>
+          </div>
+        </ng-container>
+      
+      <!-- col end.// -->
+    </div>
+    </div>
+    </section>

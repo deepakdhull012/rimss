@@ -1,0 +1,22 @@
+<div class="size-holder">
+  
+
+  <mat-accordion>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header
+        [collapsedHeight]="'auto'"
+        [expandedHeight]="'auto'"
+      >
+        <mat-panel-title> Size </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <ng-container *ngFor="let size of sizes">
+        <mat-checkbox [checked]="selectedSizes.includes(size)" [value]="size" (change)="onSizeChange($event)"
+          class="brand-cb"
+        >
+          {{ size }}
+        </mat-checkbox>
+      </ng-container>
+    </mat-expansion-panel>
+  </mat-accordion>
+</div>

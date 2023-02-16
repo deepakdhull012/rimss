@@ -1,0 +1,11 @@
+::ng-deep ngx-light-carousel {
+    .carousel {
+        overflow: hidden;
+        padding-bottom: 0 !important;
+        .sliderImage {
+           max-height: 450px;
+           height: 450px !important;
+        }
+    }
+    
+}

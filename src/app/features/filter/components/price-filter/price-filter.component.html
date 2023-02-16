@@ -1,0 +1,18 @@
+<div class="price-holder">
+  <mat-accordion>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header
+        [collapsedHeight]="'auto'"
+        [expandedHeight]="'auto'"
+      >
+        <mat-panel-title> Price </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <ng-container *ngFor="let range of priceRange; let i = index">
+        <mat-checkbox [checked]="selectedPriceRange.includes(range)" [value]="range.index.toString()" (change)="onPriceChange($event)" class="price-cb">
+          {{ range.displayText }}
+        </mat-checkbox>
+      </ng-container>
+    </mat-expansion-panel>
+  </mat-accordion>
+</div>

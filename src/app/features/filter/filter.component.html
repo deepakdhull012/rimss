@@ -1,0 +1,12 @@
+<div class="filter-holder">
+    <rimss-brand-filter (brandsChange)="onBrandFilterChange($event)" *ngIf="filterConfig.brandFilter"></rimss-brand-filter>
+    <mat-divider></mat-divider>
+    <rimss-price-filter (priceRangeChange)="onPriceFilterChange($event)" *ngIf="filterConfig.priceFilter"></rimss-price-filter>
+    <mat-divider></mat-divider>
+    <rimss-rating-filter (ratingChange)="onRatingFilterChange($event)" *ngIf="filterConfig.ratingFilter"></rimss-rating-filter>
+    <mat-divider></mat-divider>
+    <rimss-size-filter (sizeChange)="onSizeFilterChange($event)" *ngIf="filterConfig.sizeFilter"></rimss-size-filter>
+    <mat-divider></mat-divider>
+    <rimss-discount-filter (discountChange)="onDiscountFilterChange($event)" *ngIf="filterConfig.discountFilter"></rimss-discount-filter>
+    <button (click)="clearAll()">Clear all filters</button>
+</div>

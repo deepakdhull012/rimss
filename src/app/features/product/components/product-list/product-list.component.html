@@ -1,0 +1,74 @@
+<!-- ============== SECTION PAGETOP ============== -->
+<section class="bg-primary py-5">
+  <div class="container">
+    <div class="text-white py-5"><h2>Men's wear</h2></div>
+  </div>
+  <!-- container //  -->
+</section>
+<!-- ============== SECTION PAGETOP END// ============== -->
+
+<!-- ============== SECTION CONTENT ============== -->
+<section class="padding-y">
+  <div class="container">
+    <div class="row">
+      <aside class="col-lg-3">
+        <rimss-filter (filterChange)="onFilterChange($event)"></rimss-filter>
+      </aside>
+      <!-- col .// -->
+      <main class="col-lg-9">
+        <header class="d-sm-flex align-items-center border-bottom mb-4 pb-3">
+         
+          <div class="ms-auto fl">
+            <select class="form-select d-inline-block w-auto me-1">
+              <option value="0">Best match</option>
+              <option value="1">Recommended</option>
+              <option value="2">High rated</option>
+              <option value="3">Randomly</option>
+            </select>
+            <div class="btn-group grid-btns">
+              <a
+                class="btn btn-light"
+                data-bs-toggle="tooltip"
+                title="List view"
+              >
+                <i class="fa fa-bars"></i>
+              </a>
+              <a
+                class="btn btn-light active"
+                data-bs-toggle="tooltip"
+                title="Grid view"
+              >
+                <i class="fa fa-th"></i>
+              </a>
+            </div>
+            <!-- btn-group end.// -->
+          </div>
+          <strong *ngIf="products.length" class="fr py-2">{{products.length}} Product<span *ngIf="products.length > 1">s</span> found </strong>
+          <strong *ngIf="!products.length" class="fr py-2">No Product found </strong>
+          <div class="clearfix"></div>
+        </header>
+        <div class="clearfix"></div>
+
+        <!-- ========= content items ========= -->
+        <div class="row">
+            <ng-container *ngIf="!products.length">
+              <img class="img-fluid big-img" src="./../../../../../assets/my-images/no-products.jpg"/>
+            </ng-container>
+            <ng-container *ngFor="let product of products | paginate: { itemsPerPage: 10, currentPage: page }">
+              <div class="col-lg-4 col-md-6 col-sm-6">
+                <rimss-product-info [productInfo]="product"></rimss-product-info>
+              </div>
+            </ng-container>
+          
+          <!-- col end.// -->
+        </div>
+        <!-- row end.// -->
+
+        <hr />
+        <footer class="d-flex mt-4">
+          <pagination-controls (pageChange)="page = $event"></pagination-controls>
+        </footer>
+      </main>
+    </div>
+  </div>
+</section>

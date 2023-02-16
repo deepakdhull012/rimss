@@ -1,0 +1,137 @@
+<!-- ============== SECTION PAGETOP ============== -->
+<section class="bg-primary padding-y-sm">
+    <div class="container">
+      <ol class="breadcrumb ondark mb-0">
+        <li class="breadcrumb-item"> <a href="#">Home</a>  </li>
+        <li class="breadcrumb-item active"> Shopping cart  </li>
+      </ol>
+    </div> <!-- container //  -->
+    </section>
+    <!-- ============== SECTION PAGETOP END// ============== -->
+    
+    <section class="padding-y bg-light">
+    <div class="container">
+    
+    <!-- =================== COMPONENT CART+SUMMARY ====================== -->
+    <div class="row">
+      <div class="col-lg-9">
+    
+        <div class="card">
+        <div class="content-body">
+          <h4 class="card-title mb-4">Your shopping cart</h4>
+          <ng-container *ngIf="!cartProducts.length">
+            <img class="img-fluid cart-image" src="./../../../../../assets/my-images/no-products.jpg"/>
+          </ng-container>
+          <article *ngFor="let cartProduct of cartProducts" class="row gy-3 mb-4 mt-16">
+            <div class="col-lg-5">
+              <figure class="itemside me-lg-5">
+                <div class="aside"><img src="{{cartProduct.cartProductImage}}" class="img-sm img-thumbnail"></div>
+                <figcaption class="product-info">
+                  <a href="#" class="title">{{cartProduct.productBrief}}</a>
+                  <p class="text-muted">{{cartProduct.productName}}</p>
+                </figcaption>
+              </figure>
+            </div>
+            <div class="col-lg-1 mt-16">
+              <select class="form-select">
+                <option>1</option>
+                <option>2</option>	
+                <option>3</option>	
+                <option>4</option>	
+              </select> 
+            </div>
+            <div class="col-lg-3 col-sm-4 col-6 mt-16">
+              <div class="price-wrap lh-sm"> 
+                <small class="text-muted">{{cartProduct.unitPrice }} * {{ cartProduct.quantity}} = {{cartProduct.unitPrice * cartProduct.quantity }} {{cartProduct.unitCurrency}} </small> 
+              </div> <!-- price-wrap .// -->
+            </div>
+            <div class="col-lg-3 col-sm-4 mt-16">
+              <div class="float-lg-end">
+                <a (click)="removeFromCart(cartProduct)" class="btn btn-light text-danger"> Remove</a>
+              </div>
+            </div>
+          </article> <!-- row.// -->
+    
+        </div> <!-- card-body .// -->
+    
+        <div class="content-body border-top" *ngIf="cartProducts.length">
+          <p><i class="me-2 text-muted fa-lg fa fa-truck"></i> Free Delivery within 1-2 weeks</p>
+          <p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+          quis nostrud exercitation ullamco laboris nisi ut aliquip</p>
+        </div> <!-- card-body.// -->
+    
+        </div> <!-- card.// -->
+    
+      </div> <!-- col.// -->
+      <aside class="col-lg-3" *ngIf="cartProducts.length">
+    
+        <div class="card mb-3">
+        <div class="card-body">
+        <form>
+          <div class="form-group">
+            <label class="form-label">Have coupon?</label>
+            <div class="input-group">
+              <input type="text" class="form-control" name="" placeholder="Coupon code">
+              <button class="btn btn-light">Apply</button>
+            </div>
+          </div>
+        </form>
+        </div> <!-- card-body.// -->
+        </div> <!-- card.// -->
+    
+        <div class="card">
+        <div class="card-body">
+          <dl class="dlist-align">
+            <dt>Total price:</dt>
+            <dd class="text-end"> $329.00</dd>
+          </dl>
+          <dl class="dlist-align">
+            <dt>Discount:</dt>
+            <dd class="text-end text-success"> - $60.00 </dd>
+          </dl>
+          <dl class="dlist-align">
+            <dt>TAX:</dt>
+            <dd class="text-end"> $14.00 </dd>
+          </dl>
+          <hr>
+          <dl class="dlist-align">
+            <dt>Total:</dt>
+            <dd class="text-end text-dark h5"> $357.90 </dd>
+          </dl>
+          
+          <div class="d-grid gap-2 my-3">
+            <a class="btn btn-success w-100" (click)="checkout()"> Make Purchase </a>
+            <a class="btn btn-light w-100"> Back to shop </a>
+          </div>
+        </div> <!-- card-body.// -->
+        </div> <!-- card.// -->
+    
+      </aside> <!-- col.// -->
+    
+    </div> <!-- row.// -->
+    <!-- =================== COMPONENT 1 CART+SUMMARY .//END  ====================== -->
+    
+    <br><br>
+    
+    </div> <!-- container .//  -->
+    </section>
+    
+    
+    
+    <!-- ============== Recommended Products Section starts here ============== -->
+    <section class="padding-y border-top">
+    <div class="container">
+      <header class="section-heading">
+        <h4 class="section-title">Recommended items</h4>
+      </header> 
+    
+      <div class="row">
+        <ng-container *ngFor="let recommendedProduct of recommendedProducts">
+          <rimss-product-info [productInfo]="recommendedProduct"></rimss-product-info>
+        </ng-container>
+      </div> <!-- row.// -->
+      
+    </div> <!-- container .//  -->
+    </section>
+        <!-- ============== Recommended Products Section ends here  ============== -->
