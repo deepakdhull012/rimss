@@ -1,0 +1,13 @@
+<div
+  class="banner"
+  *ngIf="visible"
+  [ngClass]="{
+    'banner-info': type === BannerType.INFO,
+    'banner-success': type === BannerType.SUCCESS,
+    'banner-error': type === BannerType.ERROR,
+    'banner-warn': type === BannerType.WARN
+  }"
+>
+  {{ bannerMessage }}
+  <!-- <mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="home"></mat-icon> -->
+</div>

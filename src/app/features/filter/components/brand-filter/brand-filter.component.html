@@ -1,0 +1,16 @@
+<div class="brand-holder">
+<mat-accordion>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header [collapsedHeight]="'auto'" [expandedHeight]="'auto'">
+        <mat-panel-title> Brands </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <ng-container *ngFor="let brand of brands">
+        <mat-checkbox [checked]="selectedBrands.includes(brand.id)" [value]="brand.id.toString()" (change)="onBrandsChange($event)"  class="brand-cb">
+          {{ brand.name }}
+        </mat-checkbox>
+      </ng-container>
+    </mat-expansion-panel>
+</mat-accordion>
+
+</div>

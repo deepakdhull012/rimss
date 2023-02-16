@@ -1,0 +1,98 @@
+<!-- ================ SECTION INTRO ================ -->
+
+<div class="container-fluid">
+    <ngx-light-carousel *ngIf="salesLoaded" [options]="options" [data]="bannerSales">
+        <div ngx-light-carousel-container>
+            <div  ngx-light-carousel-item  *ngFor="let bannerSale of bannerSales; let i = index">
+                <div class="sale w-100">
+                    <a (click)="goToSalePage(bannerSale)">
+                        <img class="sliderImage img-fluid w-100" src="{{bannerSale.saleImage}}" title="{{bannerSale.title}}">
+                    </a>
+                    <!-- <h3 class="title">{{slide.title}}</h3> -->
+                </div>
+            </div>
+             <!-- include the outlet for infinite scroll at the end of the loop -->
+             <ng-template  #infiniteContainer></ng-template> 
+            </div>
+        
+        <!-- define what the infinite scroll item looks like, typically a copy of the regular item -->
+        <ng-template #carouselContent let-slide let-i="index">
+        <div>
+            <div class="slide w-100">
+                <a>
+                    <img class="w-100" src="{{slide.saleImage}}">
+                </a>
+                <!-- <h3 class="title">{{slide.title}}</h3> -->
+            </div>
+        </div>
+        </ng-template>
+        
+        <!-- Custom contents for the previous button -->
+        <ng-template  #carouselPrev>
+            <div  class="click-area">
+            </div>
+        </ng-template>
+    
+        <!-- Custom contents for the next button -->
+        <ng-template  #carouselNext>
+            <div  class="click-area">
+            </div>
+        </ng-template>
+        
+        <!-- Custom contents for the carousel index -->
+        <ng-template  #carouselDot  let-model>
+            <div class="ball bg-accent">
+            </div>
+        </ng-template>
+        
+        <!-- Custom contents for the progress bar (todo) -->
+        <ng-template  #carouselProgress  let-progress>
+            <div  class="progress"></div>
+        </ng-template>
+    </ngx-light-carousel>
+</div>
+
+
+  <!-- ================ SECTION INTRO END.// ================ -->
+  
+  
+  <!-- ================ SECTION PRODUCTS ================ -->
+  <section class="padding-y mt-32">
+  <div class="container">
+  
+    <header class="section-heading">
+      <h3 class="section-title text-center">New Arrivals</h3>
+    </header> 
+  
+    <div class="row mt-16">
+        <ng-container *ngFor="let product of newProducts">
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <rimss-product-info [productInfo]="product"></rimss-product-info>
+              </div>
+        </ng-container>
+    </div> <!-- row end.// -->
+  
+  </div> <!-- container end.// -->
+  </section>
+  <!-- ================ SECTION PRODUCTS END.// ================ -->
+  
+  <!-- ================ SECTION PRODUCTS ================ -->
+  <section class="padding-y mt-32">
+  <div class="container">
+  
+    <header class="section-heading">
+      <h3 class="section-title text-center">Recommended Products</h3>
+    </header> 
+  
+    <div class="row mt-16">
+        <ng-container *ngFor="let product of recommendedProducts">
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <rimss-product-info [productInfo]="product"></rimss-product-info>
+              </div>
+        </ng-container>
+    </div> <!-- row end.// -->
+  
+  </div> <!-- container end.// -->
+  </section>
+  <!-- ================ SECTION PRODUCTS END.// ================ -->
+  

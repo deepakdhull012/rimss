@@ -1,0 +1,65 @@
+/* You can add global styles to this file, and also import other style files */
+@import '~css-star-rating/css/star-rating.min.css';
+.w-100 {
+    width: 100%;
+}
+
+.mt-16 {
+    margin-top: 16px;
+}
+
+.mt-32 {
+    margin-top: 32px;
+}
+
+a {
+    cursor: pointer;
+}
+
+.breadcrumb {
+    padding: 8px 15px;
+    margin-bottom: 20px;
+    list-style: none;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+}
+
+.fl {
+    float: left;
+}
+.fr {
+    float: right;
+}
+.clearfix {
+    clear: both !important;
+}
+
+mat-error {
+    color: red;
+}
+
+select {
+    border-radius: 5px;
+    padding: 5px;
+}
+
+mat-checkbox, mat-radio-group {
+    display: block;
+    width: 100%;
+    input[type=checkbox], input[type=radio] {
+        width: 16px;
+        height: 16px;
+    }
+    .mat-checkbox-frame, .mat-radio-frame, .mat-checkbox-background, .mat-radio-container {
+        display: none;
+    }
+    .mat-checkbox-inner-container {
+        height: 24px;
+    }
+    .mat-checkbox-label, .mat-radio-label {
+        font-weight: normal;
+    }
+    .mat-radio-label {
+        margin-right: 10px;
+    }
+}

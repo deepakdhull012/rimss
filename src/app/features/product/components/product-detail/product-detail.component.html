@@ -1,0 +1,299 @@
+<!-- ============== SECTION PAGETOP ============== -->
+<section class="bg-primary padding-y-sm mt-32"></section>
+<!-- ============== SECTION PAGETOP END// ============== -->
+
+<!-- ============== SECTION CONTENT ============== -->
+<section class="padding-y">
+  <div class="container">
+    <div class="row">
+      <aside class="col-lg-6">
+        <article class="gallery-wrap">
+          <div class="img-big-wrap img-thumbnail">
+            <a
+              data-fslightbox="mygalley"
+              data-type="image"
+              href="{{ product.mainImage }}"
+            >
+              <img height="560" src="{{ product.mainImage }}" />
+            </a>
+          </div>
+          <!-- img-big-wrap.// -->
+          <div class="thumbs-wrap">
+            <ng-container *ngFor="let productImage of product.productImages">
+              <a
+                data-fslightbox="mygalley"
+                data-type="image"
+                class="item-thumb"
+                (click)="product.mainImage = productImage"
+              >
+                <img class="product-detail-image" width="60" height="60" src="{{ productImage }}" />
+              </a>
+            </ng-container>
+          </div>
+          <!-- thumbs-wrap.// -->
+        </article>
+        <!-- gallery-wrap .end// -->
+      </aside>
+      <main class="col-lg-6">
+        <article class="ps-lg-3">
+          <h4 class="title text-dark">{{ product.productBrief }} Briefffff</h4>
+          <div class="rating-wrap">
+            <star-rating [starType]="'svg'" [rating]="product.rating"></star-rating>
+          </div>
+          <span *ngIf="noOfUnitsInStock > 0" class="label-rating text-success">In stock {{noOfUnitsInStock }} units</span>
+          <span *ngIf="!(noOfUnitsInStock > 0)" class="out-of-stock">Out of stock</span>
+
+          <div class="price-holder">
+            <var class="price h5"
+              >{{ product.price }} {{ product.currency }}</var
+            >
+            <span class="text-muted">/{{ product.priceInfo }}</span>
+          </div>
+
+          <p>{{ product.productDescription }} Description Description Description Description Description Description Description Description Description Description Description Description Description Description Description </p>
+
+          <div class="meta-data">
+            <ng-container *ngFor="let metadata of product.metadata | keyvalue">
+              <div><strong>{{ metadata.key }}</strong>: {{ metadata.value }}</div>
+            </ng-container>
+          </div>
+
+          <hr />
+
+          <div class="row mb-4">
+            <div class="col-md-4 col-6 mb-2" *ngIf="product.sizes?.length">
+              <label class="form-label">Size</label>
+              <select class="form-select size-holder">
+                {{ product.sizes | json }}
+                <ng-container *ngFor="let size of product.sizes">
+                  <option>{{ size }}</option>
+                </ng-container>
+              </select>
+            </div>
+            <!-- col.// -->
+            <div class="">
+              <label class="form-label d-block">Quantity</label>
+              <div class="input-group input-spinner qty-holder">
+                <button class="btn btn-icon btn-light qty-btn" type="button">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="22"
+                    height="22"
+                    fill="#999"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M19 13H5v-2h14v2z"></path>
+                  </svg>
+                </button>
+                <input
+                  class="form-control text-center"
+                  placeholder=""
+                  value="14"
+                />
+                <button class="btn btn-icon btn-light qty-btn" type="button">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="22"
+                    height="22"
+                    fill="#999"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
+                  </svg>
+                </button>
+              </div>
+              <!-- input-group.// -->
+            </div>
+            <!-- col.// -->
+          </div>
+          <!-- row.// -->
+          <div class="button-holder">
+            <button class="btn btn-warning" [disabled]="!(noOfUnitsInStock > 0)" (click)="gotoCheckout()"> Buy now </button>
+          <button class="btn btn-primary" [disabled]="!(noOfUnitsInStock > 0)" (click)="addToCart()">
+            <i class="me-1 fa fa-shopping-basket"></i> Add to cart
+          </button>
+          <button (click)="addToWishList()" class="btn btn-light">
+            <i class="me-1 fa fa-heart"></i> Save to WishList
+          </button>
+          </div>
+          
+        </article>
+        <!-- product-info-aside .// -->
+      </main>
+      <!-- col.// -->
+    </div>
+    <!-- row.// -->
+  </div>
+  <!-- container .//  -->
+</section>
+<!-- ============== SECTION CONTENT END// ============== -->
+
+<!-- ============== SECTION  ============== -->
+<section class="padding-y bg-light border-top">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8">
+        <!-- =================== COMPONENT SPECS ====================== -->
+        <div class="card">
+          <header class="card-header">
+            <ul class="nav nav-tabs card-header-tabs">
+              <li class="nav-item">
+                <a
+                  href="#"
+                  data-bs-target="#tab_specs"
+                  data-bs-toggle="tab"
+                  class="nav-link active"
+                  >Specification</a
+                >
+              </li>
+              <li class="nav-item">
+                <a
+                  href="#"
+                  data-bs-target="#tab_warranty"
+                  data-bs-toggle="tab"
+                  class="nav-link"
+                  >Warranty info</a
+                >
+              </li>
+              <li class="nav-item">
+                <a
+                  href="#"
+                  data-bs-target="#tab_shipping"
+                  data-bs-toggle="tab"
+                  class="nav-link"
+                  >Shipping info</a
+                >
+              </li>
+              <li class="nav-item">
+                <a
+                  href="#"
+                  data-bs-target="#tab_seller"
+                  data-bs-toggle="tab"
+                  class="nav-link"
+                  >Seller profile</a
+                >
+              </li>
+            </ul>
+          </header>
+          <div class="tab-content">
+            <article id="tab_specs" class="tab-pane show active card-body">
+              <p>
+                With supporting text below as a natural lead-in to additional
+                content. Lorem ipsum dolor sit amet, consectetur adipisicing
+                elit, sed do eiusmod tempor incididunt ut labore et dolore magna
+                aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis
+                aute irure dolor in reprehenderit in voluptate velit esse cillum
+                dolore eu fugiat nulla pariatur.
+              </p>
+              <ul class="list-check cols-two">
+                <li>Some great feature name here</li>
+                <li>Lorem ipsum dolor sit amet, consectetur</li>
+                <li>Duis aute irure dolor in reprehenderit</li>
+                <li>Optical heart sensor</li>
+                <li>Easy fast and ver good</li>
+                <li>Some great feature name here</li>
+                <li>Modern style and design</li>
+              </ul>
+              <table class="table border table-hover">
+                <tr>
+                  <th>Display:</th>
+                  <td>13.3-inch LED-backlit display with IPS</td>
+                </tr>
+                <tr>
+                  <th>Processor capacity:</th>
+                  <td>2.3GHz dual-core Intel Core i5</td>
+                </tr>
+                <tr>
+                  <th>Camera quality:</th>
+                  <td>720p FaceTime HD camera</td>
+                </tr>
+                <tr>
+                  <th>Memory</th>
+                  <td>8 GB RAM or 16 GB RAM</td>
+                </tr>
+                <tr>
+                  <th>Graphics</th>
+                  <td>Intel Iris Plus Graphics 640</td>
+                </tr>
+              </table>
+            </article>
+            <!-- tab-content.// -->
+            <article id="tab_warranty" class="tab-pane card-body">
+              Tab content or sample information now <br />
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+              reprehenderit in voluptate velit esse cillum dolore eu fugiat
+              nulla pariatur. Excepteur sint occaecat cupidatat non proident,
+              sunt in culpa qui officia deserunt mollit anim id est laborum.
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo
+            </article>
+            <article id="tab_shipping" class="tab-pane card-body">
+              Another tab content or sample information now <br />
+              Dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+              tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+              minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+              aliquip ex ea commodo consequat. Duis aute irure dolor in
+              reprehenderit in voluptate velit esse cillum dolore eu fugiat
+              nulla pariatur. Excepteur sint occaecat cupidatat non proident,
+              sunt in culpa qui officia deserunt mollit anim id est laborum.
+            </article>
+            <article id="tab_seller" class="tab-pane card-body">
+              Some other tab content or sample information now <br />
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+              reprehenderit in voluptate velit esse cillum dolore eu fugiat
+              nulla pariatur. Excepteur sint occaecat cupidatat non proident,
+              sunt in culpa qui officia deserunt mollit anim id est laborum.
+            </article>
+          </div>
+        </div>
+        <!-- =================== COMPONENT SPECS .// ================== -->
+      </div>
+      <!-- col.// -->
+      <aside class="col-lg-4">
+        <!-- =================== COMPONENT ADDINGS ====================== -->
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Similar items</h5>
+            <ng-container *ngFor="let product of similarProducts">
+              <article class="itemside mb-3">
+                <a href="#" class="aside">
+                  <img
+                    src="{{product.mainImage}}"
+                    width="96"
+                    height="96"
+                    class="img-md img-thumbnail"
+                  />
+                </a>
+                <div class="info">
+                  <a href="#" class="title mb-1">
+                    {{product.productBrief}}
+                  </a>
+                  <strong class="price">{{product.price}}</strong>
+                  <!-- price.// -->
+                </div>
+              </article>
+            </ng-container>
+            
+          </div>
+          <!-- card-body .// -->
+        </div>
+        <!-- card .// -->
+        <!-- =================== COMPONENT ADDINGS .// ================== -->
+      </aside>
+      <!-- col.// -->
+    </div>
+
+    <br /><br />
+  </div>
+  <!-- container // -->
+</section>
+<!-- =============== SECTION  END// ============== -->

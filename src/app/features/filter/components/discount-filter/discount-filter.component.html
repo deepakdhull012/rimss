@@ -1,0 +1,16 @@
+<div class="discount-holder">
+  <mat-accordion>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header
+        [collapsedHeight]="'auto'"
+        [expandedHeight]="'auto'"
+      >
+        <mat-panel-title> Discount </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <ng-container *ngFor="let discount of discounts">
+        <mat-checkbox [checked]="selectedDiscounts.includes(discount)" [value]="discount.toString()" (change)="onDiscountChange($event)" class="brand-cb"> {{ discount }} % or more </mat-checkbox>
+      </ng-container>
+    </mat-expansion-panel>
+  </mat-accordion>
+</div>

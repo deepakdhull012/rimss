@@ -1,0 +1,56 @@
+<section class="page-header">
+  <div class="overly"></div>
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-6">
+        <div class="content text-center">
+          <h1 class="mb-3">Orders</h1>
+
+          <!-- <nav aria-label="breadcrumb">
+            <ol class="breadcrumb bg-transparent justify-content-center">
+              <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Order</li>
+            </ol>
+          </nav> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="user-dashboard page-wrapper">
+  <div class="container">
+    <div class="row">
+      <div class=" col-md-12 col-sm-12 col-lg-12">
+        <table class="table table-bordered orders-holder">
+          <thead>
+            <tr>
+              <th scope="col">Product</th>
+              <th scope="col">Product Name</th>
+              <th scope="col">Order Date</th>
+              <th scope="col">Order Status</th>
+              <th scope="col">Amount</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+                <th class="order-image-holder">
+                    <img class="order-image" src="assets/images/items/8.webp">
+                </th>
+              <th scope="row">Niva Bupa product</th>
+              <td>June 11, 2019</td>
+              <td>Completed</td>
+              <td>30</td>
+              <td>
+                <div><a routerLink="/order" class="btn btn-dark btn-small">View Product</a></div>
+                <div><a routerLink="/order" class="btn btn-dark btn-small">Track Order</a></div>
+                <div><a routerLink="/order" class="btn btn-dark btn-small">Cancel Order</a></div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>

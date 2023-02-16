@@ -1,0 +1,20 @@
+.banner {
+    padding: 10px;
+    
+    text-align: center;
+    margin: 0 auto;
+    width: 98%;
+    color: white;
+}
+.banner-error {
+    background: #a83b3b;
+}
+.banner-success {
+    background: #289128;
+}
+.banner-info {
+    background: #476a6b;
+}
+.banner-warn {
+    background: #c28413;
+}

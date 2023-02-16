@@ -1,0 +1,46 @@
+ <!-- ***** Header Area Start ***** -->
+ <header class="header-area header-sticky">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <nav class="main-nav">
+                    <!-- ***** Logo Start ***** -->
+                    <a (click)="navigateTo(['/']);$event.stopPropagation()" class="logo">
+                        RIMSS
+                    </a>
+                    <!-- ***** Logo End ***** -->
+                    <!-- ***** Menu Start ***** -->
+                    <ul class="nav" [ngClass]="{'sideNavVisible': sideNavVisible}">
+                        <li>
+                            <input type="text" #searchHolder (keyup.enter)="searchProducts(searchHolder.value)" class="search-hover" name="" placeholder="search here..." />
+                        </li>
+                        <li class="scroll-to-section"><a (click)="navigateTo(['/'])" class="active">Home</a></li>
+                        <li class="submenu" *ngFor="let category of categories" (click)="navigateTo(['products', 'list'], [category.name])">
+                            <a>{{category.name}}</a>
+                            <ul>
+                                <li (click)="navigateTo(['products', 'list'], [category.name, subcategory.name]);$event.stopPropagation()" *ngFor="let subcategory of category.child"><a routerLink="/about">{{subcategory.name}}</a></li>
+                            </ul>
+                        </li>
+                        <li class="submenu">
+                            <a>Account</a>
+                            <ul>
+                                <li (click)="navigateTo(['user', 'cart']);$event.stopPropagation()"><a>Cart</a></li>
+                                <li (click)="navigateTo(['orders']);$event.stopPropagation()"><a>Orders</a></li>
+                                <li (click)="navigateTo(['auth']);$event.stopPropagation()"><a>Profile</a></li>
+                                <li (click)="navigateTo(['user', 'wish-list']);$event.stopPropagation()"><a>Wish-list</a></li>
+                                <li *ngIf="isLoggedIn" (click)="logout();$event.stopPropagation()"><a>Logout</a></li>
+                                <li *ngIf="!isLoggedIn" (click)="login();$event.stopPropagation()"><a>Login</a></li>
+                            </ul>
+                        </li>
+                    </ul>        
+                    <a class='menu-trigger' (click)="openSideNav()">
+                        <span>Menu</span>
+                    </a>
+                    <!-- ***** Menu End ***** -->
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="clearfix"></div>
+<!-- ***** Header Area End ***** -->
