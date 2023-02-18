@@ -50,6 +50,11 @@ export class AuthService {
     return Math.random().toString(36).substr(2);
   }
 
+  public getUser(): IUser | undefined {
+    return this.loggedInUser || JSON.parse(localStorage.getItem("loggedInUser") || "{}");
+
+  }
+
   logout(): void {
     localStorage.removeItem("token");
     localStorage.removeItem("loggedInEmail");
@@ -57,11 +62,11 @@ export class AuthService {
     this.router.navigate(['auth']);
   }
 
-  getLoggedInEmail(): string | null {
+  getLoggedInEmail(): string | undefined {
     if (localStorage.getItem("token")) {
-      return localStorage.getItem("loggedInEmail");
+      return localStorage.getItem("loggedInEmail") || undefined;
     } else {
-      return null;
+      return undefined;
     }
     
   }

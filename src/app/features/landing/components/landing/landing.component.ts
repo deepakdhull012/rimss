@@ -21,7 +21,6 @@ export class LandingComponent extends BaseComponent implements OnInit {
   public salesLoaded = false;
   public newProducts: Array<IProductInfo> = [];
   public recommendedProducts: Array<IProductInfo> = [];
-  private wishList: Array<IWishList> = [];
 
   constructor(
     private router: Router,
@@ -101,7 +100,6 @@ export class LandingComponent extends BaseComponent implements OnInit {
     const newProducts$ = this.productsService.fetchAllProducts();
     forkJoin([wishList$, newProducts$]).subscribe((response) => {
       this.newProducts = response[1];
-      this.wishList = response[0];
       this.newProducts.forEach((product) => {
         product.isInWishList = this.isInWishList(product.id);
       });
@@ -109,7 +107,7 @@ export class LandingComponent extends BaseComponent implements OnInit {
   }
 
   isInWishList(productId: number): boolean {
-    const wishListProduct = this.wishList.find((wishList) => {
+    const wishListProduct = this.cartWishlistService.wishListProducts.find((wishList) => {
       return wishList.productId === productId;
     });
     return !!wishListProduct;
@@ -119,9 +117,9 @@ export class LandingComponent extends BaseComponent implements OnInit {
     const userGender = JSON.parse(localStorage.getItem("loggedInUser") || "{}")?.gender;
     let cats: Array<string> = [];
     if (userGender === 'M') {
-      cats = ["Men's"];
+      cats = ["A"];
     } else if (userGender === 'F') {
-      cats = ["Women's"];
+      cats = ["G"];
     }
     this.productsService
         .filterProductsByCriteria({

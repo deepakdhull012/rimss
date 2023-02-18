@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { IProductInfoConfig } from 'src/app/features/product/interfaces/product-info.interface';
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
+import { IWishList } from 'src/app/shared/interfaces/client/wish-list.interface';
 import { ProductsService } from 'src/app/shared/services/products.service';
+import { CartWishlistService } from '../../services/cart-wishlist.service';
 
 @Component({
   selector: 'rimss-wishlist',
@@ -10,17 +12,17 @@ import { ProductsService } from 'src/app/shared/services/products.service';
 })
 export class WishlistComponent implements OnInit {
 
-  constructor(private productsService: ProductsService) { }
+  constructor(private cartWishListService: CartWishlistService) { }
 
-  public products: Array<IProductInfo> = [];
+  public wishListProducts: Array<IProductInfo> = [];
   public productInfoConfig: IProductInfoConfig = {
     displayFavouriteIcon: false
   };
   ngOnInit(): void {
-    this.productsService
-        .fetchAllProducts()
+    this.cartWishListService
+        .getWishListProducts()
         .subscribe((products) => {
-          this.products = products;
+          this.wishListProducts = products;
         });
   }
 

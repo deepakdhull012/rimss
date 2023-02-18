@@ -74,7 +74,7 @@
             <div class="">
               <label class="form-label d-block">Quantity</label>
               <div class="input-group input-spinner qty-holder">
-                <button class="btn btn-icon btn-light qty-btn" type="button">
+                <button class="btn btn-icon btn-light qty-btn" type="button" (click)="updateQty(-1)">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="22"
@@ -88,9 +88,9 @@
                 <input
                   class="form-control text-center"
                   placeholder=""
-                  value="14"
+                  value="{{this.qty}}"
                 />
-                <button class="btn btn-icon btn-light qty-btn" type="button">
+                <button class="btn btn-icon btn-light qty-btn" type="button" (click)="updateQty(1)">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="22"
@@ -115,8 +115,12 @@
           <button *ngIf="product.isInCart" (click)="removeFromCart()" class="btn btn-danger">
             Remove from cart
           </button>
-          <button (click)="addToWishList()" class="btn btn-light">
-            <i class="me-1 fa fa-heart"></i> Save to WishList
+          <button *ngIf="!product.isInWishList" (click)="addToWishList()" class="btn btn-light">
+            <i class="me-1 fa fa-heart"></i> Add to WishList
+          </button>
+
+          <button *ngIf="product.isInWishList" (click)="removeFromWishList()" class="btn btn-light">
+            <i class="me-1 fa fa-heart in-wishlist"></i> Remove from WishList
           </button>
           </div>
           
@@ -142,7 +146,7 @@
             <ul class="nav nav-tabs card-header-tabs">
               <li class="nav-item">
                 <a
-                  href="#"
+                (click)="activateTab(IProductDetailsTab.SPECIFICATION)"
                   data-bs-target="#tab_specs"
                   data-bs-toggle="tab"
                   class="nav-link active"
@@ -151,7 +155,7 @@
               </li>
               <li class="nav-item">
                 <a
-                  href="#"
+                 (click)="activateTab(IProductDetailsTab.WARRANTY)"
                   data-bs-target="#tab_warranty"
                   data-bs-toggle="tab"
                   class="nav-link"
@@ -160,7 +164,7 @@
               </li>
               <li class="nav-item">
                 <a
-                  href="#"
+                (click)="activateTab(IProductDetailsTab.SHIPPING)"
                   data-bs-target="#tab_shipping"
                   data-bs-toggle="tab"
                   class="nav-link"
@@ -169,7 +173,7 @@
               </li>
               <li class="nav-item">
                 <a
-                  href="#"
+                (click)="activateTab(IProductDetailsTab.SELLER)"
                   data-bs-target="#tab_seller"
                   data-bs-toggle="tab"
                   class="nav-link"
@@ -179,7 +183,7 @@
             </ul>
           </header>
           <div class="tab-content">
-            <article id="tab_specs" class="tab-pane show active card-body">
+            <article *ngIf="activeTab === IProductDetailsTab.SPECIFICATION" id="tab_specs" class="card-body">
               <p>
                 With supporting text below as a natural lead-in to additional
                 content. Lorem ipsum dolor sit amet, consectetur adipisicing
@@ -222,7 +226,7 @@
               </table>
             </article>
             <!-- tab-content.// -->
-            <article id="tab_warranty" class="tab-pane card-body">
+            <article  *ngIf="activeTab === IProductDetailsTab.WARRANTY" id="tab_warranty" class="card-body">
               Tab content or sample information now <br />
               Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
               eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
@@ -236,7 +240,7 @@
               enim ad minim veniam, quis nostrud exercitation ullamco laboris
               nisi ut aliquip ex ea commodo
             </article>
-            <article id="tab_shipping" class="tab-pane card-body">
+            <article  *ngIf="activeTab === IProductDetailsTab.SHIPPING" id="tab_shipping" class="card-body">
               Another tab content or sample information now <br />
               Dolor sit amet, consectetur adipisicing elit, sed do eiusmod
               tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
@@ -246,7 +250,7 @@
               nulla pariatur. Excepteur sint occaecat cupidatat non proident,
               sunt in culpa qui officia deserunt mollit anim id est laborum.
             </article>
-            <article id="tab_seller" class="tab-pane card-body">
+            <article  *ngIf="activeTab === IProductDetailsTab.SELLER" id="tab_seller" class="card-body">
               Some other tab content or sample information now <br />
               Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
               eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut

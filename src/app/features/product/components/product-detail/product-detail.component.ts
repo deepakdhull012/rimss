@@ -8,6 +8,7 @@ import { BannerType } from 'src/app/shared/interfaces/client/banner.interface';
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
 import { BannerService } from 'src/app/shared/services/banner.service';
 import { ProductsService } from 'src/app/shared/services/products.service';
+import { IProductDetailsTab } from '../../interfaces/product-info.interface';
 
 @Component({
   selector: 'rimss-product-detail',
@@ -18,6 +19,9 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
   @Input() product: IProductInfo = null as any as IProductInfo;
   public similarProducts: Array<IProductInfo> = [];
   public noOfUnitsInStock = 0;
+  public qty = 1;
+  public IProductDetailsTab = IProductDetailsTab;
+  public activeTab: IProductDetailsTab = IProductDetailsTab.SPECIFICATION;
 
   constructor(
     private productService: ProductsService,
@@ -66,7 +70,7 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
           console.error('categories', categories);
           this.productService
             .filterProductsByCriteria({
-              category: categories
+              category: categories,
             })
             .pipe(takeUntil(this.componentDestroyed$))
             .subscribe((products) => {
@@ -75,13 +79,15 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
         });
     } else {
       this.updateStockQty();
+      this.updateCartStatus();
+      this.updateWishListStatus();
       const categories = this.product.productCategory?.length
         ? [this.product.productCategory[0]]
         : [];
       console.error('categories', categories);
       this.productService
         .filterProductsByCriteria({
-          category: categories
+          category: categories,
         })
         .pipe(takeUntil(this.componentDestroyed$))
         .subscribe((products) => {
@@ -112,7 +118,7 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
           productBrief: this.product.productBrief,
           productId: this.product.id,
           productName: this.product.productName,
-          quantity: 1,
+          quantity: this.qty,
           unitCurrency: this.product.currency,
           unitPrice: this.product.price,
           userEmail: loggedInUserEmail,
@@ -172,9 +178,34 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
   updateWishListStatus(): void {
     const productInWishList = this.cartWishlistService.wishListProducts.find(
       (p) => {
-        return p.id === this.product.id;
+        return p.productId === this.product.id;
       }
     );
+    console.error("productInWishList", this.product.id, productInWishList, this.cartWishlistService.wishListProducts)
     this.product.isInWishList = !!productInWishList;
+  }
+
+
+  removeFromWishList(): void {
+    const productInWishList = this.cartWishlistService.wishListProducts.find(wishListProduct => {
+      return wishListProduct.productId === this.product.id
+    });
+    if (productInWishList) {
+      this.cartWishlistService.removeFromWishList(productInWishList?.id).subscribe(_ => {
+        this.cartWishlistService.wishListUpdated.next();
+      });
+    }
+    
+  }
+
+  activateTab(tab: IProductDetailsTab): void {
+    this.activeTab = tab;
+  }
+
+  updateQty(count: number): void {
+    if ((count === -1 && this.qty > 1) || (count === 1 && this.qty < this.noOfUnitsInStock)) {
+      this.qty+= count;
+    }
+    
   }
 }

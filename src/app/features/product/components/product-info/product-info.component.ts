@@ -46,27 +46,31 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
   }
 
   addToWishList(): void {
-    const loggedInUserEmail =  this.authService.getLoggedInEmail();
-    if (loggedInUserEmail) {
-    this.cartWishListService
-      .addProductToWishList(this.productInfo.id, loggedInUserEmail)
-      .subscribe(_ => {
+    const loggedInUserEmail = this.authService.getLoggedInEmail();
+    const productInWishList = this.cartWishListService.wishListProducts.find(
+      (p) => {
+        return p.productId === this.productInfo.id;
+      }
+    );
+    if (productInWishList) {
+      this.removeFromWishList();
+    } else {
+      if (loggedInUserEmail) {
+        this.cartWishListService
+          .addProductToWishList(this.productInfo.id, loggedInUserEmail)
+          .subscribe();
+      } else {
         this.bannerService.displayBanner.next({
           closeIcon: true,
           closeTime: 1000,
-          message: "Product added to wishlist",
-          type: BannerType.SUCCESS
-        })
-      });
-    } else {
-      this.bannerService.displayBanner.next({
-        closeIcon: true,
-        closeTime: 300000000,
-        message: "Please login to perform the action",
-        type: BannerType.WARN
-      })
+          message: 'Please login to perform the action',
+          type: BannerType.WARN,
+        });
+      }
     }
   }
+
+  
 
   goToDetailPage(productInfo: IProductInfo): void {
     
@@ -117,8 +121,8 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
   }
 
   updateWishListStatus(): void {
-    const productInWishList = this.cartWishListService.wishListProducts.find(p => {
-      return p.id === this.productInfo.id
+    const productInWishList = this.cartWishListService.wishListProducts.find(wishListProduct => {
+      return wishListProduct.productId === this.productInfo.id
     });
     this.productInfo.isInWishList = !!productInWishList;
   }
@@ -130,5 +134,17 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
     if (cartProductId) {
       this.cartWishListService.removeFromCart(cartProductId).subscribe();
     }
+  }
+
+  removeFromWishList(): void {
+    const productInWishList = this.cartWishListService.wishListProducts.find(wishListProduct => {
+      return wishListProduct.productId === this.productInfo.id
+    });
+    if (productInWishList) {
+      this.cartWishListService.removeFromWishList(productInWishList?.id).subscribe(_ => {
+        this.cartWishListService.wishListUpdated.next();
+      });
+    }
+    
   }
 }

@@ -5,10 +5,10 @@
       </header> 
     
       <div class="row">
-        <ng-container *ngIf="!products.length">
+        <ng-container *ngIf="!wishListProducts.length">
           <img class="img-fluid big-img" src="./../../../../../assets/my-images/no-products.jpg"/>
         </ng-container>
-        <ng-container *ngFor="let product of products">
+        <ng-container *ngFor="let product of wishListProducts">
           <div class="col-lg-4 col-md-6 col-sm-6">
             
              <rimss-product-info [productInfoConfig]="productInfoConfig" [productInfo]="product"></rimss-product-info>
