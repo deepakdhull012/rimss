@@ -5,6 +5,7 @@ export interface IUser {
     email: string;
     password: string;
     gender?: "M" | "F";
+    primaryAddressId?: number;
 }
 
 export interface ILoginCredentials {

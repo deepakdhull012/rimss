@@ -26,7 +26,7 @@
                             <ul>
                                 <li (click)="navigateTo(['user', 'cart']);$event.stopPropagation()"><a>Cart</a></li>
                                 <li (click)="navigateTo(['orders']);$event.stopPropagation()"><a>Orders</a></li>
-                                <li (click)="navigateTo(['auth']);$event.stopPropagation()"><a>Profile</a></li>
+                                <li (click)="navigateTo(['profile']);$event.stopPropagation()"><a>Profile</a></li>
                                 <li (click)="navigateTo(['user', 'wish-list']);$event.stopPropagation()"><a>Wish-list</a></li>
                                 <li *ngIf="isLoggedIn" (click)="logout();$event.stopPropagation()"><a>Logout</a></li>
                                 <li *ngIf="!isLoggedIn" (click)="login();$event.stopPropagation()"><a>Login</a></li>
