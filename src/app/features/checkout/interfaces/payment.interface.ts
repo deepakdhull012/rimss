@@ -1,0 +1,6 @@
+export enum PaymentMode {
+    CASH_ON_DELIVERY = "CASH_ON_DELIVERY",
+    CREDIT_DEBIT_CARD = "CREDIT_DEBIT_CARD",
+    NET_BANKING = "NET_BANKING",
+    WALLET = "WALLET"
+}

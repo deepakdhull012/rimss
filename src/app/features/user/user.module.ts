@@ -25,7 +25,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     MatButtonModule,
     UserRoutingModule
   ],
-  exports: [AddressCardComponent],
+  exports: [AddressComponent, AddressCardComponent],
   providers: [UserService]
 })
 export class UserModule { }

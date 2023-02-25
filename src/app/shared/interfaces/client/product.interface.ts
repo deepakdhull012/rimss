@@ -7,7 +7,7 @@ export interface IProductServer {
   productBrief: string;
   productDescription?: string;
   price: number;
-  priceAfterDiscount?: number;
+  priceAfterDiscount: number;
   currency: string;
   isOnOffer?: boolean;
   priceInfo?: string;

@@ -34,20 +34,26 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr *ngFor="let order of orderProducts">
                 <th class="order-image-holder">
-                    <img class="order-image" src="assets/images/items/8.webp">
+                    <img class="order-image" src="{{order.productImage}}">
                 </th>
-              <th scope="row">Niva Bupa product</th>
-              <td>June 11, 2019</td>
-              <td>Completed</td>
-              <td>30</td>
+              <th scope="row">{{order.productSummary}}</th>
+              <td>{{ order.orderDate | date}}</td>
+              <td>Order Accepted</td>
+              <td>{{order.discountedPrice}} Rs\-</td>
               <td>
                 <div><a routerLink="/order" class="btn btn-dark btn-small">View Product</a></div>
                 <div><a routerLink="/order" class="btn btn-dark btn-small">Track Order</a></div>
                 <div><a routerLink="/order" class="btn btn-dark btn-small">Cancel Order</a></div>
               </td>
             </tr>
+            <tr *ngIf="!orderProducts.length">
+              <th colspan="6" class="order-image-holder">
+                  No Orders found
+              </th>
+            
+          </tr>
           </tbody>
         </table>
       </div>

@@ -22,7 +22,7 @@
           <ng-container *ngIf="!cartProducts.length">
             <img class="img-fluid cart-image" src="./../../../../../assets/my-images/no-products.jpg"/>
           </ng-container>
-          <article *ngFor="let cartProduct of cartProducts" class="row gy-3 mb-4 mt-16">
+          <article *ngFor="let cartProduct of cartProducts; let i = index;" class="row gy-3 mb-4 mt-16">
             <div class="col-lg-5">
               <figure class="itemside me-lg-5">
                 <div class="aside"><img src="{{cartProduct.cartProductImage}}" class="img-sm img-thumbnail"></div>
@@ -33,7 +33,7 @@
               </figure>
             </div>
             <div class="col-lg-1 mt-16">
-              <select class="form-select">
+              <select class="form-select" (change)="updateQuantity($event, i)">
                 <option>1</option>
                 <option>2</option>	
                 <option>3</option>	
@@ -42,7 +42,7 @@
             </div>
             <div class="col-lg-3 col-sm-4 col-6 mt-16">
               <div class="price-wrap lh-sm"> 
-                <small class="text-muted">{{cartProduct.unitPrice }} * {{ cartProduct.quantity}} = {{cartProduct.unitPrice * cartProduct.quantity }} {{cartProduct.unitCurrency}} </small> 
+                <small class="text-muted"><del>{{cartProduct.unitPrice }}</del> {{cartProduct.discountedPrice }} * {{ cartProduct.quantity}} = <del>{{cartProduct.unitPrice * cartProduct.quantity }}</del> {{cartProduct.discountedPrice * cartProduct.quantity }} {{cartProduct.unitCurrency}} </small> 
               </div> <!-- price-wrap .// -->
             </div>
             <div class="col-lg-3 col-sm-4 mt-16">
@@ -68,15 +68,13 @@
     
         <div class="card mb-3">
         <div class="card-body">
-        <form>
           <div class="form-group">
             <label class="form-label">Have coupon?</label>
             <div class="input-group">
-              <input type="text" class="form-control" name="" placeholder="Coupon code">
-              <button class="btn btn-light">Apply</button>
+              <input #couponName type="text" class="form-control coupon-input" name="" placeholder="Coupon code">
+              <button (click)="applyCoupon(couponName.value)" color="primary" mat-button class="mat-button mat-raised-button apply-coupon">Apply</button>
             </div>
           </div>
-        </form>
         </div> <!-- card-body.// -->
         </div> <!-- card.// -->
     
@@ -84,25 +82,33 @@
         <div class="card-body">
           <dl class="dlist-align">
             <dt>Total price:</dt>
-            <dd class="text-end"> $329.00</dd>
+            <dd class="text-end"> {{ originalPriceSum }} Rs/-</dd>
           </dl>
           <dl class="dlist-align">
             <dt>Discount:</dt>
-            <dd class="text-end text-success"> - $60.00 </dd>
+            <dd class="text-end text-success"> {{ originalPriceSum - discountedPriceSum }} Rs/-</dd>
           </dl>
           <dl class="dlist-align">
             <dt>TAX:</dt>
-            <dd class="text-end"> $14.00 </dd>
+            <dd class="text-end"> {{ tax }} Rs/-</dd>
+          </dl>
+          <dl class="dlist-align">
+            <dt>Delivery Charges:</dt>
+            <dd class="text-end"> {{ deliveryCharges }} Rs/-</dd>
+          </dl>
+          <dl class="dlist-align" *ngIf="appliedCoupon">
+            <dt>Coupon Discount:</dt>
+            <dd class="text-end"> {{ couponDiscount }} Rs/-</dd>
           </dl>
           <hr>
           <dl class="dlist-align">
             <dt>Total:</dt>
-            <dd class="text-end text-dark h5"> $357.90 </dd>
+            <dd class="text-end text-dark h5"> {{ orderAmount }} Rs/- </dd>
           </dl>
           
           <div class="d-grid gap-2 my-3">
-            <a class="btn btn-success w-100" (click)="checkout()"> Make Purchase </a>
-            <a class="btn btn-light w-100"> Back to shop </a>
+            <a class="btn btn-success w-100 mt-16" (click)="checkout()"> Make Purchase </a>
+            <a class="btn btn-light w-100 mt-16"> Back to shop </a>
           </div>
         </div> <!-- card-body.// -->
         </div> <!-- card.// -->

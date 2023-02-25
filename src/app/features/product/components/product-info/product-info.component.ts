@@ -91,6 +91,7 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
         quantity: 1,
         unitCurrency: this.productInfo.currency,
         unitPrice: this.productInfo.price,
+        discountedPrice: this.productInfo.priceAfterDiscount,
         userEmail: loggedInUserEmail,
       })
       .subscribe((res) => {
@@ -115,7 +116,7 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
 
   updateCartStatus(): void {
     const productInCart = this.cartWishListService.cartProducts.find(p => {
-      return p.id === this.productInfo.id
+      return p.productId === this.productInfo.id
     });
     this.productInfo.isInCart = !!productInCart;
   }

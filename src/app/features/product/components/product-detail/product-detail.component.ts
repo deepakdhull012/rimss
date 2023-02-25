@@ -5,6 +5,7 @@ import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { AuthService } from 'src/app/features/authentication/services/auth.service';
 import { CartWishlistService } from 'src/app/features/cart-wishlist/services/cart-wishlist.service';
 import { BannerType } from 'src/app/shared/interfaces/client/banner.interface';
+import { IOrderProduct, IOrderSummary } from 'src/app/shared/interfaces/client/order.interface';
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
 import { BannerService } from 'src/app/shared/services/banner.service';
 import { ProductsService } from 'src/app/shared/services/products.service';
@@ -22,6 +23,8 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
   public qty = 1;
   public IProductDetailsTab = IProductDetailsTab;
   public activeTab: IProductDetailsTab = IProductDetailsTab.SPECIFICATION;
+  private orderSummary?: IOrderSummary;
+  private deliveryCharges = 40;
 
   constructor(
     private productService: ProductsService,
@@ -105,8 +108,45 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
   }
 
   gotoCheckout(): void {
-    this.router.navigate(['checkout']);
+    
+    const preTaxAmount = (this.product.priceAfterDiscount * this.qty) + this.deliveryCharges;
+    const tax = preTaxAmount / 10;
+    const orderAmount = preTaxAmount + tax;
+    this.orderSummary = {
+      deliveryCharges: this.deliveryCharges,
+      tax: tax,
+      discountedPrice: this.product.priceAfterDiscount,
+      originalPrice: this.product.price,
+      orderAmount,
+      productOrders: this.prepareOrderProducts(),
+      couponCode: "",
+      couponDiscount: 0,
+      fromcart: false
+    };
+    this.router.navigate(['checkout'], {
+      state: {
+        orderSummary: this.orderSummary,
+      },
+    });
   }
+  private prepareOrderProducts(): IOrderProduct[] {
+    const orderProducts: IOrderProduct[] = [];
+      const orderProduct: IOrderProduct = {
+        deliveryInfo: {
+          orderUpdateEvents: [],
+        },
+        discountedPrice: this.product.priceAfterDiscount,
+        originalPrice: this.product.price,
+        productId: this.product.id,
+        productSummary: this.product.productBrief,
+        productImage: this.product.mainImage,
+        qty: this.qty
+      };
+      orderProducts.push(orderProduct);
+
+    return orderProducts;
+  }
+
 
   addToCart(): void {
     const loggedInUserEmail = this.authService.getLoggedInEmail();
@@ -122,6 +162,7 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
           unitCurrency: this.product.currency,
           unitPrice: this.product.price,
           userEmail: loggedInUserEmail,
+          discountedPrice: this.product.priceAfterDiscount
         })
         .subscribe((res) => {
           this.bannerService.displayBanner.next({

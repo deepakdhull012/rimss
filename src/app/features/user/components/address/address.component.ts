@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntil } from 'rxjs';
@@ -16,6 +16,8 @@ export class AddressComponent extends BaseComponent implements OnInit {
   public addressForm: FormGroup = {} as FormGroup;
   public isEditMode = false;
   public isSubmitted = false;
+  @Input() standalone = true;
+  @Output() addressSave: EventEmitter<void> = new EventEmitter<void>();
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -57,7 +59,14 @@ export class AddressComponent extends BaseComponent implements OnInit {
         .addAddress(addressToPost)
         .pipe(takeUntil(this.componentDestroyed$))
         .subscribe(_ => {
-          this.router.navigate(['profile']);
+          if (this.standalone) {
+            this.router.navigate(['profile']);
+          } else {
+            this.isSubmitted = false;
+            this.composeForm();
+            this.addressSave.next();
+          }
+          
         });
     }
   }

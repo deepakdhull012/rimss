@@ -5,3 +5,14 @@
 .wish-list {
     color: grey;
 }
+.pImg img{
+    width: auto !important;
+    height: auto !important;
+}
+.info-wrap {
+    span {
+        height: 51px !important;
+    display: block;
+    overflow: hidden;
+    }
+}

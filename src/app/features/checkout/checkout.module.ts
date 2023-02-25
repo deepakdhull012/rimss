@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { CheckoutComponent } from './components/checkout/checkout.component';
 import { CheckoutRoutingModule } from './checkout.routes';
 import { UserModule } from '../user/user.module';
-import { MatRadioModule } from '@angular/material';
+import { MatButtonModule, MatRadioModule } from '@angular/material';
 
 
 
@@ -15,7 +15,8 @@ import { MatRadioModule } from '@angular/material';
     CommonModule,
     CheckoutRoutingModule,
     UserModule,
-    MatRadioModule
+    MatRadioModule,
+    MatButtonModule
   ]
 })
 export class CheckoutModule { }

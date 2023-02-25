@@ -9,7 +9,7 @@
     </address>
     <span *ngIf="address?.isPrimaryAddress" class="primary-badge">Default</span>
   </mat-card-content>
-  <mat-card-actions align="end">
+  <mat-card-actions *ngIf="!readMode" align="end">
     <button (click)="makeDefault()" [disabled]="address?.isPrimaryAddress" mat-button mat-raised-button color="primary">Mark default</button>
     <button (click)="editAddress()" mat-button mat-raised-button>Edit</button>
     <button (click)="deleteAddress()" mat-button mat-raised-button color="warn">Delete</button>

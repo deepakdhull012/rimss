@@ -11,6 +11,7 @@ import { UserService } from '../../services/user.service';
 export class AddressCardComponent extends BaseComponent implements OnInit {
 
   @Input() address?: IAddress;
+  @Input() readMode = false;
 
   constructor(private userService: UserService) { 
     super();

@@ -1,7 +1,7 @@
 <div class="account section">
-  <div class="container">
+  <div [ngClass]="{ 'container' : standalone === true } ">
     <div class="row justify-content-center">
-      <div class="col-lg-6 col-lg-offset-3">
+      <div [ngClass]="{ 'col-lg-6 col-lg-offset-3' : standalone === true, 'col-md-12': standalone === false } ">
         <div class="login-form border p-5">
           <form [formGroup]="addressForm" (ngSubmit)="onSubmit()">
             <div class="row">

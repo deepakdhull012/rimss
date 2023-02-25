@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
 import { Observable, of, Subject, takeUntil } from 'rxjs';
+import { environment } from 'src/environments/environment';
 import { IBrand, IFilterObject, IPriceRange } from '../interfaces/filter-config.interface';
 
 @Injectable({
@@ -8,7 +9,7 @@ import { IBrand, IFilterObject, IPriceRange } from '../interfaces/filter-config.
 })
 export class FilterService implements OnDestroy {
 
-  private BASE_URL = 'http://localhost:3000';
+  private BASE_URL = environment.BASE_API_URL;
 
   private serviceDestroyed$ = new Subject<void>();
   public onClear: Subject<void> = new Subject<void>();

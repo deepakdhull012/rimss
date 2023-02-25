@@ -6,6 +6,9 @@
   
   ::ng-deep {
    .radio-holder {
+    .mat-radio-label-content {
+        width: 100%;
+    }
     .cdk-visually-hidden {
         display: block;
         visibility: visible;
@@ -14,3 +17,21 @@
     }
    } 
   }
+
+  .add-new-address {
+    margin-bottom: 10px;
+  }
+
+  .payment-button {
+    margin-top: 16px;
+    margin-left: 15px;
+  }
+
+  .apply-coupon {
+    margin-left: 10px 0 10px 0;
+    height: 34px;
+}
+
+.coupon-input {
+    width: 100%;
+}

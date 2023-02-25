@@ -8,5 +8,5 @@
     <rimss-size-filter (sizeChange)="onSizeFilterChange($event)" *ngIf="filterConfig.sizeFilter"></rimss-size-filter>
     <mat-divider></mat-divider>
     <rimss-discount-filter (discountChange)="onDiscountFilterChange($event)" *ngIf="filterConfig.discountFilter"></rimss-discount-filter>
-    <button (click)="clearAll()">Clear all filters</button>
+    <button mat-button (click)="clearAll()">Clear all filters</button>
 </div>

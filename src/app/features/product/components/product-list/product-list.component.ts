@@ -40,6 +40,10 @@ export class ProductListComponent extends BaseComponent implements OnInit {
       } else {
         this.categories = categoryParam;
       }
+      if (this.categories?.length > 1) {
+        this.categories = [this.categories[this.categories.length - 1]]
+      }
+      
       if (mode === "banner-sale") {
         this.fetchproductsBasedOnCriteria();
       } else if (mode === "search") {
