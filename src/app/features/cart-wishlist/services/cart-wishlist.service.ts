@@ -1,17 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
 import {
-  filter,
-  Observable,
-  of,
-  Subject,
+  forkJoin,
+  Observable, Subject,
   switchMap,
   takeUntil,
-  tap,
+  tap
 } from 'rxjs';
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
 import { IWishList } from 'src/app/shared/interfaces/client/wish-list.interface';
-import { ProductsService } from 'src/app/shared/services/products.service';
+import { environment } from 'src/environments/environment';
 import { AuthService } from '../../authentication/services/auth.service';
 import { ICartProduct } from '../interfaces/cart-product.interface';
 
@@ -26,11 +24,13 @@ export class CartWishlistService implements OnDestroy {
   public cartUpdated: Subject<void> = new Subject<void>();
   public wishListUpdated: Subject<void> = new Subject<void>();
 
-  private BASE_URL = 'http://localhost:3000';
+  private BASE_URL = environment.BASE_API_URL;
   constructor(
     private httpClient: HttpClient,
     private authService: AuthService
-  ) {}
+  ) {
+   
+  }
 
   addProductToWishList(
     productId: number,
@@ -116,6 +116,15 @@ export class CartWishlistService implements OnDestroy {
           this.wishListUpdated.next();
         })
       );
+  }
+
+  clearCart(): Observable<any> {
+    const cartremoveRequest$: any[] = [];
+    this.cartProducts.forEach((cartProduct) => {
+      const removeCartReq = this.removeFromCart(cartProduct.id as number);
+      cartremoveRequest$.push(removeCartReq);
+    });
+    return forkJoin(cartremoveRequest$);
   }
 
   ngOnDestroy(): void {

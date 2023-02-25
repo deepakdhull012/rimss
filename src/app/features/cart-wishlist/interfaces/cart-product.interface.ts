@@ -7,6 +7,7 @@ export interface ICartProduct {
     userEmail: string;
     unitPrice: number;
     unitCurrency: string;
+    discountedPrice: number;
     cartAddDate: Date;
     cartProductImage: string;
 }

@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
 import { Observable, of, Subject, takeUntil, tap } from 'rxjs';
+import { environment } from 'src/environments/environment';
 import { IUser } from '../../authentication/interfaces/user.interface';
 import { AuthService } from '../../authentication/services/auth.service';
 import { IAddress } from '../interfaces/profile.interface';
@@ -9,7 +10,7 @@ import { IAddress } from '../interfaces/profile.interface';
 export class UserService implements OnDestroy {
   private userEmail?: string;
   private serviceDestroyed$ = new Subject<void>();
-  private BASE_URL = 'http://localhost:3000';
+  private BASE_URL = environment.BASE_API_URL;
   public addressUpdated$ = new Subject<void>();
 
   constructor(private authService: AuthService, private http: HttpClient) {

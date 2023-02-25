@@ -35,6 +35,13 @@ a {
     clear: both !important;
 }
 
+.cdk-visually-hidden {
+    display: block;
+    visibility: visible;
+    -webkit-appearance: auto;
+    position: inherit;
+}
+
 mat-error {
     color: red;
 }
@@ -59,8 +66,13 @@ mat-checkbox, mat-radio-group {
     }
     .mat-checkbox-label, .mat-radio-label {
         font-weight: normal;
+        margin-left: 10px;
     }
     .mat-radio-label {
         margin-right: 10px;
     }
+}
+
+.mat-expansion-panel-header {
+    padding: 10px 15px !important;
 }

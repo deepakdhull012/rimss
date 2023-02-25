@@ -5,12 +5,14 @@ import { IFilterCriteria, IProductInfo, IProductServer } from '../interfaces/cli
 import { ICategory } from '../interfaces/client/category.interface';
 import { IBannerSale } from 'src/app/features/landing/interfaces/banner-sale.interface';
 import { SortBy } from 'src/app/features/product/interfaces/product-info.interface';
+import { ICoupon } from '../interfaces/client/order.interface';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductsService implements OnDestroy {
-  private BASE_URL = 'http://localhost:3000';
+  private BASE_URL = environment.BASE_API_URL;
 
   private serviceDestroyed$ = new Subject<void>();
 
@@ -53,6 +55,12 @@ export class ProductsService implements OnDestroy {
   getProductsBySearch(searchText: string): Observable<Array<IProductInfo>> {
     return this.http
       .get<Array<IProductInfo>>(`${this.BASE_URL}/products?q=${searchText}`)
+      .pipe(takeUntil(this.serviceDestroyed$));
+  }
+
+  fetchCoupons(): Observable<ICoupon[]> {
+    return this.http
+      .get<Array<ICoupon>>(`${this.BASE_URL}/coupons`)
       .pipe(takeUntil(this.serviceDestroyed$));
   }
 
@@ -105,6 +113,8 @@ export class ProductsService implements OnDestroy {
     }
     return filterString;
   }
+
+  
 
   ngOnDestroy(): void {
     this.serviceDestroyed$.next();

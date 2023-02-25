@@ -2,13 +2,14 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { map, mergeMap, Observable, of, switchMap } from 'rxjs';
+import { environment } from 'src/environments/environment';
 import { ILoginCredentials, IUser } from '../interfaces/user.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private BASE_URL = 'http://localhost:3000';
+  private BASE_URL = environment.BASE_API_URL;
   public loggedInUser?: IUser;
 
   constructor(private http: HttpClient, private router: Router) {}
