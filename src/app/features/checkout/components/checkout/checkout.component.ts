@@ -39,7 +39,7 @@ export class CheckoutComponent extends BaseComponent implements OnInit {
   ngOnInit(): void {
     this.loggedInEmail = this.authService.getLoggedInEmail();
     this.loggedInUser = this.authService.getUser();
-    this.orderSummary = window.history.state.orderSummary;
+    this.orderSummary = window.history.state?.orderSummary;
     this.fetchAddresses();
   }
 
