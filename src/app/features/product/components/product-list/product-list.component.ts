@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { filter, takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
@@ -29,8 +29,15 @@ export class ProductListComponent extends BaseComponent implements OnInit {
   public SortBy = SortBy;
 
   ngOnInit(): void {
+    this.router.events
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe((event) => {
+        if (event instanceof NavigationStart) {
+          this.page = 1;
+        }
+      });
     this.route.queryParams.subscribe((params) => {
-      const mode: "banner-sale" | "category" | "search"  = params['mode'];
+      const mode: 'banner-sale' | 'category' | 'search' = params['mode'];
       this.saleId = params['saleId'];
       const searchText = params['search'];
       const categoryParam = params['category'];
@@ -41,22 +48,20 @@ export class ProductListComponent extends BaseComponent implements OnInit {
         this.categories = categoryParam;
       }
       if (this.categories?.length > 1) {
-        this.categories = [this.categories[this.categories.length - 1]]
+        this.categories = [this.categories[this.categories.length - 1]];
       }
-      
-      if (mode === "banner-sale") {
+
+      if (mode === 'banner-sale') {
         this.fetchproductsBasedOnCriteria();
-      } else if (mode === "search") {
+      } else if (mode === 'search') {
         this.productsService
-        .getProductsBySearch(searchText)
-        .subscribe((products) => {
-          this.products = products;
-        });
-      }  else {
+          .getProductsBySearch(searchText)
+          .subscribe((products) => {
+            this.products = products;
+          });
+      } else {
         this.fetchproductsBasedOnCriteria();
       }
-      
-      
     });
   }
 
@@ -76,18 +81,20 @@ export class ProductListComponent extends BaseComponent implements OnInit {
       this.sortByValue = sortBy;
       this.fetchproductsBasedOnCriteria();
     }
-    
   }
 
   private fetchproductsBasedOnCriteria(): void {
     this.productsService
-        .filterProductsByCriteria({
+      .filterProductsByCriteria(
+        {
           category: this.categories,
           filterString: this.filterString,
-          saleId: this.saleId
-        }, this.sortByValue)
-        .subscribe((products) => {
-          this.products = products;
-        });
+          saleId: this.saleId,
+        },
+        this.sortByValue
+      )
+      .subscribe((products) => {
+        this.products = products;
+      });
   }
 }

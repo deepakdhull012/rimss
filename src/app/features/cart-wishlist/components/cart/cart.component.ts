@@ -143,7 +143,6 @@ export class CartComponent extends BaseComponent implements OnInit {
   }
 
   private updateAmounts(): void {
-    
     this.originalPriceSum = 0;
     this.discountedPriceSum = 0;
     this.cartProducts.forEach((product) => {
