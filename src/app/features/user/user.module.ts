@@ -6,7 +6,9 @@ import { UserComponent } from './components/user/user.component';
 import { UserRoutingModule } from './user-routing.module';
 import { UserService } from './services/user.service';
 import { AddressCardComponent } from './components/address-card/address-card.component';
-import { MatButtonModule, MatCardModule, MatFormFieldModule } from '@angular/material';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { ReactiveFormsModule } from '@angular/forms';
 
 

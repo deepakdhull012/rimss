@@ -6,7 +6,10 @@ import { RatingFilterComponent } from './components/rating-filter/rating-filter.
 import { DiscountFilterComponent } from './components/discount-filter/discount-filter.component';
 import { SizeFilterComponent } from './components/size-filter/size-filter.component';
 import { FilterComponent } from './filter.component';
-import { MatButtonModule, MatCheckboxModule, MatDividerModule, MatExpansionModule } from '@angular/material';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { StarRatingModule } from 'angular-star-rating'
 
 

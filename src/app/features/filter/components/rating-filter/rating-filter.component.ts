@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { MatCheckboxChange, MatSelectChange } from '@angular/material';
+import { MatCheckboxChange } from '@angular/material/checkbox';
 import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { IFilterRating } from '../../interfaces/filter-config.interface';
