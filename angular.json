@@ -69,10 +69,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "rimss:build:production"
+              "buildTarget": "rimss:build:production"
             },
             "development": {
-              "browserTarget": "rimss:build:development"
+              "buildTarget": "rimss:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -80,7 +80,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "rimss:build"
+            "buildTarget": "rimss:build"
           }
         },
         "test": {
