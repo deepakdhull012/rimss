@@ -16,45 +16,33 @@ export class SignupComponent extends BaseComponent implements OnInit {
 
   public signupForm: FormGroup = {} as FormGroup;
   public isSubmitted = false;
+  
   constructor(
     private router: Router,
-    private route: ActivatedRoute,
     private fb: FormBuilder,
     private authService: AuthService
   ) {
     super();
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.composeForm();
   }
 
-  composeForm(): void {
-    this.signupForm = this.fb.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(PASSWORD_MIN_LENGTH)]],
-      confirmPassword: ['', [Validators.required, Validators.minLength(PASSWORD_MIN_LENGTH)]],
-      gender: ['M', Validators.required]
-    })
-  }
-
-  navigateTo(path: Array<string>) {
+  public navigateTo(path: Array<string>): void {
     this.router.navigate(path);
   }
 
-  onSubmit() {
+  public onSubmit(): void {
     this.isSubmitted = true;
     if (this.signupForm.valid) {
       const userToPost = this.mapToUserInfo();
-      this.authService.signup(userToPost).pipe(takeUntil(this.componentDestroyed$)).subscribe(res => {
-      })
+      this.authService.signup(userToPost).pipe(takeUntil(this.componentDestroyed$)).subscribe();
     }
   }
 
-  getError(controlName: string): string | null{
-    const hasError = this.controlTouched(controlName) ? this.signupForm.get(controlName)?.invalid || false : false;
+  public getError(controlName: string): string | null {
+    const hasError = this.isControlTouched(controlName) ? this.signupForm.get(controlName)?.invalid || false : false;
     if (hasError) {
       const errors = this.signupForm.get(controlName)?.errors;
       console.error("errors", errors)
@@ -71,11 +59,11 @@ export class SignupComponent extends BaseComponent implements OnInit {
     return null;
   }
 
-  controlTouched(controlName: string): boolean {
+  private isControlTouched(controlName: string): boolean {
     return this.signupForm.get(controlName)?.touched || this.isSubmitted;
   }
 
-  mapToUserInfo(): IUser {
+  private mapToUserInfo(): IUser {
     return {
       firstName: this.signupForm.get('firstName')?.value,
       lastName: this.signupForm.get('lastName')?.value,
@@ -83,5 +71,16 @@ export class SignupComponent extends BaseComponent implements OnInit {
       password: this.signupForm.get('password')?.value,
       gender: this.signupForm.get('gender')?.value
     }
+  }
+
+  private composeForm(): void {
+    this.signupForm = this.fb.group({
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(PASSWORD_MIN_LENGTH)]],
+      confirmPassword: ['', [Validators.required, Validators.minLength(PASSWORD_MIN_LENGTH)]],
+      gender: ['M', Validators.required]
+    })
   }
 }

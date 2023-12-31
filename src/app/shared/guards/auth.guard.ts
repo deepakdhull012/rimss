@@ -11,7 +11,8 @@ export class AuthGuard  {
   constructor(private router: Router, private bannerService: BannerService) {
 
   }
-  canActivate(
+  
+  public canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
       const token = localStorage.getItem("token");

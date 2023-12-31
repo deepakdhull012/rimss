@@ -8,28 +8,25 @@ import { FilterService } from '../../services/filter.service';
 @Component({
   selector: 'rimss-brand-filter',
   templateUrl: './brand-filter.component.html',
-  styleUrls: ['./brand-filter.component.scss']
+  styleUrls: ['./brand-filter.component.scss'],
 })
 export class BrandFilterComponent extends BaseComponent implements OnInit {
   public brands: Array<IBrand> = [];
   public selectedBrands: Array<number> = [];
-  @Output() brandsChange: EventEmitter<Array<number>> = new EventEmitter<Array<number>>();
+  @Output() brandsChange: EventEmitter<Array<number>> = new EventEmitter<
+    Array<number>
+  >();
 
   constructor(private filterService: FilterService) {
     super();
-   }
-
-  ngOnInit(): void {
-    this.filterService.onClear.pipe(takeUntil(this.componentDestroyed$)).subscribe(_ => {
-      this.selectedBrands = [];
-      this.brandsChange.next(this.selectedBrands);
-    });
-    this.filterService.getBrands().pipe(takeUntil(this.componentDestroyed$)).subscribe(brands => {
-      this.brands = brands;
-    })
   }
 
-  onBrandsChange(event: MatCheckboxChange): void {
+  public ngOnInit(): void {
+    this.fetchBrands();
+    this.handleClear();
+  }
+
+  public onBrandsChange(event: MatCheckboxChange): void {
     if (event.checked) {
       this.selectedBrands.push(+event.source.value);
     } else {
@@ -39,4 +36,25 @@ export class BrandFilterComponent extends BaseComponent implements OnInit {
     this.brandsChange.next(this.selectedBrands);
   }
 
+  private handleClear(): void {
+    this.filterService.onClear
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe({
+        next: (_) => {
+          this.selectedBrands = [];
+          this.brandsChange.next(this.selectedBrands);
+        },
+      });
+  }
+
+  private fetchBrands(): void {
+    this.filterService
+      .getBrands()
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe({
+        next: (brands) => {
+          this.brands = brands;
+        },
+      });
+  }
 }

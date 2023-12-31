@@ -18,13 +18,6 @@ import { CartWishlistService } from '../../services/cart-wishlist.service';
   styleUrls: ['./cart.component.scss'],
 })
 export class CartComponent extends BaseComponent implements OnInit {
-  constructor(
-    private router: Router,
-    private cartService: CartWishlistService,
-    private productsService: ProductsService
-  ) {
-    super();
-  }
   public cartProducts: Array<ICartProduct> = [];
   public recommendedProducts: Array<IProductInfo> = [];
   public originalPriceSum = 0;
@@ -37,12 +30,20 @@ export class CartComponent extends BaseComponent implements OnInit {
   private coupons: ICoupon[] = [];
   public appliedCoupon?: ICoupon;
 
-  ngOnInit(): void {
+  constructor(
+    private router: Router,
+    private cartService: CartWishlistService,
+    private productsService: ProductsService
+  ) {
+    super();
+  }
+
+  public ngOnInit(): void {
     this.fetchCartProducts();
     this.fetchCoupons();
   }
 
-  checkout(): void {
+  public checkout(): void {
     this.orderSummary = {
       deliveryCharges: this.deliveryCharges,
       tax: this.tax,
@@ -52,7 +53,7 @@ export class CartComponent extends BaseComponent implements OnInit {
       productOrders: this.prepareOrderProducts(),
       couponCode: this.appliedCoupon?.name,
       couponDiscount: this.couponDiscount,
-      fromcart: true
+      fromcart: true,
     };
     this.router.navigate(['checkout'], {
       state: {
@@ -61,7 +62,50 @@ export class CartComponent extends BaseComponent implements OnInit {
     });
   }
 
-  prepareOrderProducts(): IOrderProduct[] {
+  public removeFromCart(cartProduct: ICartProduct): void {
+    this.cartService
+      .removeFromCart(cartProduct.id as number)
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe((res) => {
+        this.fetchCartProducts();
+      });
+  }
+
+  public applyCoupon(couponName: string): void {
+    this.appliedCoupon = this.coupons.find((coupon) => {
+      return coupon.name === couponName;
+    });
+    this.updateAmounts();
+  }
+
+  public updateQuantity(selectEvent: Event, cartItemIndex: number) {
+    if (selectEvent.target) {
+      const qty: number = (selectEvent.target as any).value;
+      this.cartProducts[cartItemIndex].quantity = qty;
+    }
+    this.updateAmounts();
+  }
+
+  private fetchCartProducts(): void {
+    this.cartService
+      .getCartProducts()
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe((cartProducts) => {
+        this.cartProducts = cartProducts;
+        this.updateAmounts();
+      });
+  }
+
+  private fetchCoupons(): void {
+    this.productsService
+      .fetchCoupons()
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe((coupons) => {
+        this.coupons = coupons;
+      });
+  }
+
+  private prepareOrderProducts(): IOrderProduct[] {
     const orderProducts: IOrderProduct[] = [];
     this.cartProducts.forEach((cartProduct) => {
       const orderProduct: IOrderProduct = {
@@ -73,7 +117,7 @@ export class CartComponent extends BaseComponent implements OnInit {
         productId: cartProduct.productId,
         productSummary: cartProduct.productBrief,
         productImage: cartProduct.cartProductImage,
-        qty: cartProduct.quantity
+        qty: cartProduct.quantity,
       };
       orderProducts.push(orderProduct);
     });
@@ -81,66 +125,7 @@ export class CartComponent extends BaseComponent implements OnInit {
     return orderProducts;
   }
 
-  removeFromCart(cartProduct: ICartProduct): void {
-    this.cartService
-      .removeFromCart(cartProduct.id as number)
-      .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((res) => {
-        this.fetchCartProducts();
-      });
-  }
-
-  fetchCartProducts(): void {
-    this.cartService
-      .getCartProducts()
-      .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((cartProducts) => {
-        this.cartProducts = cartProducts;
-        this.updateAmounts();
-      });
-  }
-
-  fetchCoupons(): void {
-    this.productsService
-      .fetchCoupons()
-      .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((coupons) => {
-        this.coupons = coupons;
-      });
-  }
-
-  fetchRecommendedProducts(): void {}
-
-  applyCoupon(couponName: string): void {
-    this.appliedCoupon = this.coupons.find((coupon) => {
-      return coupon.name === couponName;
-    });
-    this.updateAmounts();
-  }
-
-  checkCoupon(): void {
-    if (this.appliedCoupon) {
-      console.error(this.discountedPriceSum, this.appliedCoupon.minAmount)
-      if (this.discountedPriceSum >= this.appliedCoupon.minAmount) {
-        this.couponDiscount =
-          this.appliedCoupon.type === 'flat'
-            ? this.appliedCoupon.amount
-            : (this.discountedPriceSum * this.appliedCoupon.amount) / 100;
-      } else {
-        this.couponDiscount = 0;
-      }
-    } else {
-      this.couponDiscount = 0;
-    }
-  }
-
-  updateQuantity(selectEvent: Event, cartItemIndex: number) {
-    if (selectEvent.target) {
-      const qty: number = (selectEvent.target as any).value;
-      this.cartProducts[cartItemIndex].quantity = qty;
-    }
-    this.updateAmounts();
-  }
+  private fetchRecommendedProducts(): void {}
 
   private updateAmounts(): void {
     this.originalPriceSum = 0;
@@ -156,5 +141,21 @@ export class CartComponent extends BaseComponent implements OnInit {
       this.deliveryCharges +
       this.tax -
       this.couponDiscount;
+  }
+
+  private checkCoupon(): void {
+    if (this.appliedCoupon) {
+      console.error(this.discountedPriceSum, this.appliedCoupon.minAmount);
+      if (this.discountedPriceSum >= this.appliedCoupon.minAmount) {
+        this.couponDiscount =
+          this.appliedCoupon.type === 'flat'
+            ? this.appliedCoupon.amount
+            : (this.discountedPriceSum * this.appliedCoupon.amount) / 100;
+      } else {
+        this.couponDiscount = 0;
+      }
+    } else {
+      this.couponDiscount = 0;
+    }
   }
 }

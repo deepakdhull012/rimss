@@ -1,29 +1,33 @@
 <div class="login-holder">
     <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-lg-6 col-lg-offset-3">
-          <div class="login-form border p-5">
-            <div class="text-center heading">
-              <!-- <h2 class="mb-2">Login</h2> -->
-              
-            </div>
-  
+      <div class="row">
+
+        <!-- Left section image -->
+        <div class="col-lg-6">
+          <img src="assets/images/login1.png" alt="Your Image" class="full-screen-image">
+        </div>
+        <!-- Right side login setion -->
+
+        <div class="col-lg-6">
+          <div class="login-form mt-5">
+
             <form [formGroup]="loginForm" (ngSubmit)="login()">
               <div class="form-group mb-4">
                 <input formControlName="email" type="text" class="form-control" placeholder="Enter Username">
                 <mat-error *ngIf="getError('email')">{{ getError('email') }}</mat-error>
               </div>
-              <div class="form-group">
-               
+              <div class="form-group mb-4">
                 <input formControlName="password" type="password" class="form-control" placeholder="Enter Password"> 
                 <mat-error *ngIf="getError('password')">{{ getError('password') }}</mat-error>
               </div>
   
-              <button type="submit" class="btn btn-primary mt-3 btn-block">Login</button>
+              <button type="submit" class="btn btn-primary mt-3">Login</button>
 
-              <a class="float-right mt-16" href="">Forget password?</a>
+              <a href="" class="stretched-link float-right mt-16">Forgot password?</a>
 
-              <p class="lead mt-16">Don’t have an account? <a (click)="goToSignup()">Create a free account</a></p>
+              <p class="mt-16"><span class="">Don’t have an account? </span>
+                <a [routerLink]="['signup']" class="stretched-link">Create a free account</a>
+              </p>
             </form>
           </div>
         </div>

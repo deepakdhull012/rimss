@@ -16,8 +16,8 @@ import { IBannerSale } from '../../interfaces/banner-sale.interface';
   styleUrls: ['./landing.component.scss'],
 })
 export class LandingComponent extends BaseComponent implements OnInit {
-  options: ngxLightOptions = {} as ngxLightOptions;
-  bannerSales: Array<IBannerSale> = [];
+  public options: ngxLightOptions = {} as ngxLightOptions;
+  public bannerSales: Array<IBannerSale> = [];
   public salesLoaded = false;
   public newProducts: Array<IProductInfo> = [];
   public recommendedProducts: Array<IProductInfo> = [];
@@ -25,20 +25,33 @@ export class LandingComponent extends BaseComponent implements OnInit {
   constructor(
     private router: Router,
     private productsService: ProductsService,
-    private cartWishlistService: CartWishlistService,
-    private authService: AuthService
+    private cartWishlistService: CartWishlistService
   ) {
     super();
     this.initCarouselConfig();
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.initSliderImages();
     this.initNewProducts();
     this.initRecommendedProducts();
   }
 
-  initCarouselConfig(): void {
+  public goToDetailPage(product: IProductInfo) {
+    this.productsService.productSelected = product;
+    this.router.navigate(['product', `${product.id}`]);
+  }
+
+  public goToSalePage(bannerSale: IBannerSale): void {
+    this.router.navigate(['products', 'list'], {
+      queryParams: {
+        saleId: bannerSale.saleId,
+        mode: 'banner-sale',
+      },
+    });
+  }
+
+  private initCarouselConfig(): void {
     this.options = {
       scroll: {
         numberToScroll: 1,
@@ -78,70 +91,64 @@ export class LandingComponent extends BaseComponent implements OnInit {
     };
   }
 
-  initSliderImages(): void {
+  private initSliderImages(): void {
     this.productsService
       .fetchAllBannerSales()
       .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe(
-        (bannerSales) => {
+      .subscribe({
+        next: (bannerSales) => {
           this.bannerSales = bannerSales;
           this.salesLoaded = true;
           console.error('banner sales', this.bannerSales);
         },
-        (err) => {
+        error: (err) => {
           this.bannerSales = [];
           this.salesLoaded = true;
-        }
-      );
+        },
+      });
   }
 
-  initNewProducts(): void {
+  private initNewProducts(): void {
     const wishList$ = this.cartWishlistService.getWishListProducts();
     const newProducts$ = this.productsService.fetchAllProducts();
-    forkJoin([wishList$, newProducts$]).subscribe((response) => {
-      this.newProducts = response[1];
-      this.newProducts.forEach((product) => {
-        product.isInWishList = this.isInWishList(product.id);
+    forkJoin([wishList$, newProducts$])
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe({
+        next: (response) => {
+          this.newProducts = response[1];
+          this.newProducts.forEach((product) => {
+            product.isInWishList = this.isInWishList(product.id);
+          });
+        },
       });
-    });
   }
 
-  isInWishList(productId: number): boolean {
-    const wishListProduct = this.cartWishlistService.wishListProducts.find((wishList) => {
-      return wishList.productId === productId;
-    });
+  private isInWishList(productId: number): boolean {
+    const wishListProduct = this.cartWishlistService.wishListProducts.find(
+      (wishList) => {
+        return wishList.productId === productId;
+      }
+    );
     return !!wishListProduct;
   }
 
-  initRecommendedProducts(): void {
-    const userGender = JSON.parse(localStorage.getItem("loggedInUser") || "{}")?.gender;
+  private initRecommendedProducts(): void {
+    const userGender = JSON.parse(
+      localStorage.getItem('loggedInUser') || '{}'
+    )?.gender;
     let cats: Array<string> = [];
     if (userGender === 'M') {
-      cats = ["A"];
+      cats = ['A'];
     } else if (userGender === 'F') {
-      cats = ["G"];
+      cats = ['G'];
     }
     this.productsService
-        .filterProductsByCriteria({
-          category: cats
-        })
-        .pipe(takeUntil(this.componentDestroyed$))
-        .subscribe((recommendedProducts) => {
-          this.recommendedProducts = recommendedProducts;
-        });
-  }
-
-  goToDetailPage(product: IProductInfo) {
-    this.productsService.productSelected = product;
-    this.router.navigate(['product', `${product.id}`]);
-  }
-
-  goToSalePage(bannerSale: IBannerSale): void {
-    this.router.navigate(['products', 'list'], {
-      queryParams: {
-        saleId: bannerSale.saleId,
-        mode: 'banner-sale',
-      },
-    });
+      .filterProductsByCriteria({
+        category: cats,
+      })
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe((recommendedProducts) => {
+        this.recommendedProducts = recommendedProducts;
+      });
   }
 }

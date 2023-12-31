@@ -19,7 +19,7 @@ export class OrderService implements OnDestroy {
    * Create the order
    * @returns IOrder[]
    */
-  fetchOrder(): Observable<IOrder[]> {
+  public fetchOrder(): Observable<IOrder[]> {
     return this.http.get<IOrder[]>(`${this.BASE_URL}/orders`).pipe(takeUntil(this.serviceDestroyed$));
     
   }
@@ -29,13 +29,13 @@ export class OrderService implements OnDestroy {
    * @param order : IOrder
    * @returns void
    */
-  makeOrder(order: IOrder): Observable<void> {
+  public makeOrder(order: IOrder): Observable<void> {
     return this.http.post<void>(`${this.BASE_URL}/orders`, order).pipe(takeUntil(this.serviceDestroyed$));
   }
   /**
    * On destroy life cycle hook
    */
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
       this.serviceDestroyed$.next();
   }
 }

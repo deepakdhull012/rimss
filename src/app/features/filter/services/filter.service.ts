@@ -4,9 +4,7 @@ import { Observable, of, Subject, takeUntil } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { IBrand, IFilterObject, IPriceRange } from '../interfaces/filter-config.interface';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class FilterService implements OnDestroy {
 
   private BASE_URL = environment.BASE_API_URL;

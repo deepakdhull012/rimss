@@ -7,29 +7,25 @@ import { FilterService } from '../../services/filter.service';
 @Component({
   selector: 'rimss-size-filter',
   templateUrl: './size-filter.component.html',
-  styleUrls: ['./size-filter.component.scss']
+  styleUrls: ['./size-filter.component.scss'],
 })
 export class SizeFilterComponent extends BaseComponent implements OnInit {
   public sizes: Array<string> = [];
   public selectedSizes: Array<string> = [];
-  @Output() sizeChange: EventEmitter<Array<string>> =
-    new EventEmitter<Array<string>>();
+  @Output() sizeChange: EventEmitter<Array<string>> = new EventEmitter<
+    Array<string>
+  >();
 
-  constructor(private filterService: FilterService) { 
+  constructor(private filterService: FilterService) {
     super();
   }
 
-  ngOnInit(): void {
-    this.filterService.onClear.pipe(takeUntil(this.componentDestroyed$)).subscribe(_ => {
-      this.selectedSizes = [];
-      this.sizeChange.next(this.selectedSizes);
-    });
-    this.filterService.getSizes().pipe(takeUntil(this.componentDestroyed$)).subscribe(sizes => {
-      this.sizes = sizes;
-    })
+  public ngOnInit(): void {
+    this.handleClear();
+    this.fetchSizes();
   }
 
-  onSizeChange(event: MatCheckboxChange): void {
+  public onSizeChange(event: MatCheckboxChange): void {
     const size = event.source.value;
     if (event.checked) {
       this.selectedSizes.push(size);
@@ -40,4 +36,23 @@ export class SizeFilterComponent extends BaseComponent implements OnInit {
     this.sizeChange.next(this.selectedSizes);
   }
 
+  private handleClear(): void {
+    this.filterService.onClear
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe((_) => {
+        this.selectedSizes = [];
+        this.sizeChange.next(this.selectedSizes);
+      });
+  }
+
+  private fetchSizes(): void {
+    this.filterService
+      .getSizes()
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe({
+        next: (sizes) => {
+          this.sizes = sizes;
+        },
+      });
+  }
 }

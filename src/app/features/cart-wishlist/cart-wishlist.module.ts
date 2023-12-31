@@ -6,20 +6,17 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { ProductModule } from '../product/product.module';
 import { CartWishListRoutingModule } from './cart-wishlist.routes';
 import { MatButtonModule } from '@angular/material/button';
-
-
+import { CartWishlistService } from './services/cart-wishlist.service';
 
 @NgModule({
-  declarations: [
-    CartComponent,
-    WishlistComponent
-  ],
+  declarations: [CartComponent, WishlistComponent],
   imports: [
     CommonModule,
     SharedModule,
     CartWishListRoutingModule,
     ProductModule,
-    MatButtonModule
-  ]
+    MatButtonModule,
+  ],
+  providers: [CartWishlistService],
 })
-export class CartWishlistModule { }
+export class CartWishlistModule {}

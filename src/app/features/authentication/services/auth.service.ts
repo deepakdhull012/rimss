@@ -6,7 +6,7 @@ import { environment } from 'src/environments/environment';
 import { ILoginCredentials, IUser } from '../interfaces/user.interface';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private BASE_URL = environment.BASE_API_URL;
@@ -14,7 +14,7 @@ export class AuthService {
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  signup(user: IUser): Observable<boolean> {
+  public signup(user: IUser): Observable<boolean> {
     return this.http.post(`${this.BASE_URL}/users`, user).pipe(
       map((res) => {
         return true;
@@ -22,53 +22,48 @@ export class AuthService {
     );
   }
 
-  login(credentials: ILoginCredentials): Observable<string | null> {
+  public login(credentials: ILoginCredentials): Observable<boolean> {
     return this.http
       .get<Array<IUser>>(
         `${this.BASE_URL}/users?email=${credentials.email}&password=${credentials.password}`
       )
       .pipe(
-        map((matchingUsers) => {
-          if(matchingUsers?.length) {
+        map((matchingUsers: any[]) => {
+          if (matchingUsers?.length) {
             const matchingUserEmail = matchingUsers[0].email;
             this.loggedInUser = matchingUsers[0];
-            localStorage.setItem("loggedInUser", JSON.stringify(this.loggedInUser));
-            localStorage.setItem("loggedInEmail", matchingUserEmail);
-            return this.getToken();
+            localStorage.setItem(
+              'loggedInUser',
+              JSON.stringify(this.loggedInUser)
+            );
+            localStorage.setItem('loggedInEmail', matchingUserEmail);
+            return true;
           } else {
-            return null;
+            return false;
           }
-          
         })
       );
   }
 
-  private getToken() {
-    return this.randomGenerator() + this.randomGenerator(); // to make it longer
-  }
-
-  private randomGenerator(): string {
-    return Math.random().toString(36).substr(2);
-  }
-
   public getUser(): IUser | undefined {
-    return this.loggedInUser || JSON.parse(localStorage.getItem("loggedInUser") || "{}");
-
+    return (
+      this.loggedInUser ||
+      JSON.parse(localStorage.getItem('loggedInUser') || '{}')
+    );
   }
 
-  logout(): void {
-    localStorage.removeItem("token");
-    localStorage.removeItem("loggedInEmail");
-    localStorage.removeItem("loggedInUser");
+  public logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('loggedInEmail');
+    localStorage.removeItem('loggedInUser');
     this.router.navigate(['auth']);
   }
 
-  getLoggedInEmail(): string | undefined {
-    if (localStorage.getItem("token")) {
-      return localStorage.getItem("loggedInEmail") || undefined;
+  public getLoggedInEmail(): string | undefined {
+    if (localStorage.getItem('token')) {
+      return localStorage.getItem('loggedInEmail') || undefined;
     } else {
       return undefined;
     }
-    
   }
 }

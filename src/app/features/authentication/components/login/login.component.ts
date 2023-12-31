@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { BannerType } from 'src/app/shared/interfaces/client/banner.interface';
 import { BannerService } from 'src/app/shared/services/banner.service';
 import { PASSWORD_MIN_LENGTH } from '../../consts/auth.const';
@@ -17,30 +17,16 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private route: ActivatedRoute,
     private fb: FormBuilder,
     private authService: AuthService,
     private bannerService: BannerService
   ) {}
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.composeForm();
   }
 
-  goToSignup() {
-    this.router.navigate(['signup'], {
-      relativeTo: this.route,
-    });
-  }
-
-  composeForm(): void {
-    this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required]],
-    });
-  }
-
-  login() {
+  public login(): void {
     this.isSubmitted = true;
     if (this.loginForm.valid) {
       this.authService
@@ -48,14 +34,12 @@ export class LoginComponent implements OnInit {
         email: this.loginForm.value['email'],
         password: this.loginForm.value['password'],
       })
-      .subscribe((token) => {
-        if (token) {
+      .subscribe((success: boolean) => {
+        if (success) {
           const redirectionPage = sessionStorage.getItem('redirectionPage');
           if (!redirectionPage) {
             this.router.navigate(['products', 'list']);
           }
-          localStorage.setItem('token', token);
-          console.log('token is', token);
         } else {
           this.bannerService.displayBanner.next({
             closeIcon: true,
@@ -73,18 +57,16 @@ export class LoginComponent implements OnInit {
         type: BannerType.ERROR
       })
     }
-    
   }
 
-  getError(controlName: string): string | null{
-    const hasError = this.controlTouched(controlName) ? this.loginForm.get(controlName)?.invalid || false : false;
+  public getError(controlName: string): string | null {
+    const hasError = this.isControlTouched(controlName) ? this.loginForm.get(controlName)?.invalid || false : false;
     if (hasError) {
       const errors = this.loginForm.get(controlName)?.errors;
-      console.error("errors", errors)
       if (errors && errors["required"]) {
-        return `${controlName} is reuired`;
+        return `${controlName} is required.`;
       } else if (errors && errors["email"]) {
-        return `Invalid email`;
+        return `Invalid email.`;
       }  else {
         return null;
       }
@@ -92,11 +74,15 @@ export class LoginComponent implements OnInit {
     return null;
   }
 
-  controlTouched(controlName: string): boolean {
-    return this.loginForm.get(controlName)?.touched || this.isSubmitted;
+  private composeForm(): void {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required]],
+    });
   }
 
-  getErrorMessage(errorType: "email" | "minLength" | "required", controlName: string): string {
-    return "";
+
+  private isControlTouched(controlName: string): boolean {
+    return this.loginForm.get(controlName)?.touched || this.isSubmitted;
   }
 }

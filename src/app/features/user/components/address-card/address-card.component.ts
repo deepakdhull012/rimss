@@ -8,7 +8,7 @@ import { UserService } from '../../services/user.service';
   templateUrl: './address-card.component.html',
   styleUrls: ['./address-card.component.scss']
 })
-export class AddressCardComponent extends BaseComponent implements OnInit {
+export class AddressCardComponent extends BaseComponent {
 
   @Input() address?: IAddress;
   @Input() readMode = false;
@@ -17,18 +17,15 @@ export class AddressCardComponent extends BaseComponent implements OnInit {
     super();
   }
 
-  ngOnInit(): void {
-  }
-
-  makeDefault(): void {
+  public makeDefault(): void {
     this.userService.markAsPrimaryAddress(this.address?.id as number).subscribe();
   }
 
-  deleteAddress(): void {
+  public deleteAddress(): void {
     this.userService.deleteAddress(this.address?.id as number).subscribe();
   }
 
-  editAddress(): void {
+  public editAddress(): void {
 
   }
 

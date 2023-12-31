@@ -10,7 +10,6 @@ import { BannerService } from '../../services/banner.service';
   styleUrls: ['./banner.component.scss'],
 })
 export class BannerComponent extends BaseComponent implements OnInit {
-
   public bannerMessage: string = '';
   public type: BannerType = BannerType.INFO;
   public visible = false;
@@ -21,18 +20,20 @@ export class BannerComponent extends BaseComponent implements OnInit {
     super();
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.bannerService.displayBanner
       .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((bannerConfig) => {
-        this.bannerMessage = bannerConfig.message;
-        this.type = bannerConfig.type;
-        this.visible = true;
-        if (bannerConfig.closeTime) {
-          setTimeout(()=>{
-            this.visible = false;
-          }, bannerConfig.closeTime)
-        }
+      .subscribe({
+        next: (bannerConfig) => {
+          this.bannerMessage = bannerConfig.message;
+          this.type = bannerConfig.type;
+          this.visible = true;
+          if (bannerConfig.closeTime) {
+            setTimeout(() => {
+              this.visible = false;
+            }, bannerConfig.closeTime);
+          }
+        },
       });
   }
 }

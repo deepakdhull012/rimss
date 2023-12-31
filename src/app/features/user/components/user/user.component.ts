@@ -25,20 +25,22 @@ export class UserComponent extends BaseComponent implements OnInit {
     this.user = this.authService.getUser();
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.userService.addressUpdated$
       .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((_) => {
-        this.getAddresses();
+      .subscribe({
+        next: (_) => {
+          this.getAddresses();
+        },
       });
     this.getAddresses();
   }
 
-  addAddress(): void {
+  public addAddress(): void {
     this.router.navigate(['profile', 'addresses']);
   }
 
-  getAddresses(): void {
+  private getAddresses(): void {
     this.userService
       .getUserAddresses()
       .pipe(takeUntil(this.componentDestroyed$))

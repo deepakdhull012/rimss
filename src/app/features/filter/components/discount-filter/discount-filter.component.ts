@@ -12,26 +12,20 @@ import { FilterService } from '../../services/filter.service';
 export class DiscountFilterComponent extends BaseComponent implements OnInit {
   public discounts: Array<number> = [];
   public selectedDiscounts: Array<number> = [];
-  @Output() discountChange: EventEmitter<Array<number>> = new EventEmitter<Array<number>>();
+  @Output() discountChange: EventEmitter<Array<number>> = new EventEmitter<
+    Array<number>
+  >();
 
   constructor(private filterService: FilterService) {
     super();
   }
 
-  ngOnInit(): void {
-    this.filterService.onClear.pipe(takeUntil(this.componentDestroyed$)).subscribe(_ => {
-      this.selectedDiscounts = [];
-      this.discountChange.next(this.selectedDiscounts);
-    });
-    this.filterService
-      .getDiscountBreakPoints()
-      .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((discounts) => {
-        this.discounts = discounts;
-      });
+  public ngOnInit(): void {
+    this.handleClear();
+    this.fetchDiscountBreakPoints();
   }
 
-  onDiscountChange(event: MatCheckboxChange): void {
+  public onDiscountChange(event: MatCheckboxChange): void {
     if (event.checked) {
       this.selectedDiscounts.push(+event.source.value);
     } else {
@@ -39,5 +33,25 @@ export class DiscountFilterComponent extends BaseComponent implements OnInit {
       this.selectedDiscounts.splice(index, 1);
     }
     this.discountChange.next(this.selectedDiscounts);
+  }
+
+  private handleClear(): void {
+    this.filterService.onClear
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe((_) => {
+        this.selectedDiscounts = [];
+        this.discountChange.next(this.selectedDiscounts);
+      });
+  }
+
+  private fetchDiscountBreakPoints(): void {
+    this.filterService
+      .getDiscountBreakPoints()
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe({
+        next: (discounts) => {
+          this.discounts = discounts;
+        },
+      });
   }
 }

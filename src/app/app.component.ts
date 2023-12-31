@@ -19,16 +19,18 @@ export class AppComponent extends BaseComponent implements OnInit {
     super();
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     if (this.authservice.getLoggedInEmail()) {
       this.cartWishListService
         .getCartProducts()
         .pipe(takeUntil(this.componentDestroyed$))
-        .subscribe((products) => {
-          this.cartWishListService.cartProducts = products;
+        .subscribe({
+          next: (products) => {
+            this.cartWishListService.cartProducts = products;
+          },
         });
 
-        this.cartWishListService
+      this.cartWishListService
         .getWishListProducts()
         .pipe(takeUntil(this.componentDestroyed$))
         .subscribe();

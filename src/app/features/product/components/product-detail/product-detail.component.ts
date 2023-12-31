@@ -5,16 +5,21 @@ import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { AuthService } from 'src/app/features/authentication/services/auth.service';
 import { CartWishlistService } from 'src/app/features/cart-wishlist/services/cart-wishlist.service';
 import { BannerType } from 'src/app/shared/interfaces/client/banner.interface';
-import { IOrderProduct, IOrderSummary } from 'src/app/shared/interfaces/client/order.interface';
+import {
+  IOrderProduct,
+  IOrderSummary,
+} from 'src/app/shared/interfaces/client/order.interface';
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
 import { BannerService } from 'src/app/shared/services/banner.service';
 import { ProductsService } from 'src/app/shared/services/products.service';
 import { IProductDetailsTab } from '../../interfaces/product-info.interface';
+import { ProductDetailService } from '../../services/product-detail.service';
 
 @Component({
   selector: 'rimss-product-detail',
   templateUrl: './product-detail.component.html',
   styleUrls: ['./product-detail.component.scss'],
+  providers: [ProductDetailService]
 })
 export class ProductDetailComponent extends BaseComponent implements OnInit {
   @Input() product: IProductInfo = null as any as IProductInfo;
@@ -37,7 +42,7 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
     super();
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.product = this.productService.productSelected;
 
     this.cartWishlistService.cartUpdated
@@ -57,28 +62,20 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
 
     if (!this.product?.id) {
       const pId = this.route.snapshot.params['id'];
-
       this.productService
         .fetchProductById(pId)
         .pipe(takeUntil(this.componentDestroyed$))
-        .subscribe((product) => {
-          this.product = product;
-          this.updateCartStatus();
-          this.updateWishListStatus();
-          this.updateStockQty();
-          console.error('this.route', this.route, this.product);
-          const categories = this.product.productCategory?.length
-            ? [this.product.productCategory[0]]
-            : [];
-          console.error('categories', categories);
-          this.productService
-            .filterProductsByCriteria({
-              category: categories,
-            })
-            .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe((products) => {
-              this.similarProducts = products;
-            });
+        .subscribe({
+          next: (product) => {
+            this.product = product;
+            this.updateCartStatus();
+            this.updateWishListStatus();
+            this.updateStockQty();
+            const categories = this.product.productCategory?.length
+              ? [this.product.productCategory[0]]
+              : [];
+            this.fetchSimilarProducts(categories);
+          },
         });
     } else {
       this.updateStockQty();
@@ -87,29 +84,13 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
       const categories = this.product.productCategory?.length
         ? [this.product.productCategory[0]]
         : [];
-      console.error('categories', categories);
-      this.productService
-        .filterProductsByCriteria({
-          category: categories,
-        })
-        .pipe(takeUntil(this.componentDestroyed$))
-        .subscribe((products) => {
-          this.similarProducts = products;
-        });
+      this.fetchSimilarProducts(categories);
     }
   }
 
-  updateStockQty(): void {
-    let noOfQty = 0;
-    this.product.sku?.forEach((sku) => {
-      noOfQty += sku.units_in_stock;
-    });
-    this.noOfUnitsInStock = noOfQty;
-  }
-
-  gotoCheckout(): void {
-    
-    const preTaxAmount = (this.product.priceAfterDiscount * this.qty) + this.deliveryCharges;
+  public gotoCheckout(): void {
+    const preTaxAmount =
+      this.product.priceAfterDiscount * this.qty + this.deliveryCharges;
     const tax = preTaxAmount / 10;
     const orderAmount = preTaxAmount + tax;
     this.orderSummary = {
@@ -119,9 +100,9 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
       originalPrice: this.product.price,
       orderAmount,
       productOrders: this.prepareOrderProducts(),
-      couponCode: "",
+      couponCode: '',
       couponDiscount: 0,
-      fromcart: false
+      fromcart: false,
     };
     this.router.navigate(['checkout'], {
       state: {
@@ -129,26 +110,8 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
       },
     });
   }
-  private prepareOrderProducts(): IOrderProduct[] {
-    const orderProducts: IOrderProduct[] = [];
-      const orderProduct: IOrderProduct = {
-        deliveryInfo: {
-          orderUpdateEvents: [],
-        },
-        discountedPrice: this.product.priceAfterDiscount,
-        originalPrice: this.product.price,
-        productId: this.product.id,
-        productSummary: this.product.productBrief,
-        productImage: this.product.mainImage,
-        qty: this.qty
-      };
-      orderProducts.push(orderProduct);
 
-    return orderProducts;
-  }
-
-
-  addToCart(): void {
+  public addToCart(): void {
     const loggedInUserEmail = this.authService.getLoggedInEmail();
     if (loggedInUserEmail) {
       this.cartWishlistService
@@ -162,15 +125,17 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
           unitCurrency: this.product.currency,
           unitPrice: this.product.price,
           userEmail: loggedInUserEmail,
-          discountedPrice: this.product.priceAfterDiscount
+          discountedPrice: this.product.priceAfterDiscount,
         })
-        .subscribe((res) => {
-          this.bannerService.displayBanner.next({
-            closeIcon: true,
-            closeTime: 1000,
-            message: 'Product added to cart successfully',
-            type: BannerType.SUCCESS,
-          });
+        .subscribe({
+          next: (res) => {
+            this.bannerService.displayBanner.next({
+              closeIcon: true,
+              closeTime: 1000,
+              message: 'Product added to cart successfully',
+              type: BannerType.SUCCESS,
+            });
+          },
         });
     } else {
       this.bannerService.displayBanner.next({
@@ -182,7 +147,7 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
     }
   }
 
-  addToWishList(): void {
+  public addToWishList(): void {
     const loggedInUserEmail = this.authService.getLoggedInEmail();
     if (loggedInUserEmail) {
       this.cartWishlistService
@@ -198,7 +163,7 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
     }
   }
 
-  removeFromCart(): void {
+  public removeFromCart(): void {
     const cartProductId = this.cartWishlistService.cartProducts.find(
       (cartP) => {
         return cartP.productId === this.product.id;
@@ -209,44 +174,87 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
     }
   }
 
-  updateCartStatus(): void {
+  public removeFromWishList(): void {
+    const productInWishList = this.cartWishlistService.wishListProducts.find(
+      (wishListProduct) => {
+        return wishListProduct.productId === this.product.id;
+      }
+    );
+    if (productInWishList) {
+      this.cartWishlistService
+        .removeFromWishList(productInWishList?.id)
+        .subscribe({
+          next: (_) => {
+            this.cartWishlistService.wishListUpdated.next();
+          },
+        });
+    }
+  }
+
+  public activateTab(tab: IProductDetailsTab): void {
+    this.activeTab = tab;
+  }
+
+  public updateQty(count: number): void {
+    if (
+      (count === -1 && this.qty > 1) ||
+      (count === 1 && this.qty < this.noOfUnitsInStock)
+    ) {
+      this.qty += count;
+    }
+  }
+
+  private fetchSimilarProducts(categories: string[]): void {
+    this.productService
+      .filterProductsByCriteria({
+        category: categories,
+      })
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe({
+        next: (products) => {
+          this.similarProducts = products;
+        },
+      });
+  }
+
+  private updateStockQty(): void {
+    let noOfQty = 0;
+    this.product.sku?.forEach((sku) => {
+      noOfQty += sku.units_in_stock;
+    });
+    this.noOfUnitsInStock = noOfQty;
+  }
+
+  private prepareOrderProducts(): IOrderProduct[] {
+    const orderProducts: IOrderProduct[] = [];
+    const orderProduct: IOrderProduct = {
+      deliveryInfo: {
+        orderUpdateEvents: [],
+      },
+      discountedPrice: this.product.priceAfterDiscount,
+      originalPrice: this.product.price,
+      productId: this.product.id,
+      productSummary: this.product.productBrief,
+      productImage: this.product.mainImage,
+      qty: this.qty,
+    };
+    orderProducts.push(orderProduct);
+    return orderProducts;
+  }
+
+  private updateCartStatus(): void {
     const productInCart = this.cartWishlistService.cartProducts.find((p) => {
       return p.id === this.product.id;
     });
     this.product.isInCart = !!productInCart;
   }
 
-  updateWishListStatus(): void {
+  private updateWishListStatus(): void {
     const productInWishList = this.cartWishlistService.wishListProducts.find(
       (p) => {
         return p.productId === this.product.id;
       }
     );
-    console.error("productInWishList", this.product.id, productInWishList, this.cartWishlistService.wishListProducts)
     this.product.isInWishList = !!productInWishList;
-  }
-
-
-  removeFromWishList(): void {
-    const productInWishList = this.cartWishlistService.wishListProducts.find(wishListProduct => {
-      return wishListProduct.productId === this.product.id
-    });
-    if (productInWishList) {
-      this.cartWishlistService.removeFromWishList(productInWishList?.id).subscribe(_ => {
-        this.cartWishlistService.wishListUpdated.next();
-      });
-    }
-    
-  }
-
-  activateTab(tab: IProductDetailsTab): void {
-    this.activeTab = tab;
-  }
-
-  updateQty(count: number): void {
-    if ((count === -1 && this.qty > 1) || (count === 1 && this.qty < this.noOfUnitsInStock)) {
-      this.qty+= count;
-    }
-    
   }
 }

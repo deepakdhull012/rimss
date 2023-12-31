@@ -5,10 +5,13 @@ import { Subject } from 'rxjs';
   selector: '[base]'
 })
 export abstract class BaseComponent implements OnDestroy {
-  public componentDestroyed$ = new Subject<void>();
+
+  
+  protected componentDestroyed$ = new Subject<void>();
+
   constructor() { }
 
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this.componentDestroyed$.next();
   }
 

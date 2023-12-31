@@ -27,11 +27,52 @@ export class AddressComponent extends BaseComponent implements OnInit {
     super();
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.composeForm();
   }
 
-  composeForm(): void {
+  public onSubmit(): void {
+    this.isSubmitted = true;
+    if (this.addressForm.valid) {
+      const addressToPost = this.mapToAddressInfo();
+      this.userService
+        .addAddress(addressToPost)
+        .pipe(takeUntil(this.componentDestroyed$))
+        .subscribe({
+          next: (_) => {
+            if (this.standalone) {
+              this.router.navigate(['profile']);
+            } else {
+              this.isSubmitted = false;
+              this.composeForm();
+              this.addressSave.next();
+            }
+          },
+        });
+    }
+  }
+
+  public getError(controlName: string): string | null {
+    const hasError = this.isControlTouched(controlName)
+      ? this.addressForm.get(controlName)?.invalid || false
+      : false;
+    if (hasError) {
+      const errors = this.addressForm.get(controlName)?.errors;
+      console.error('errors', errors);
+      if (errors && errors['required']) {
+        return `${controlName} is reuired`;
+      } else if (errors && errors['email']) {
+        return `Invalid email`;
+      } else if (errors && errors['minlength']) {
+        return `Password should be at-least 8 characters long`;
+      } else {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  private composeForm(): void {
     this.addressForm = this.fb.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
@@ -51,51 +92,11 @@ export class AddressComponent extends BaseComponent implements OnInit {
     });
   }
 
-  onSubmit(): void {
-    this.isSubmitted = true;
-    if (this.addressForm.valid) {
-      const addressToPost = this.mapToAddressInfo();
-      this.userService
-        .addAddress(addressToPost)
-        .pipe(takeUntil(this.componentDestroyed$))
-        .subscribe(_ => {
-          if (this.standalone) {
-            this.router.navigate(['profile']);
-          } else {
-            this.isSubmitted = false;
-            this.composeForm();
-            this.addressSave.next();
-          }
-          
-        });
-    }
-  }
-
-  getError(controlName: string): string | null {
-    const hasError = this.controlTouched(controlName)
-      ? this.addressForm.get(controlName)?.invalid || false
-      : false;
-    if (hasError) {
-      const errors = this.addressForm.get(controlName)?.errors;
-      console.error('errors', errors);
-      if (errors && errors['required']) {
-        return `${controlName} is reuired`;
-      } else if (errors && errors['email']) {
-        return `Invalid email`;
-      } else if (errors && errors['minlength']) {
-        return `Password should be at-least 8 characters long`;
-      } else {
-        return null;
-      }
-    }
-    return null;
-  }
-
-  controlTouched(controlName: string): boolean {
+  private isControlTouched(controlName: string): boolean {
     return this.addressForm.get(controlName)?.touched || this.isSubmitted;
   }
 
-  mapToAddressInfo(): IAddress {
+  private mapToAddressInfo(): IAddress {
     return {
       firstName: this.addressForm.get('firstName')?.value,
       lastName: this.addressForm.get('lastName')?.value,

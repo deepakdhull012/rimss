@@ -17,13 +17,13 @@ export class UserService implements OnDestroy {
     this.userEmail = this.authService.getLoggedInEmail();
   }
 
-  getUserAddresses(): Observable<IAddress[]> {
+  public getUserAddresses(): Observable<IAddress[]> {
     return this.http
       .get<IAddress[]>(`${this.BASE_URL}/addresses?userEmail=${this.userEmail}`)
       .pipe(takeUntil(this.serviceDestroyed$));
   }
 
-  addAddress(addressPayload: IAddress): Observable<void> {
+  public addAddress(addressPayload: IAddress): Observable<void> {
     return this.http
       .post<void>(`${this.BASE_URL}/addresses`, addressPayload)
       .pipe(takeUntil(this.serviceDestroyed$),
@@ -32,7 +32,7 @@ export class UserService implements OnDestroy {
       }));
   }
 
-  deleteAddress(addressId: number): Observable<void> {
+  public deleteAddress(addressId: number): Observable<void> {
     return this.http
       .delete<void>(`${this.BASE_URL}/addresses/${addressId}`)
       .pipe(takeUntil(this.serviceDestroyed$),
@@ -41,7 +41,7 @@ export class UserService implements OnDestroy {
       }));
   }
 
-  updateAddress(addressPayload: IAddress, addressId: number): Observable<void> {
+  public updateAddress(addressPayload: IAddress, addressId: number): Observable<void> {
     return this.http
       .put<void>(`${this.BASE_URL}/addresses/${addressId}`, addressPayload)
       .pipe(takeUntil(this.serviceDestroyed$),
@@ -50,7 +50,7 @@ export class UserService implements OnDestroy {
       }));
   }
 
-  markAsPrimaryAddress(addressId: number): Observable<void> {
+  public markAsPrimaryAddress(addressId: number): Observable<void> {
     const user: IUser | undefined = this.authService.getUser();
     if (user) {
       return this.http
@@ -68,7 +68,7 @@ export class UserService implements OnDestroy {
   }
 
 
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this.serviceDestroyed$.next();
   }
 }

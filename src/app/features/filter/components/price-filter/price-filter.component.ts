@@ -22,21 +22,46 @@ export class PriceFilterComponent extends BaseComponent implements OnInit {
     super();
   }
 
-  ngOnInit(): void {
-    this.filterService.onClear.pipe(takeUntil(this.componentDestroyed$)).subscribe(_ => {
-      this.selectedPriceRange = [];
-      this.priceRangeChange.next(this.selectedPriceRange);
-    });
-    this.filterService
-      .getPriceBreakPoint()
+  public ngOnInit(): void {
+    this.handleClear();
+    this.fetchPriceBreakPoints();
+  }
+
+  public onPriceChange(event: MatCheckboxChange): void {
+    const index = +event.source.value;
+    if (event.checked) {
+      this.selectedPriceRange.push(this.priceRange[index]);
+    } else {
+      const matchingIndex = this.selectedPriceRange.findIndex((priceRange) => {
+        return priceRange.index === index;
+      });
+      this.selectedPriceRange.splice(matchingIndex, 1);
+    }
+    this.priceRangeChange.next(this.selectedPriceRange);
+  }
+
+  private handleClear(): void {
+    this.filterService.onClear
       .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((priceRange) => {
-        this.priceBreakPoints = priceRange;
-        this.updateRange();
+      .subscribe((_) => {
+        this.selectedPriceRange = [];
+        this.priceRangeChange.next(this.selectedPriceRange);
       });
   }
 
-  updateRange() {
+  private fetchPriceBreakPoints(): void {
+    this.filterService
+      .getPriceBreakPoint()
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe({
+        next: (priceRange) => {
+          this.priceBreakPoints = priceRange;
+          this.updateRange();
+        },
+      });
+  }
+
+  private updateRange() {
     this.priceRange = this.priceBreakPoints.map((priceBreakPoint, index) => {
       if (index === 0) {
         return {
@@ -64,18 +89,5 @@ export class PriceFilterComponent extends BaseComponent implements OnInit {
         this.priceBreakPoints[this.priceBreakPoints.length - 1]
       }`,
     });
-  }
-
-  onPriceChange(event: MatCheckboxChange): void {
-    const index = +event.source.value;
-    if (event.checked) {
-      this.selectedPriceRange.push(this.priceRange[index]);
-    } else {
-      const matchingIndex = this.selectedPriceRange.findIndex((priceRange) => {
-        return priceRange.index === index;
-      });
-      this.selectedPriceRange.splice(matchingIndex, 1);
-    }
-    this.priceRangeChange.next(this.selectedPriceRange);
   }
 }

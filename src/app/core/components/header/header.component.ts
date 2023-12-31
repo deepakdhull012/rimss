@@ -3,33 +3,35 @@ import { Router } from '@angular/router';
 import { AuthService } from 'src/app/features/authentication/services/auth.service';
 import { ICategory } from 'src/app/shared/interfaces/client/category.interface';
 import { ProductsService } from 'src/app/shared/services/products.service';
+import { BaseComponent } from '../base/base.component';
+import { takeUntil } from 'rxjs';
 
 @Component({
   selector: 'rimss-header',
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss']
+  styleUrls: ['./header.component.scss'],
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent extends BaseComponent implements OnInit {
   public isLoggedIn = false;
+
   constructor(
     private router: Router,
     private productService: ProductsService,
     private authService: AuthService
-  ) {}
+  ) {
+    super();
+  }
 
   public sideNavVisible = false;
 
   public categories: Array<ICategory> = [];
 
-  ngOnInit(): void {
-    this.productService.fetchAllCategories().subscribe((categories) => {
-      this.categories = categories;
-    });
+  public ngOnInit(): void {
     this.isLoggedIn = !!this.authService.getLoggedInEmail();
+    this.fetchAllCategories();
   }
 
-  navigateTo(path: Array<string>, category?: Array<string>): void {
-    console.error('cat', category);
+  public navigateTo(path: Array<string>, category?: Array<string>): void {
     this.router.navigate(path, {
       queryParams: {
         category,
@@ -37,7 +39,7 @@ export class HeaderComponent implements OnInit {
     });
   }
 
-  searchProducts(searchText: string): void {
+  public searchProducts(searchText: string): void {
     this.router.navigate(['products', 'list'], {
       queryParams: {
         search: searchText,
@@ -46,15 +48,26 @@ export class HeaderComponent implements OnInit {
     });
   }
 
-  logout(): void {
+  private fetchAllCategories(): void {
+    this.productService
+      .fetchAllCategories()
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe({
+        next: (categories) => {
+          this.categories = categories;
+        }
+      });
+  }
+
+  public logout(): void {
     this.authService.logout();
   }
 
-  login(): void {
+  public login(): void {
     this.router.navigate(['auth']);
   }
 
-  openSideNav() {
+  public openSideNav() {
     this.sideNavVisible = !this.sideNavVisible;
   }
 }

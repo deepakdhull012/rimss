@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { of, switchMap, takeLast, takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
-import { IOrder, IOrderProduct, IOrderProductUI } from 'src/app/shared/interfaces/client/order.interface';
+import {
+  IOrder,
+  IOrderProduct,
+  IOrderProductUI,
+} from 'src/app/shared/interfaces/client/order.interface';
 import { OrderService } from 'src/app/shared/services/order.service';
 
 @Component({
@@ -17,7 +21,11 @@ export class OrdersComponent extends BaseComponent implements OnInit {
     super();
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
+    this.fetchOrders();
+  }
+
+  private fetchOrders(): void {
     this.orderService
       .fetchOrder()
       .pipe(takeUntil(this.componentDestroyed$))
@@ -27,21 +35,19 @@ export class OrdersComponent extends BaseComponent implements OnInit {
       });
   }
 
-  mapToOrderProductsUI(): void {
+  private mapToOrderProductsUI(): void {
     this.orderProducts = [];
-    this.orders.forEach(order => {
-      order.productOrders.forEach(productOrder => {
+    this.orders.forEach((order) => {
+      order.productOrders.forEach((productOrder) => {
         const orderProductUI: IOrderProductUI = {
           deliveryInfo: productOrder.deliveryInfo,
           discountedPrice: productOrder.discountedPrice,
           orderDate: order.orderDate,
           productImage: productOrder.productImage,
-          productSummary: productOrder.productSummary
+          productSummary: productOrder.productSummary,
         };
         this.orderProducts.push(orderProductUI);
-      })
-    })
+      });
+    });
   }
-
-
 }

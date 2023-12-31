@@ -8,50 +8,22 @@ import { FilterService } from '../../services/filter.service';
 @Component({
   selector: 'rimss-rating-filter',
   templateUrl: './rating-filter.component.html',
-  styleUrls: ['./rating-filter.component.scss']
+  styleUrls: ['./rating-filter.component.scss'],
 })
 export class RatingFilterComponent extends BaseComponent implements OnInit {
-
   public ratingOptions: Array<IFilterRating> = [];
   public selectedRatingOptions: Array<number> = [];
-  @Output() ratingChange: EventEmitter<Array<number>> = new EventEmitter<Array<number>>();
+  @Output() ratingChange: EventEmitter<Array<number>> = new EventEmitter<
+    Array<number>
+  >();
 
-  constructor(private filterService: FilterService) { 
+  constructor(private filterService: FilterService) {
     super();
   }
 
-  ngOnInit(): void {
-    this.filterService.onClear.pipe(takeUntil(this.componentDestroyed$)).subscribe(_ => {
-      this.selectedRatingOptions = [];
-      this.ratingChange.next(this.selectedRatingOptions);
-    });
+  public ngOnInit(): void {
+    this.handleClear();
     this.initRatingOptions();
-  }
-
-  initRatingOptions(): void {
-    this.ratingOptions.length = 0;
-    this.ratingOptions = [
-      {
-        minRating: 0,
-        displayValue: 0.5
-      },
-      {
-        minRating: 1,
-        displayValue: 1.5
-      },
-      {
-        minRating: 2,
-        displayValue: 2.5
-      },
-      {
-        minRating: 3,
-        displayValue: 3.5
-      },
-      {
-        minRating: 4,
-        displayValue: 4.5
-      },
-    ]
   }
 
   onRatingChange(event: MatCheckboxChange): void {
@@ -65,4 +37,40 @@ export class RatingFilterComponent extends BaseComponent implements OnInit {
     this.ratingChange.next(this.selectedRatingOptions);
   }
 
+  private handleClear(): void {
+    this.filterService.onClear
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe({
+        next: (_) => {
+          this.selectedRatingOptions = [];
+          this.ratingChange.next(this.selectedRatingOptions);
+        },
+      });
+  }
+
+  private initRatingOptions(): void {
+    this.ratingOptions.length = 0;
+    this.ratingOptions = [
+      {
+        minRating: 0,
+        displayValue: 0.5,
+      },
+      {
+        minRating: 1,
+        displayValue: 1.5,
+      },
+      {
+        minRating: 2,
+        displayValue: 2.5,
+      },
+      {
+        minRating: 3,
+        displayValue: 3.5,
+      },
+      {
+        minRating: 4,
+        displayValue: 4.5,
+      },
+    ];
+  }
 }

@@ -13,9 +13,7 @@ import { environment } from 'src/environments/environment';
 import { AuthService } from '../../authentication/services/auth.service';
 import { ICartProduct } from '../interfaces/cart-product.interface';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class CartWishlistService implements OnDestroy {
   private serviceDestroyed$ = new Subject<void>();
 

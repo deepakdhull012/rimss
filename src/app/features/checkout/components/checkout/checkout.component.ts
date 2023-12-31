@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, RouterStateSnapshot } from '@angular/router';
+import { Router } from '@angular/router';
 import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { IUser } from 'src/app/features/authentication/interfaces/user.interface';
@@ -36,34 +36,18 @@ export class CheckoutComponent extends BaseComponent implements OnInit {
     super();
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.loggedInEmail = this.authService.getLoggedInEmail();
     this.loggedInUser = this.authService.getUser();
     this.orderSummary = window.history.state?.orderSummary;
     this.fetchAddresses();
   }
 
-  placeOrder(): void {
-    this.router.navigate(['thank-you']);
-  }
-
-  chooseAddNewAddress(): void {
+  public chooseAddNewAddress(): void {
     this.useAddNewAddress = !this.useAddNewAddress;
   }
 
-  private setDefaultAddressId(): void {
-    const defaultAddressOfUser = this.loggedInUser?.primaryAddressId;
-    if (!defaultAddressOfUser) {
-      this.defaultAddressIdForOrder = this.addresses[0]?.id || undefined;
-    } else {
-      const defaultAddress = this.addresses.find((address) => {
-        return address.id === defaultAddressOfUser;
-      });
-      this.defaultAddressIdForOrder = defaultAddress?.id || undefined;
-    }
-  }
-
-  makeOrder(): void {
+  public makeOrder(): void {
     const user = this.authService.getUser();
     if (this.orderSummary && this.defaultAddressIdForOrder && user) {
       this.orderService
@@ -91,14 +75,27 @@ export class CheckoutComponent extends BaseComponent implements OnInit {
     }
   }
 
-  fetchAddresses(): void {
+  public fetchAddresses(): void {
     this.userService
       .getUserAddresses()
       .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((addresses) => {
-        this.addresses = addresses;
-        this.setDefaultAddressId();
-        console.error('addresses', this.addresses);
+      .subscribe({
+        next: (addresses) => {
+          this.addresses = addresses;
+          this.setDefaultAddressId();
+        }
       });
+  }
+
+  private setDefaultAddressId(): void {
+    const defaultAddressOfUser = this.loggedInUser?.primaryAddressId;
+    if (!defaultAddressOfUser) {
+      this.defaultAddressIdForOrder = this.addresses[0]?.id || undefined;
+    } else {
+      const defaultAddress = this.addresses.find((address) => {
+        return address.id === defaultAddressOfUser;
+      });
+      this.defaultAddressIdForOrder = defaultAddress?.id || undefined;
+    }
   }
 }

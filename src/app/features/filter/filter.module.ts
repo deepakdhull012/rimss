@@ -10,10 +10,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { StarRatingModule } from 'angular-star-rating'
-
-
-
+import { StarRatingModule } from 'angular-star-rating';
+import { FilterService } from './services/filter.service';
 
 @NgModule({
   declarations: [
@@ -22,7 +20,7 @@ import { StarRatingModule } from 'angular-star-rating'
     RatingFilterComponent,
     DiscountFilterComponent,
     SizeFilterComponent,
-    FilterComponent
+    FilterComponent,
   ],
   imports: [
     CommonModule,
@@ -30,8 +28,7 @@ import { StarRatingModule } from 'angular-star-rating'
     MatCheckboxModule,
     MatDividerModule,
     MatExpansionModule,
-    MatButtonModule
-    
+    MatButtonModule,
   ],
   exports: [
     PriceFilterComponent,
@@ -39,7 +36,8 @@ import { StarRatingModule } from 'angular-star-rating'
     RatingFilterComponent,
     DiscountFilterComponent,
     SizeFilterComponent,
-    FilterComponent
-  ]
+    FilterComponent,
+  ],
+  providers: [FilterService],
 })
-export class FilterModule { }
+export class FilterModule {}
