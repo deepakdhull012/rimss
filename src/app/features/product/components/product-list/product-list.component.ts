@@ -12,10 +12,11 @@ import { SortBy } from '../../interfaces/product-info.interface';
   styleUrls: ['./product-list.component.scss'],
 })
 export class ProductListComponent extends BaseComponent implements OnInit {
-  private saleId?: number;
-  private categories: Array<string> = [];
-  private filterString?: string;
-  private sortByValue?: SortBy;
+  public products: Array<IProductInfo> = [];
+  public page: number = 1;
+  public SortBy = SortBy;
+  public loading = false;
+
   constructor(
     private productsService: ProductsService,
     private route: ActivatedRoute,
@@ -24,9 +25,11 @@ export class ProductListComponent extends BaseComponent implements OnInit {
     super();
   }
 
-  public products: Array<IProductInfo> = [];
-  public page: number = 1;
-  public SortBy = SortBy;
+  private saleId?: number;
+  private categories: Array<string> = [];
+  private filterString?: string;
+  private sortByValue?: SortBy;
+  
 
   ngOnInit(): void {
     this.router.events
@@ -51,18 +54,24 @@ export class ProductListComponent extends BaseComponent implements OnInit {
         this.categories = [this.categories[this.categories.length - 1]];
       }
 
-      if (mode === 'banner-sale') {
-        this.fetchproductsBasedOnCriteria();
-      } else if (mode === 'search') {
-        this.productsService
-          .getProductsBySearch(searchText)
-          .subscribe((products) => {
-            this.products = products;
-          });
-      } else {
-        this.fetchproductsBasedOnCriteria();
-      }
-    });
+        if (mode === 'banner-sale') {
+          this.fetchproductsBasedOnCriteria();
+        } else if (mode === 'search') {
+          this.loading = true;
+          this.productsService
+            .getProductsBySearch(searchText)
+            .subscribe({
+              next: (products) => {
+                this.products = products;
+              },
+              complete: () => {
+                this.loading = false;
+              }
+            });
+        } else {
+          this.fetchproductsBasedOnCriteria();
+        }
+      })   
   }
 
   goToDetailPage(product: IProductInfo) {
@@ -84,6 +93,7 @@ export class ProductListComponent extends BaseComponent implements OnInit {
   }
 
   private fetchproductsBasedOnCriteria(): void {
+    this.loading = true;
     this.productsService
       .filterProductsByCriteria(
         {
@@ -93,8 +103,13 @@ export class ProductListComponent extends BaseComponent implements OnInit {
         },
         this.sortByValue
       )
-      .subscribe((products) => {
-        this.products = products;
+      .subscribe({
+        next: (products) => {
+          this.products = products;
+        },
+        complete: () => {
+          this.loading = false;
+        }
       });
   }
 }

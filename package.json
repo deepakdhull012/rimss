@@ -22,6 +22,8 @@
     "@angular/router": "^14.0.0",
     "angular-star-rating": "^6.0.0",
     "ngx-light-carousel": "^1.1.21",
+    "ngx-loading": "^16.0.0",
+    "ngx-logger": "^5.0.12",
     "ngx-pagination": "^6.0.3",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
