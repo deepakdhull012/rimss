@@ -18,7 +18,7 @@
                         <li class="submenu" *ngFor="let category of categories" (click)="navigateTo(['products', 'list'], [category.catId])">
                             <a>{{category.name}}</a>
                             <ul>
-                                <li (click)="navigateTo(['products', 'list'], [category.catId, subcategory.catId]);$event.stopPropagation()" *ngFor="let subcategory of category.child"><a routerLink="/about">{{subcategory.name}}</a></li>
+                                <li (click)="navigateTo(['products', 'list'], [category.catId, subcategory.catId]);$event.stopPropagation()" *ngFor="let subcategory of category.child"><a>{{subcategory.name}}</a></li>
                             </ul>
                         </li>
                         <li class="submenu">

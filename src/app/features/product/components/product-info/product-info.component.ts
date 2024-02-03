@@ -129,7 +129,7 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
     const productInCart = this.cartWishListService.cartProducts.find((p) => {
       return p.productId === this.productInfo.id;
     });
-    this.productInfo.isInCart = !!productInCart;
+    this.productInfo = {...this.productInfo, isInCart: !!productInCart};
   }
 
   private updateWishListStatus(): void {
@@ -138,7 +138,7 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
         return wishListProduct.productId === this.productInfo.id;
       }
     );
-    this.productInfo.isInWishList = !!productInWishList;
+    this.productInfo = {...this.productInfo, isInWishList: !!productInWishList};
   }
 
   private removeFromWishList(): void {

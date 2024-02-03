@@ -13,6 +13,8 @@ import { CoreModule } from 'src/app/core/core.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { StoreModule } from '@ngrx/store';
 import { productReducer } from "./store/products.reducers";
+import { EffectsModule } from '@ngrx/effects';
+import { ProductsEffects } from "./store/products.effects";
 
 
 
@@ -30,7 +32,8 @@ import { productReducer } from "./store/products.reducers";
     StarRatingModule.forRoot(),
     MatSelectModule,
     SharedModule,
-    StoreModule.forFeature("products", productReducer)
+    StoreModule.forFeature("products", productReducer),
+    EffectsModule.forFeature(ProductsEffects)
   ],
   exports: [
     ProductInfoComponent

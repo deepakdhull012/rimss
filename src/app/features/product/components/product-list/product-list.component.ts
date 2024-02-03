@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
-import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
+import { IFilterCriteria, IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
 import { ProductsService } from 'src/app/api/products.service';
 import { SortBy } from '../../interfaces/product-info.interface';
 import { Store } from '@ngrx/store';
 import { IAppState } from 'src/app/core/store/app.state';
+import * as ProductsActions from "./../../store/products.actions";
 
 @Component({
   selector: 'rimss-product-list',
@@ -104,24 +105,13 @@ export class ProductListComponent extends BaseComponent implements OnInit {
   }
 
   private fetchproductsBasedOnCriteria(): void {
-    // this.loading = true;
-    // this.store.dispatch(ProductsActions.requestLoadProducts());
-    // this.productsService
-    //   .filterProductsByCriteria(
-    //     {
-    //       category: this.categories,
-    //       filterString: this.filterString,
-    //       saleId: this.saleId,
-    //     },
-    //     this.sortByValue
-    //   )
-    //   .subscribe({
-    //     next: (products) => {
-    //       this.products = products;
-    //     },
-    //     complete: () => {
-    //       this.loading = false;
-    //     }
-    //   });
+    const filterCritera: IFilterCriteria = {
+      category: this.categories,
+      filterString: this.filterString,
+      saleId: this.saleId,
+    };
+    this.store.dispatch(ProductsActions.fetchCategoryProducts({
+      filterCriteria: filterCritera
+    }));
   }
 }

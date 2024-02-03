@@ -27,7 +27,7 @@ export class AppComponent extends BaseComponent implements OnInit {
         .getCartProducts()
         .pipe(takeUntil(this.componentDestroyed$))
         .subscribe({
-          next: (products) => {
+          next: (products: any) => {
             this.cartWishListService.cartProducts = products;
           },
         });

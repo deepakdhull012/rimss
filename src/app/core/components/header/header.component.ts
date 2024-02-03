@@ -34,7 +34,7 @@ export class HeaderComponent extends BaseComponent implements OnInit {
     this.fetchAllCategories();
   }
 
-  navigateTo(path: Array<string>, category?: Array<string>): void {
+  public navigateTo(path: Array<string>, category?: Array<string>): void {
     this.router.navigate(path, {
       queryParams: {
         category,

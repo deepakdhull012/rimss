@@ -44,10 +44,6 @@ export class ProductsService implements OnDestroy {
       .pipe(takeUntil(this.serviceDestroyed$));
   }
 
- 
-
-  
-
   public getProductsBySearch(searchText: string): Observable<Array<IProductInfo>> {
     return this.http
       .get<Array<IProductInfo>>(`${this.BASE_URL}/products?q=${searchText}`)

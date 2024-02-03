@@ -7,22 +7,15 @@ export const productsFeatureKey = 'products';
 export const initialState: IProductState = {
     isLoading: false,
     products: [
-        {
-            currency: "INR",
-            id: 1,
-            mainImage: "",
-            price: 100,
-            priceAfterDiscount: 90,
-            productBrief: "Brief",
-            productName: "Name",
-            rating: 3
-        }
     ]
   };
 
   export const productReducer = createReducer(
     initialState,
     on(ProductsActions.requestLoadProducts, state => ({ ...state, isLoading: true })),
-    on(ProductsActions.loadProductsSuccess, state => ({ ...state, isLoading: false, products: state.products })),
+    on(ProductsActions.loadProductsSuccess, (state, newState) => {
+      console.log('again in reducer', state, newState)
+      return ({ ...state, isLoading: false, products: newState.products })
+    }),
 
   );

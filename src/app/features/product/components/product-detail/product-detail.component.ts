@@ -246,7 +246,7 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
     const productInCart = this.cartWishlistService.cartProducts.find((p) => {
       return p.id === this.product.id;
     });
-    this.product.isInCart = !!productInCart;
+    this.product = {...this.product, isInCart: !!productInCart};
   }
 
   private updateWishListStatus(): void {
@@ -255,6 +255,6 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
         return p.productId === this.product.id;
       }
     );
-    this.product.isInWishList = !!productInWishList;
+    this.product = {...this.product, isInWishList: !!productInWishList};
   }
 }
