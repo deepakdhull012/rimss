@@ -9,6 +9,10 @@ import { ProductDetailComponent } from './components/product-detail/product-deta
 import { ProductInfoComponent } from './components/product-info/product-info.component';
 import { ProductListComponent } from './components/product-list/product-list.component';
 import { ProductRoutingModule } from './product.routes';
+import { CoreModule } from 'src/app/core/core.module';
+import { SharedModule } from 'src/app/shared/shared.module';
+import { StoreModule } from '@ngrx/store';
+import { productReducer } from "./store/products.reducers";
 
 
 
@@ -24,7 +28,9 @@ import { ProductRoutingModule } from './product.routes';
     ProductRoutingModule,
     NgxPaginationModule,
     StarRatingModule.forRoot(),
-    MatSelectModule
+    MatSelectModule,
+    SharedModule,
+    StoreModule.forFeature("products", productReducer)
   ],
   exports: [
     ProductInfoComponent

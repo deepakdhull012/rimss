@@ -3,8 +3,10 @@ import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { filter, takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
-import { ProductsService } from 'src/app/shared/services/products.service';
+import { ProductsService } from 'src/app/api/products.service';
 import { SortBy } from '../../interfaces/product-info.interface';
+import { Store } from '@ngrx/store';
+import { IAppState } from 'src/app/core/store/app.state';
 
 @Component({
   selector: 'rimss-product-list',
@@ -12,21 +14,25 @@ import { SortBy } from '../../interfaces/product-info.interface';
   styleUrls: ['./product-list.component.scss'],
 })
 export class ProductListComponent extends BaseComponent implements OnInit {
-  private saleId?: number;
-  private categories: Array<string> = [];
-  private filterString?: string;
-  private sortByValue?: SortBy;
+  public products: Array<IProductInfo> = [];
+  public page: number = 1;
+  public SortBy = SortBy;
+  public loading = false;
+
   constructor(
     private productsService: ProductsService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private store: Store<IAppState>
   ) {
     super();
   }
 
-  public products: Array<IProductInfo> = [];
-  public page: number = 1;
-  public SortBy = SortBy;
+  private saleId?: number;
+  private categories: Array<string> = [];
+  private filterString?: string;
+  private sortByValue?: SortBy;
+  
 
   ngOnInit(): void {
     this.router.events
@@ -35,6 +41,14 @@ export class ProductListComponent extends BaseComponent implements OnInit {
         if (event instanceof NavigationStart) {
           this.page = 1;
         }
+      });
+      this.store.select('products').pipe(takeUntil(this.componentDestroyed$)).subscribe(state => {
+        console.log("Store provided the products", state)
+        if (state.products) {
+          this.products = state.products;
+          console.log(this.products)
+        }
+        
       });
     this.route.queryParams.subscribe((params) => {
       const mode: 'banner-sale' | 'category' | 'search' = params['mode'];
@@ -51,18 +65,24 @@ export class ProductListComponent extends BaseComponent implements OnInit {
         this.categories = [this.categories[this.categories.length - 1]];
       }
 
-      if (mode === 'banner-sale') {
-        this.fetchproductsBasedOnCriteria();
-      } else if (mode === 'search') {
-        this.productsService
-          .getProductsBySearch(searchText)
-          .subscribe((products) => {
-            this.products = products;
-          });
-      } else {
-        this.fetchproductsBasedOnCriteria();
-      }
-    });
+        if (mode === 'banner-sale') {
+          this.fetchproductsBasedOnCriteria();
+        } else if (mode === 'search') {
+          this.loading = true;
+          this.productsService
+            .getProductsBySearch(searchText)
+            .subscribe({
+              next: (products) => {
+                this.products = products;
+              },
+              complete: () => {
+                this.loading = false;
+              }
+            });
+        } else {
+          this.fetchproductsBasedOnCriteria();
+        }
+      })   
   }
 
   goToDetailPage(product: IProductInfo) {
@@ -84,17 +104,24 @@ export class ProductListComponent extends BaseComponent implements OnInit {
   }
 
   private fetchproductsBasedOnCriteria(): void {
-    this.productsService
-      .filterProductsByCriteria(
-        {
-          category: this.categories,
-          filterString: this.filterString,
-          saleId: this.saleId,
-        },
-        this.sortByValue
-      )
-      .subscribe((products) => {
-        this.products = products;
-      });
+    // this.loading = true;
+    // this.store.dispatch(ProductsActions.requestLoadProducts());
+    // this.productsService
+    //   .filterProductsByCriteria(
+    //     {
+    //       category: this.categories,
+    //       filterString: this.filterString,
+    //       saleId: this.saleId,
+    //     },
+    //     this.sortByValue
+    //   )
+    //   .subscribe({
+    //     next: (products) => {
+    //       this.products = products;
+    //     },
+    //     complete: () => {
+    //       this.loading = false;
+    //     }
+    //   });
   }
 }
