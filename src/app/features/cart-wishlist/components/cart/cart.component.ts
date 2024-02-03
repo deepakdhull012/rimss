@@ -8,9 +8,10 @@ import {
   IOrderSummary,
 } from 'src/app/shared/interfaces/client/order.interface';
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
-import { ProductsService } from 'src/app/shared/services/products.service';
+import { ProductsService } from 'src/app/api/products.service';
 import { ICartProduct } from '../../interfaces/cart-product.interface';
 import { CartWishlistService } from '../../services/cart-wishlist.service';
+import { SalesService } from 'src/app/api/sales.service';
 
 @Component({
   selector: 'rimss-cart',
@@ -18,6 +19,13 @@ import { CartWishlistService } from '../../services/cart-wishlist.service';
   styleUrls: ['./cart.component.scss'],
 })
 export class CartComponent extends BaseComponent implements OnInit {
+  constructor(
+    private router: Router,
+    private cartService: CartWishlistService,
+    private saleService: SalesService
+  ) {
+    super();
+  }
   public cartProducts: Array<ICartProduct> = [];
   public recommendedProducts: Array<IProductInfo> = [];
   public originalPriceSum = 0;
@@ -29,14 +37,6 @@ export class CartComponent extends BaseComponent implements OnInit {
   public couponDiscount = 0;
   private coupons: ICoupon[] = [];
   public appliedCoupon?: ICoupon;
-
-  constructor(
-    private router: Router,
-    private cartService: CartWishlistService,
-    private productsService: ProductsService
-  ) {
-    super();
-  }
 
   public ngOnInit(): void {
     this.fetchCartProducts();
@@ -86,25 +86,6 @@ export class CartComponent extends BaseComponent implements OnInit {
     this.updateAmounts();
   }
 
-  private fetchCartProducts(): void {
-    this.cartService
-      .getCartProducts()
-      .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((cartProducts) => {
-        this.cartProducts = cartProducts;
-        this.updateAmounts();
-      });
-  }
-
-  private fetchCoupons(): void {
-    this.productsService
-      .fetchCoupons()
-      .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((coupons) => {
-        this.coupons = coupons;
-      });
-  }
-
   private prepareOrderProducts(): IOrderProduct[] {
     const orderProducts: IOrderProduct[] = [];
     this.cartProducts.forEach((cartProduct) => {
@@ -125,7 +106,44 @@ export class CartComponent extends BaseComponent implements OnInit {
     return orderProducts;
   }
 
-  private fetchRecommendedProducts(): void {}
+  private fetchCartProducts(): void {
+    this.cartService
+      .getCartProducts()
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe((cartProducts) => {
+        this.cartProducts = cartProducts;
+        this.updateAmounts();
+      });
+  }
+
+  private fetchCoupons(): void {
+    this.saleService
+      .fetchCoupons()
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe({
+        next: (coupons => {
+          this.coupons = coupons;
+        })
+      });
+  }
+
+  
+
+  private checkCoupon(): void {
+    if (this.appliedCoupon) {
+      console.error(this.discountedPriceSum, this.appliedCoupon.minAmount)
+      if (this.discountedPriceSum >= this.appliedCoupon.minAmount) {
+        this.couponDiscount =
+          this.appliedCoupon.type === 'flat'
+            ? this.appliedCoupon.amount
+            : (this.discountedPriceSum * this.appliedCoupon.amount) / 100;
+      } else {
+        this.couponDiscount = 0;
+      }
+    } else {
+      this.couponDiscount = 0;
+    }
+  }
 
   private updateAmounts(): void {
     this.originalPriceSum = 0;
@@ -141,21 +159,5 @@ export class CartComponent extends BaseComponent implements OnInit {
       this.deliveryCharges +
       this.tax -
       this.couponDiscount;
-  }
-
-  private checkCoupon(): void {
-    if (this.appliedCoupon) {
-      console.error(this.discountedPriceSum, this.appliedCoupon.minAmount);
-      if (this.discountedPriceSum >= this.appliedCoupon.minAmount) {
-        this.couponDiscount =
-          this.appliedCoupon.type === 'flat'
-            ? this.appliedCoupon.amount
-            : (this.discountedPriceSum * this.appliedCoupon.amount) / 100;
-      } else {
-        this.couponDiscount = 0;
-      }
-    } else {
-      this.couponDiscount = 0;
-    }
   }
 }

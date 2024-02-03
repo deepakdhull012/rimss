@@ -1,18 +1,9 @@
-import { Injectable, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, takeUntil } from 'rxjs/operators';
-
-import {
-  IFilterCriteria,
-  IProductInfo,
-  IProductServer,
-} from '../interfaces/client/product.interface';
-import { ICategory } from '../interfaces/client/category.interface';
-import { IBannerSale } from 'src/app/features/landing/interfaces/banner-sale.interface';
+import { Injectable, OnDestroy } from '@angular/core';
+import { Observable, Subject, map, takeUntil } from 'rxjs';
 import { SortBy } from 'src/app/features/product/interfaces/product-info.interface';
-import { ICoupon } from '../interfaces/client/order.interface';
 import { environment } from 'src/environments/environment';
-import { Observable, Subject } from 'rxjs';
+import { IFilterCriteria, IProductInfo, IProductServer } from '../shared/interfaces/client/product.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -27,12 +18,10 @@ export class ProductsService implements OnDestroy {
   constructor(private http: HttpClient) {}
 
   public fetchAllProducts(): Observable<Array<IProductInfo>> {
-    return this.http.get<Array<IProductInfo>>(`${this.BASE_URL}/products`).pipe(
-      takeUntil(this.serviceDestroyed$),
-      map((productsFromServer: Array<IProductServer>) =>
-        this.mapServerToClient(productsFromServer)
-      )
-    );
+    return this.http
+      .get<Array<IProductInfo>>(`${this.BASE_URL}/products`)
+      .pipe(takeUntil(this.serviceDestroyed$),
+      map((productsFromServer: Array<IProductServer>) => this.mapServerToClient(productsFromServer)));
   }
 
   public filterProductsByCriteria(
@@ -55,35 +44,17 @@ export class ProductsService implements OnDestroy {
       .pipe(takeUntil(this.serviceDestroyed$));
   }
 
-  public fetchAllCategories(): Observable<Array<ICategory>> {
-    return this.http
-      .get<Array<ICategory>>(`${this.BASE_URL}/categories`)
-      .pipe(takeUntil(this.serviceDestroyed$));
-  }
+ 
 
-  public fetchAllBannerSales(): Observable<Array<IBannerSale>> {
-    return this.http
-      .get<Array<IBannerSale>>(`${this.BASE_URL}/banner-sales`)
-      .pipe(takeUntil(this.serviceDestroyed$));
-  }
+  
 
-  public getProductsBySearch(
-    searchText: string
-  ): Observable<Array<IProductInfo>> {
+  public getProductsBySearch(searchText: string): Observable<Array<IProductInfo>> {
     return this.http
       .get<Array<IProductInfo>>(`${this.BASE_URL}/products?q=${searchText}`)
       .pipe(takeUntil(this.serviceDestroyed$));
   }
 
-  public fetchCoupons(): Observable<ICoupon[]> {
-    return this.http
-      .get<Array<ICoupon>>(`${this.BASE_URL}/coupons`)
-      .pipe(takeUntil(this.serviceDestroyed$));
-  }
-
-  private mapServerToClient(
-    products: Array<IProductServer>
-  ): Array<IProductInfo> {
+  private mapServerToClient(products: Array<IProductServer>): Array<IProductInfo> {
     return products as Array<IProductInfo>;
   }
 

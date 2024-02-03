@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/features/authentication/services/auth.service';
 import { ICategory } from 'src/app/shared/interfaces/client/category.interface';
-import { ProductsService } from 'src/app/shared/services/products.service';
+import { CategoryService } from 'src/app/api/category.service';
 import { BaseComponent } from '../base/base.component';
 import { takeUntil } from 'rxjs';
 
@@ -16,7 +16,7 @@ export class HeaderComponent extends BaseComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private productService: ProductsService,
+    private categoryService: CategoryService,
     private authService: AuthService
   ) {
     super();
@@ -27,11 +27,14 @@ export class HeaderComponent extends BaseComponent implements OnInit {
   public categories: Array<ICategory> = [];
 
   public ngOnInit(): void {
+    this.categoryService.fetchAllCategories().subscribe((categories) => {
+      this.categories = categories;
+    });
     this.isLoggedIn = !!this.authService.getLoggedInEmail();
     this.fetchAllCategories();
   }
 
-  public navigateTo(path: Array<string>, category?: Array<string>): void {
+  navigateTo(path: Array<string>, category?: Array<string>): void {
     this.router.navigate(path, {
       queryParams: {
         category,
@@ -49,7 +52,7 @@ export class HeaderComponent extends BaseComponent implements OnInit {
   }
 
   private fetchAllCategories(): void {
-    this.productService
+    this.categoryService
       .fetchAllCategories()
       .pipe(takeUntil(this.componentDestroyed$))
       .subscribe({

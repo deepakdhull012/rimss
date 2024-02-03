@@ -11,7 +11,7 @@ import {
 } from 'src/app/shared/interfaces/client/order.interface';
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
 import { BannerService } from 'src/app/shared/services/banner.service';
-import { ProductsService } from 'src/app/shared/services/products.service';
+import { ProductsService } from 'src/app/api/products.service';
 import { IProductDetailsTab } from '../../interfaces/product-info.interface';
 import { ProductDetailService } from '../../services/product-detail.service';
 

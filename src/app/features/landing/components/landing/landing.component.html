@@ -1,5 +1,7 @@
 <!-- ================ SECTION INTRO ================ -->
-
+<rimss-loader
+    *ngIf="loading"
+  ></rimss-loader>
 <div class="container-fluid">
     <ngx-light-carousel *ngIf="salesLoaded" [options]="options" [data]="bannerSales">
         <div ngx-light-carousel-container>
@@ -51,6 +53,7 @@
         </ng-template>
     </ngx-light-carousel>
 </div>
+<div class="clearfix"></div>
 
 
   <!-- ================ SECTION INTRO END.// ================ -->

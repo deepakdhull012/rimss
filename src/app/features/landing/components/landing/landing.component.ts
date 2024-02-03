@@ -1,14 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { Route, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { ngxLightOptions } from 'ngx-light-carousel/public-api';
 import { forkJoin, take, takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
-import { AuthService } from 'src/app/features/authentication/services/auth.service';
 import { CartWishlistService } from 'src/app/features/cart-wishlist/services/cart-wishlist.service';
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
-import { IWishList } from 'src/app/shared/interfaces/client/wish-list.interface';
-import { ProductsService } from 'src/app/shared/services/products.service';
+import { ProductsService } from 'src/app/api/products.service';
 import { IBannerSale } from '../../interfaces/banner-sale.interface';
+import { SalesService } from 'src/app/api/sales.service';
 
 @Component({
   selector: 'rimss-landing',
@@ -21,11 +20,13 @@ export class LandingComponent extends BaseComponent implements OnInit {
   public salesLoaded = false;
   public newProducts: Array<IProductInfo> = [];
   public recommendedProducts: Array<IProductInfo> = [];
+  public loading = false;
 
   constructor(
     private router: Router,
     private productsService: ProductsService,
-    private cartWishlistService: CartWishlistService
+    private cartWishlistService: CartWishlistService,
+    private salesService: SalesService
   ) {
     super();
     this.initCarouselConfig();
@@ -92,34 +93,41 @@ export class LandingComponent extends BaseComponent implements OnInit {
   }
 
   private initSliderImages(): void {
-    this.productsService
+    this.loading = true;
+    this.salesService
       .fetchAllBannerSales()
       .pipe(takeUntil(this.componentDestroyed$))
       .subscribe({
         next: (bannerSales) => {
+          this.loading = false;
           this.bannerSales = bannerSales;
           this.salesLoaded = true;
-          console.error('banner sales', this.bannerSales);
         },
         error: (err) => {
+          this.loading = false;
           this.bannerSales = [];
           this.salesLoaded = true;
-        },
+        }
       });
   }
 
   private initNewProducts(): void {
+    this.loading = true;
     const wishList$ = this.cartWishlistService.getWishListProducts();
     const newProducts$ = this.productsService.fetchAllProducts();
     forkJoin([wishList$, newProducts$])
       .pipe(takeUntil(this.componentDestroyed$))
       .subscribe({
         next: (response) => {
+          this.loading = false;
           this.newProducts = response[1];
           this.newProducts.forEach((product) => {
             product.isInWishList = this.isInWishList(product.id);
           });
         },
+        error: () => {
+          this.loading = false;
+        }
       });
   }
 
