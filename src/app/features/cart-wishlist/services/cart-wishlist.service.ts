@@ -14,7 +14,7 @@ import { AuthService } from '../../authentication/services/auth.service';
 import { ICartProduct } from '../interfaces/cart-product.interface';
 
 @Injectable({
-  providedIn: "root"
+  providedIn: 'root',
 })
 export class CartWishlistService implements OnDestroy {
   private serviceDestroyed$ = new Subject<void>();

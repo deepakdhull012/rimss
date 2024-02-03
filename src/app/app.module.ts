@@ -1,12 +1,15 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { StarRatingModule } from 'angular-star-rating';
+import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CoreModule } from './core/core.module';
+import { CartWishlistModule } from './features/cart-wishlist/cart-wishlist.module';
+import { LandingModule } from './features/landing/landing.module';
+import { ProductModule } from './features/product/product.module';
 import { SharedModule } from './shared/shared.module';
-import { StoreModule } from '@ngrx/store';
 
 @NgModule({
   declarations: [
@@ -19,8 +22,7 @@ import { StoreModule } from '@ngrx/store';
     BrowserModule,
     AppRoutingModule,
     CoreModule,
-    SharedModule,
-    StoreModule.forRoot({})
+    SharedModule
   ],
   providers: [],
   bootstrap: [AppComponent]
