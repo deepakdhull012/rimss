@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/features/authentication/services/auth.service';
 import { ICategory } from 'src/app/shared/interfaces/client/category.interface';
-import { ProductsService } from 'src/app/shared/services/products.service';
+import { ProductsService } from 'src/app/api/products.service';
+import { CategoryService } from 'src/app/api/category.service';
 
 @Component({
   selector: 'rimss-header',
@@ -13,7 +14,7 @@ export class HeaderComponent implements OnInit {
   public isLoggedIn = false;
   constructor(
     private router: Router,
-    private productService: ProductsService,
+    private categoryService: CategoryService,
     private authService: AuthService
   ) {}
 
@@ -21,15 +22,14 @@ export class HeaderComponent implements OnInit {
 
   public categories: Array<ICategory> = [];
 
-  ngOnInit(): void {
-    this.productService.fetchAllCategories().subscribe((categories) => {
+  public ngOnInit(): void {
+    this.categoryService.fetchAllCategories().subscribe((categories) => {
       this.categories = categories;
     });
     this.isLoggedIn = !!this.authService.getLoggedInEmail();
   }
 
   navigateTo(path: Array<string>, category?: Array<string>): void {
-    console.error('cat', category);
     this.router.navigate(path, {
       queryParams: {
         category,

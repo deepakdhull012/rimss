@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'rimss-loader',
   templateUrl: './loader.component.html',
-  styleUrl: './loader.component.scss'
+  styleUrls: ['./loader.component.scss']
 })
 export class LoaderComponent {
 

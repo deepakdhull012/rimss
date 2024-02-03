@@ -3,8 +3,10 @@ import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { filter, takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
-import { ProductsService } from 'src/app/shared/services/products.service';
+import { ProductsService } from 'src/app/api/products.service';
 import { SortBy } from '../../interfaces/product-info.interface';
+import { Store } from '@ngrx/store';
+import { IAppState } from 'src/app/core/store/app.state';
 
 @Component({
   selector: 'rimss-product-list',
@@ -20,7 +22,8 @@ export class ProductListComponent extends BaseComponent implements OnInit {
   constructor(
     private productsService: ProductsService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private store: Store<IAppState>
   ) {
     super();
   }
@@ -38,6 +41,14 @@ export class ProductListComponent extends BaseComponent implements OnInit {
         if (event instanceof NavigationStart) {
           this.page = 1;
         }
+      });
+      this.store.select('products').pipe(takeUntil(this.componentDestroyed$)).subscribe(state => {
+        console.log("Store provided the products", state)
+        if (state.products) {
+          this.products = state.products;
+          console.log(this.products)
+        }
+        
       });
     this.route.queryParams.subscribe((params) => {
       const mode: 'banner-sale' | 'category' | 'search' = params['mode'];
@@ -93,23 +104,24 @@ export class ProductListComponent extends BaseComponent implements OnInit {
   }
 
   private fetchproductsBasedOnCriteria(): void {
-    this.loading = true;
-    this.productsService
-      .filterProductsByCriteria(
-        {
-          category: this.categories,
-          filterString: this.filterString,
-          saleId: this.saleId,
-        },
-        this.sortByValue
-      )
-      .subscribe({
-        next: (products) => {
-          this.products = products;
-        },
-        complete: () => {
-          this.loading = false;
-        }
-      });
+    // this.loading = true;
+    // this.store.dispatch(ProductsActions.requestLoadProducts());
+    // this.productsService
+    //   .filterProductsByCriteria(
+    //     {
+    //       category: this.categories,
+    //       filterString: this.filterString,
+    //       saleId: this.saleId,
+    //     },
+    //     this.sortByValue
+    //   )
+    //   .subscribe({
+    //     next: (products) => {
+    //       this.products = products;
+    //     },
+    //     complete: () => {
+    //       this.loading = false;
+    //     }
+    //   });
   }
 }

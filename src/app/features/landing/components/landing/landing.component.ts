@@ -5,7 +5,7 @@ import { forkJoin, take, takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { CartWishlistService } from 'src/app/features/cart-wishlist/services/cart-wishlist.service';
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
-import { ProductsService } from 'src/app/shared/services/products.service';
+import { ProductsService } from 'src/app/api/products.service';
 import { IBannerSale } from '../../interfaces/banner-sale.interface';
 
 @Component({
@@ -24,8 +24,7 @@ export class LandingComponent extends BaseComponent implements OnInit {
   constructor(
     private router: Router,
     private productsService: ProductsService,
-    private cartWishlistService: CartWishlistService,
-    private authService: AuthService
+    private cartWishlistService: CartWishlistService
   ) {
     super();
     this.initCarouselConfig();

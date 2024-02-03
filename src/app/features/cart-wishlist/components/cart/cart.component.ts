@@ -8,9 +8,10 @@ import {
   IOrderSummary,
 } from 'src/app/shared/interfaces/client/order.interface';
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
-import { ProductsService } from 'src/app/shared/services/products.service';
+import { ProductsService } from 'src/app/api/products.service';
 import { ICartProduct } from '../../interfaces/cart-product.interface';
 import { CartWishlistService } from '../../services/cart-wishlist.service';
+import { SalesService } from 'src/app/api/sales.service';
 
 @Component({
   selector: 'rimss-cart',
@@ -21,7 +22,8 @@ export class CartComponent extends BaseComponent implements OnInit {
   constructor(
     private router: Router,
     private cartService: CartWishlistService,
-    private productsService: ProductsService
+    private productsService: ProductsService,
+    private saleService: SalesService
   ) {
     super();
   }
@@ -37,12 +39,12 @@ export class CartComponent extends BaseComponent implements OnInit {
   private coupons: ICoupon[] = [];
   public appliedCoupon?: ICoupon;
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.fetchCartProducts();
     this.fetchCoupons();
   }
 
-  checkout(): void {
+  public checkout(): void {
     this.orderSummary = {
       deliveryCharges: this.deliveryCharges,
       tax: this.tax,
@@ -61,7 +63,31 @@ export class CartComponent extends BaseComponent implements OnInit {
     });
   }
 
-  prepareOrderProducts(): IOrderProduct[] {
+  public removeFromCart(cartProduct: ICartProduct): void {
+    this.cartService
+      .removeFromCart(cartProduct.id as number)
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe((res) => {
+        this.fetchCartProducts();
+      });
+  }
+
+  public applyCoupon(couponName: string): void {
+    this.appliedCoupon = this.coupons.find((coupon) => {
+      return coupon.name === couponName;
+    });
+    this.updateAmounts();
+  }
+
+  public updateQuantity(selectEvent: Event, cartItemIndex: number) {
+    if (selectEvent.target) {
+      const qty: number = (selectEvent.target as any).value;
+      this.cartProducts[cartItemIndex].quantity = qty;
+    }
+    this.updateAmounts();
+  }
+
+  private prepareOrderProducts(): IOrderProduct[] {
     const orderProducts: IOrderProduct[] = [];
     this.cartProducts.forEach((cartProduct) => {
       const orderProduct: IOrderProduct = {
@@ -81,16 +107,7 @@ export class CartComponent extends BaseComponent implements OnInit {
     return orderProducts;
   }
 
-  removeFromCart(cartProduct: ICartProduct): void {
-    this.cartService
-      .removeFromCart(cartProduct.id as number)
-      .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((res) => {
-        this.fetchCartProducts();
-      });
-  }
-
-  fetchCartProducts(): void {
+  private fetchCartProducts(): void {
     this.cartService
       .getCartProducts()
       .pipe(takeUntil(this.componentDestroyed$))
@@ -100,25 +117,20 @@ export class CartComponent extends BaseComponent implements OnInit {
       });
   }
 
-  fetchCoupons(): void {
-    this.productsService
+  private fetchCoupons(): void {
+    this.saleService
       .fetchCoupons()
       .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((coupons) => {
-        this.coupons = coupons;
+      .subscribe({
+        next: (coupons => {
+          this.coupons = coupons;
+        })
       });
   }
 
-  fetchRecommendedProducts(): void {}
+  
 
-  applyCoupon(couponName: string): void {
-    this.appliedCoupon = this.coupons.find((coupon) => {
-      return coupon.name === couponName;
-    });
-    this.updateAmounts();
-  }
-
-  checkCoupon(): void {
+  private checkCoupon(): void {
     if (this.appliedCoupon) {
       console.error(this.discountedPriceSum, this.appliedCoupon.minAmount)
       if (this.discountedPriceSum >= this.appliedCoupon.minAmount) {
@@ -132,14 +144,6 @@ export class CartComponent extends BaseComponent implements OnInit {
     } else {
       this.couponDiscount = 0;
     }
-  }
-
-  updateQuantity(selectEvent: Event, cartItemIndex: number) {
-    if (selectEvent.target) {
-      const qty: number = (selectEvent.target as any).value;
-      this.cartProducts[cartItemIndex].quantity = qty;
-    }
-    this.updateAmounts();
   }
 
   private updateAmounts(): void {
