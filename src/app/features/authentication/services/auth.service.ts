@@ -53,14 +53,13 @@ export class AuthService {
   }
 
   public logout(): void {
-    localStorage.removeItem('token');
     localStorage.removeItem('loggedInEmail');
     localStorage.removeItem('loggedInUser');
     this.router.navigate(['auth']);
   }
 
   public getLoggedInEmail(): string | undefined {
-    if (localStorage.getItem('token')) {
+    if (localStorage.getItem('loggedInUser')) {
       return localStorage.getItem('loggedInEmail') || undefined;
     } else {
       return undefined;

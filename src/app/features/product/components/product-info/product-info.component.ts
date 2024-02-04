@@ -3,12 +3,19 @@ import { Route, Router } from '@angular/router';
 import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { AuthService } from 'src/app/features/authentication/services/auth.service';
-import { CartWishlistService } from 'src/app/features/cart-wishlist/services/cart-wishlist.service';
 import { BannerType } from 'src/app/shared/interfaces/client/banner.interface';
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
 import { BannerService } from 'src/app/shared/services/banner.service';
-import { ProductsService } from 'src/app/api/products.service';
 import { IProductInfoConfig } from '../../interfaces/product-info.interface';
+import { Store } from '@ngrx/store';
+import { IAppState } from 'src/app/core/store/app.state';
+import * as ProductsActions from './../../store/products.actions';
+import {
+  selectCartProducts,
+  selectWishlistProducts,
+} from 'src/app/features/cart-wishlist/store/cart-wishlist.selectors';
+import { ICartProduct } from 'src/app/features/cart-wishlist/interfaces/cart-product.interface';
+import * as CartWishlistActions from './../../../cart-wishlist/store/cart-wishlist.actions';
 
 @Component({
   selector: 'rimss-product-info',
@@ -20,48 +27,52 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
   @Input() productInfoConfig?: IProductInfoConfig;
 
   constructor(
-    private cartWishListService: CartWishlistService,
-    private productService: ProductsService,
     private authService: AuthService,
     private bannerService: BannerService,
-    private router: Router
+    private router: Router,
+    private store: Store<IAppState>
   ) {
     super();
   }
 
+  private cartProducts: ICartProduct[] = [];
+  private wishlistProducts: IProductInfo[] = [];
+
   public ngOnInit(): void {
     this.updateCartStatus();
     this.updateWishListStatus();
-    this.cartWishListService.cartUpdated
+    this.store
+      .select(selectCartProducts)
       .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((_) => {
-        this.cartWishListService.getCartProducts().subscribe((_) => {
-          this.updateCartStatus();
-        });
+      .subscribe((cartProducts) => {
+        this.cartProducts = cartProducts;
+        this.updateCartStatus();
       });
-    this.cartWishListService.wishListUpdated
+    this.store
+      .select(selectWishlistProducts)
       .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((_) => {
-        this.cartWishListService.getWishListProducts().subscribe((_) => {
-          this.updateWishListStatus();
-        });
+      .subscribe((wishlistProducts) => {
+        this.wishlistProducts = wishlistProducts;
+        this.updateWishListStatus();
       });
   }
 
   public addToWishList(): void {
     const loggedInUserEmail = this.authService.getLoggedInEmail();
-    const productInWishList = this.cartWishListService.wishListProducts.find(
-      (p) => {
-        return p.productId === this.productInfo.id;
-      }
-    );
+    console.error(this.wishlistProducts, this.productInfo.id)
+    const productInWishList = this.wishlistProducts.find((p) => {
+      return p.id === this.productInfo.id;
+    });
     if (productInWishList) {
       this.removeFromWishList();
     } else {
       if (loggedInUserEmail) {
-        this.cartWishListService
-          .addProductToWishList(this.productInfo.id, loggedInUserEmail)
-          .subscribe();
+        this.store.dispatch(
+          CartWishlistActions.addProductToWishlist({
+            productId: this.productInfo.id,
+            email: loggedInUserEmail,
+          })
+        );
       } else {
         this.bannerService.displayBanner.next({
           closeIcon: true,
@@ -74,28 +85,36 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
   }
 
   public goToDetailPage(productInfo: IProductInfo): void {
-    this.productService.productSelected = productInfo;
+    this.store.dispatch(
+      ProductsActions.selectProduct({ selectedproduct: productInfo })
+    );
     this.router.navigate([`products`, `details`, `${productInfo.id}`]);
   }
 
   public addToCart(): void {
     const loggedInUserEmail = this.authService.getLoggedInEmail();
     if (loggedInUserEmail) {
-      this.cartWishListService
-        .addProductToCart({
-          cartAddDate: new Date(),
-          cartProductImage: this.productInfo.mainImage,
-          productBrief: this.productInfo.productBrief,
-          productId: this.productInfo.id,
-          productName: this.productInfo.productName,
-          quantity: 1,
-          unitCurrency: this.productInfo.currency,
-          unitPrice: this.productInfo.price,
-          discountedPrice: this.productInfo.priceAfterDiscount,
-          userEmail: loggedInUserEmail,
+      this.store.dispatch(
+        CartWishlistActions.addProductToCart({
+          cartProduct: {
+            cartAddDate: new Date(),
+            cartProductImage: this.productInfo.mainImage,
+            productBrief: this.productInfo.productBrief,
+            productId: this.productInfo.id,
+            productName: this.productInfo.productName,
+            quantity: 1,
+            unitCurrency: this.productInfo.currency,
+            unitPrice: this.productInfo.price,
+            discountedPrice: this.productInfo.priceAfterDiscount,
+            userEmail: loggedInUserEmail,
+          },
         })
+      );
+      this.store
+        .select(selectCartProducts)
+        .pipe(takeUntil(this.componentDestroyed$))
         .subscribe({
-          next: (res) => {
+          next: (cartProducts) => {
             this.bannerService.displayBanner.next({
               closeIcon: true,
               closeTime: 1000,
@@ -115,44 +134,47 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
   }
 
   public removeFromCart(): void {
-    const cartProductId = this.cartWishListService.cartProducts.find(
+    const cartProductId = this.cartProducts.find(
       (cartP) => {
         return cartP.productId === this.productInfo.id;
       }
     )?.id;
     if (cartProductId) {
-      this.cartWishListService.removeFromCart(cartProductId).subscribe();
+      this.store.dispatch(CartWishlistActions.removeFromCart({
+        productId: cartProductId
+      }));
     }
   }
 
   private updateCartStatus(): void {
-    const productInCart = this.cartWishListService.cartProducts.find((p) => {
+    const productInCart = this.cartProducts.find((p) => {
       return p.productId === this.productInfo.id;
     });
-    this.productInfo = {...this.productInfo, isInCart: !!productInCart};
+    this.productInfo = { ...this.productInfo, isInCart: !!productInCart };
   }
 
   private updateWishListStatus(): void {
-    const productInWishList = this.cartWishListService.wishListProducts.find(
+    const productInWishList = this.wishlistProducts.find(
       (wishListProduct) => {
-        return wishListProduct.productId === this.productInfo.id;
+        return wishListProduct.id === this.productInfo.id;
       }
     );
-    this.productInfo = {...this.productInfo, isInWishList: !!productInWishList};
+    this.productInfo = {
+      ...this.productInfo,
+      isInWishList: !!productInWishList,
+    };
   }
 
   private removeFromWishList(): void {
-    const productInWishList = this.cartWishListService.wishListProducts.find(
+    const productInWishList = this.wishlistProducts.find(
       (wishListProduct) => {
-        return wishListProduct.productId === this.productInfo.id;
+        return wishListProduct.id === this.productInfo.id;
       }
     );
     if (productInWishList) {
-      this.cartWishListService
-        .removeFromWishList(productInWishList?.id)
-        .subscribe((_) => {
-          this.cartWishListService.wishListUpdated.next();
-        });
+      this.store.dispatch(CartWishlistActions.removeFromWishlist({
+        productId: productInWishList.id
+      }));
     }
   }
 }

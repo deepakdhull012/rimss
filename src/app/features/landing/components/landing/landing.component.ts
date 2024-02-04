@@ -1,13 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ngxLightOptions } from 'ngx-light-carousel/public-api';
-import { forkJoin, take, takeUntil } from 'rxjs';
+import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
-import { CartWishlistService } from 'src/app/features/cart-wishlist/services/cart-wishlist.service';
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
-import { ProductsService } from 'src/app/api/products.service';
 import { IBannerSale } from '../../interfaces/banner-sale.interface';
-import { SalesService } from 'src/app/api/sales.service';
+import { Store } from '@ngrx/store';
+import { IAppState } from 'src/app/core/store/app.state';
+import * as ProductsActions from './../../../product/store/products.actions';
+import * as CartWishlistActions from './../../../cart-wishlist/store/cart-wishlist.actions';
+import {
+  getRecommendedProducts,
+  selectBannerSales,
+  selectProducts,
+} from 'src/app/features/product/store/products.selectors';
+import { selectWishlistProducts } from 'src/app/features/cart-wishlist/store/cart-wishlist.selectors';
 
 @Component({
   selector: 'rimss-landing',
@@ -17,20 +24,15 @@ import { SalesService } from 'src/app/api/sales.service';
 export class LandingComponent extends BaseComponent implements OnInit {
   public options: ngxLightOptions = {} as ngxLightOptions;
   public bannerSales: Array<IBannerSale> = [];
-  public salesLoaded = false;
   public newProducts: Array<IProductInfo> = [];
   public recommendedProducts: Array<IProductInfo> = [];
   public loading = false;
 
-  constructor(
-    private router: Router,
-    private productsService: ProductsService,
-    private cartWishlistService: CartWishlistService,
-    private salesService: SalesService
-  ) {
+  constructor(private router: Router, private store: Store<IAppState>) {
     super();
     this.initCarouselConfig();
   }
+  private wishListProducts: IProductInfo[] = [];
 
   public ngOnInit(): void {
     this.initSliderImages();
@@ -39,7 +41,9 @@ export class LandingComponent extends BaseComponent implements OnInit {
   }
 
   public goToDetailPage(product: IProductInfo) {
-    this.productsService.productSelected = product;
+    this.store.dispatch(
+      ProductsActions.selectProduct({ selectedproduct: product })
+    );
     this.router.navigate(['product', `${product.id}`]);
   }
 
@@ -94,49 +98,51 @@ export class LandingComponent extends BaseComponent implements OnInit {
 
   private initSliderImages(): void {
     this.loading = true;
-    this.salesService
-      .fetchAllBannerSales()
+    this.store.dispatch(ProductsActions.fetchBannerSales());
+    this.store
+      .select(selectBannerSales)
       .pipe(takeUntil(this.componentDestroyed$))
       .subscribe({
         next: (bannerSales) => {
           this.loading = false;
           this.bannerSales = bannerSales;
-          this.salesLoaded = true;
         },
         error: (err) => {
           this.loading = false;
           this.bannerSales = [];
-          this.salesLoaded = true;
-        }
+        },
       });
   }
 
   private initNewProducts(): void {
     this.loading = true;
-    const wishList$ = this.cartWishlistService.getWishListProducts();
-    const newProducts$ = this.productsService.fetchAllProducts();
-    forkJoin([wishList$, newProducts$])
+    this.store.dispatch(ProductsActions.fetchProducts());
+    this.store.dispatch(CartWishlistActions.fetchWishlistProducts());
+
+    this.store
+      .select(selectWishlistProducts)
       .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe({
-        next: (response) => {
-          this.loading = false;
-          this.newProducts = response[1];
-          this.newProducts.forEach((product) => {
-            product.isInWishList = this.isInWishList(product.id);
-          });
-        },
-        error: () => {
-          this.loading = false;
-        }
+      .subscribe((wishlistProducts) => {
+        this.wishListProducts = wishlistProducts;
+        this.newProducts.forEach((product) => {
+          product = { ...product, isInWishList: this.isInWishList(product.id) };
+        });
+      });
+    this.store
+      .select(selectProducts)
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe((allProducts) => {
+        this.newProducts = allProducts;
+        this.newProducts.forEach((product) => {
+          product = { ...product, isInWishList: this.isInWishList(product.id) };
+        });
       });
   }
 
   private isInWishList(productId: number): boolean {
-    const wishListProduct = this.cartWishlistService.wishListProducts.find(
-      (wishList) => {
-        return wishList.productId === productId;
-      }
-    );
+    const wishListProduct = this.wishListProducts.find((wishList) => {
+      return wishList.id === productId;
+    });
     return !!wishListProduct;
   }
 
@@ -150,13 +156,18 @@ export class LandingComponent extends BaseComponent implements OnInit {
     } else if (userGender === 'F') {
       cats = ['G'];
     }
-    this.productsService
-      .filterProductsByCriteria({
-        category: cats,
+    this.store.dispatch(
+      ProductsActions.fetchRecommendedProducts({
+        filterCriteria: {
+          category: cats,
+        },
       })
+    );
+    this.store
+      .select(getRecommendedProducts)
       .pipe(takeUntil(this.componentDestroyed$))
       .subscribe((recommendedProducts) => {
-        this.recommendedProducts = recommendedProducts;
+        this.recommendedProducts = recommendedProducts || [];
       });
   }
 }

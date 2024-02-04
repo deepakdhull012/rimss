@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject, takeUntil } from 'rxjs';
-import { IBannerSale } from '../features/landing/interfaces/banner-sale.interface';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { ICategory } from '../shared/interfaces/client/category.interface';

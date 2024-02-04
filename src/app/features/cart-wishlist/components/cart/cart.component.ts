@@ -8,10 +8,14 @@ import {
   IOrderSummary,
 } from 'src/app/shared/interfaces/client/order.interface';
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
-import { ProductsService } from 'src/app/api/products.service';
 import { ICartProduct } from '../../interfaces/cart-product.interface';
-import { CartWishlistService } from '../../services/cart-wishlist.service';
-import { SalesService } from 'src/app/api/sales.service';
+import { Store } from '@ngrx/store';
+import * as CartWishlistActions from './../../store/cart-wishlist.actions';
+import {
+  selectCartProducts,
+  selectCoupons,
+} from '../../store/cart-wishlist.selectors';
+import { IAppState } from 'src/app/core/store/app.state';
 
 @Component({
   selector: 'rimss-cart',
@@ -19,11 +23,7 @@ import { SalesService } from 'src/app/api/sales.service';
   styleUrls: ['./cart.component.scss'],
 })
 export class CartComponent extends BaseComponent implements OnInit {
-  constructor(
-    private router: Router,
-    private cartService: CartWishlistService,
-    private saleService: SalesService
-  ) {
+  constructor(private router: Router, private store: Store<IAppState>) {
     super();
   }
   public cartProducts: Array<ICartProduct> = [];
@@ -63,12 +63,11 @@ export class CartComponent extends BaseComponent implements OnInit {
   }
 
   public removeFromCart(cartProduct: ICartProduct): void {
-    this.cartService
-      .removeFromCart(cartProduct.id as number)
-      .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((res) => {
-        this.fetchCartProducts();
-      });
+    this.store.dispatch(
+      CartWishlistActions.removeFromCart({
+        productId: cartProduct.id as number,
+      })
+    );
   }
 
   public applyCoupon(couponName: string): void {
@@ -107,31 +106,32 @@ export class CartComponent extends BaseComponent implements OnInit {
   }
 
   private fetchCartProducts(): void {
-    this.cartService
-      .getCartProducts()
+    this.store
+      .select(selectCartProducts)
       .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((cartProducts) => {
-        this.cartProducts = cartProducts;
-        this.updateAmounts();
+      .subscribe({
+        next: (cartProducts) => {
+          this.cartProducts = cartProducts;
+          this.updateAmounts();
+        },
       });
   }
 
   private fetchCoupons(): void {
-    this.saleService
-      .fetchCoupons()
+    this.store.dispatch(CartWishlistActions.fetchCoupons());
+    this.store
+      .select(selectCoupons)
       .pipe(takeUntil(this.componentDestroyed$))
       .subscribe({
-        next: (coupons => {
+        next: (coupons) => {
           this.coupons = coupons;
-        })
+        },
       });
   }
 
-  
-
   private checkCoupon(): void {
     if (this.appliedCoupon) {
-      console.error(this.discountedPriceSum, this.appliedCoupon.minAmount)
+      console.error(this.discountedPriceSum, this.appliedCoupon.minAmount);
       if (this.discountedPriceSum >= this.appliedCoupon.minAmount) {
         this.couponDiscount =
           this.appliedCoupon.type === 'flat'

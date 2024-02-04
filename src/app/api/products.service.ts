@@ -13,8 +13,6 @@ export class ProductsService implements OnDestroy {
 
   private serviceDestroyed$ = new Subject<void>();
 
-  public productSelected: IProductInfo = {} as IProductInfo;
-
   constructor(private http: HttpClient) {}
 
   public fetchAllProducts(): Observable<Array<IProductInfo>> {
@@ -44,7 +42,7 @@ export class ProductsService implements OnDestroy {
       .pipe(takeUntil(this.serviceDestroyed$));
   }
 
-  public getProductsBySearch(searchText: string): Observable<Array<IProductInfo>> {
+  public fetchProductsBySearchCriteria(searchText: string): Observable<Array<IProductInfo>> {
     return this.http
       .get<Array<IProductInfo>>(`${this.BASE_URL}/products?q=${searchText}`)
       .pipe(takeUntil(this.serviceDestroyed$));

@@ -3,7 +3,7 @@
     *ngIf="loading"
   ></rimss-loader>
 <div class="container-fluid">
-    <ngx-light-carousel *ngIf="salesLoaded" [options]="options" [data]="bannerSales">
+    <ngx-light-carousel *ngIf="bannerSales.length > 0" [options]="options" [data]="bannerSales">
         <div ngx-light-carousel-container>
             <div  ngx-light-carousel-item  *ngFor="let bannerSale of bannerSales; let i = index">
                 <div class="sale w-100">

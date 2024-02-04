@@ -12,9 +12,10 @@ import { ProductRoutingModule } from './product.routes';
 import { CoreModule } from 'src/app/core/core.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { StoreModule } from '@ngrx/store';
-import { productReducer } from "./store/products.reducers";
+import { productReducer, productsFeatureKey } from "./store/products.reducers";
 import { EffectsModule } from '@ngrx/effects';
 import { ProductsEffects } from "./store/products.effects";
+import { CartWishlistModule } from '../cart-wishlist/cart-wishlist.module';
 
 
 
@@ -32,7 +33,7 @@ import { ProductsEffects } from "./store/products.effects";
     StarRatingModule.forRoot(),
     MatSelectModule,
     SharedModule,
-    StoreModule.forFeature("products", productReducer),
+    StoreModule.forFeature(productsFeatureKey, productReducer),
     EffectsModule.forFeature(ProductsEffects)
   ],
   exports: [

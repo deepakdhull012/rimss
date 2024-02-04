@@ -2,12 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
-import { IFilterCriteria, IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
-import { ProductsService } from 'src/app/api/products.service';
+import {
+  IFilterCriteria,
+  IProductInfo,
+} from 'src/app/shared/interfaces/client/product.interface';
 import { SortBy } from '../../interfaces/product-info.interface';
 import { Store } from '@ngrx/store';
 import { IAppState } from 'src/app/core/store/app.state';
-import * as ProductsActions from "./../../store/products.actions";
+import * as ProductsActions from './../../store/products.actions';
+import { selectProductState } from '../../store/products.selectors';
 
 @Component({
   selector: 'rimss-product-list',
@@ -21,7 +24,6 @@ export class ProductListComponent extends BaseComponent implements OnInit {
   public loading = false;
 
   constructor(
-    private productsService: ProductsService,
     private route: ActivatedRoute,
     private router: Router,
     private store: Store<IAppState>
@@ -33,7 +35,6 @@ export class ProductListComponent extends BaseComponent implements OnInit {
   private categories: Array<string> = [];
   private filterString?: string;
   private sortByValue?: SortBy;
-  
 
   public ngOnInit(): void {
     this.router.events
@@ -43,13 +44,13 @@ export class ProductListComponent extends BaseComponent implements OnInit {
           this.page = 1;
         }
       });
-      this.store.select('products').pipe(takeUntil(this.componentDestroyed$)).subscribe(state => {
-        console.log("Store provided the products", state)
+    this.store
+      .select(selectProductState)
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe((state) => {
         if (state.products) {
           this.products = state.products;
-          console.log(this.products)
         }
-        
       });
     this.route.queryParams.subscribe((params) => {
       const mode: 'banner-sale' | 'category' | 'search' = params['mode'];
@@ -66,28 +67,22 @@ export class ProductListComponent extends BaseComponent implements OnInit {
         this.categories = [this.categories[this.categories.length - 1]];
       }
 
-        if (mode === 'banner-sale') {
-          this.fetchproductsBasedOnCriteria();
-        } else if (mode === 'search') {
-          this.loading = true;
-          this.productsService
-            .getProductsBySearch(searchText)
-            .subscribe({
-              next: (products) => {
-                this.products = products;
-              },
-              complete: () => {
-                this.loading = false;
-              }
-            });
-        } else {
-          this.fetchproductsBasedOnCriteria();
-        }
-      })   
+      if (mode === 'search') {
+        this.store.dispatch(
+          ProductsActions.fetchProductsBySearchCritera({
+            searchtext: searchText,
+          })
+        );
+      } else {
+        this.fetchproductsBasedOnCriteria();
+      }
+    });
   }
 
   public goToDetailPage(product: IProductInfo) {
-    this.productsService.productSelected = product;
+    this.store.dispatch(
+      ProductsActions.selectProduct({ selectedproduct: product })
+    );
     this.router.navigate(['product', `${product.id}`]);
   }
 
@@ -110,8 +105,10 @@ export class ProductListComponent extends BaseComponent implements OnInit {
       filterString: this.filterString,
       saleId: this.saleId,
     };
-    this.store.dispatch(ProductsActions.fetchCategoryProducts({
-      filterCriteria: filterCritera
-    }));
+    this.store.dispatch(
+      ProductsActions.fetchProductsByCatgory({
+        filterCriteria: filterCritera,
+      })
+    );
   }
 }

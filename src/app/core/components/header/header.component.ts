@@ -2,9 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/features/authentication/services/auth.service';
 import { ICategory } from 'src/app/shared/interfaces/client/category.interface';
-import { CategoryService } from 'src/app/api/category.service';
 import { BaseComponent } from '../base/base.component';
 import { takeUntil } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { IAppState } from '../../store/app.state';
+import * as RootActions from './../../store/app.actions';
+import { selectCategories } from '../../store/app.selectors';
 
 @Component({
   selector: 'rimss-header',
@@ -16,8 +19,8 @@ export class HeaderComponent extends BaseComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private categoryService: CategoryService,
-    private authService: AuthService
+    private authService: AuthService,
+    private store: Store<IAppState>
   ) {
     super();
   }
@@ -27,9 +30,6 @@ export class HeaderComponent extends BaseComponent implements OnInit {
   public categories: Array<ICategory> = [];
 
   public ngOnInit(): void {
-    this.categoryService.fetchAllCategories().subscribe((categories) => {
-      this.categories = categories;
-    });
     this.isLoggedIn = !!this.authService.getLoggedInEmail();
     this.fetchAllCategories();
   }
@@ -52,13 +52,14 @@ export class HeaderComponent extends BaseComponent implements OnInit {
   }
 
   private fetchAllCategories(): void {
-    this.categoryService
-      .fetchAllCategories()
+    this.store.dispatch(RootActions.fetchCategories());
+    this.store
+      .select(selectCategories)
       .pipe(takeUntil(this.componentDestroyed$))
       .subscribe({
         next: (categories) => {
           this.categories = categories;
-        }
+        },
       });
   }
 

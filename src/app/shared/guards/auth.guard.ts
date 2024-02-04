@@ -15,8 +15,8 @@ export class AuthGuard  {
   public canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-      const token = localStorage.getItem("token");
-      if (token) {
+      const loggedInUser = localStorage.getItem("loggedInUser");
+      if (loggedInUser) {
         return true;
       } else {
         this.bannerService.displayBanner.next({

@@ -10,8 +10,8 @@ import {
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
 import { IWishList } from 'src/app/shared/interfaces/client/wish-list.interface';
 import { environment } from 'src/environments/environment';
-import { AuthService } from '../../authentication/services/auth.service';
-import { ICartProduct } from '../interfaces/cart-product.interface';
+import { AuthService } from '../features/authentication/services/auth.service';
+import { ICartProduct } from '../features/cart-wishlist/interfaces/cart-product.interface';
 
 @Injectable({
   providedIn: "root"
@@ -19,8 +19,7 @@ import { ICartProduct } from '../interfaces/cart-product.interface';
 export class CartWishlistService implements OnDestroy {
   private serviceDestroyed$ = new Subject<void>();
 
-  public cartProducts: Array<ICartProduct> = [];
-  public wishListProducts: Array<IWishList> = [];
+
   public cartUpdated: Subject<void> = new Subject<void>();
   public wishListUpdated: Subject<void> = new Subject<void>();
 
@@ -32,7 +31,7 @@ export class CartWishlistService implements OnDestroy {
    
   }
 
-  addProductToWishList(
+  public addProductToWishList(
     productId: number,
     email: string
   ): Observable<IWishList> {
@@ -49,7 +48,7 @@ export class CartWishlistService implements OnDestroy {
       );
   }
 
-  addProductToCart(cartProduct: ICartProduct): Observable<ICartProduct> {
+  public addProductToCart(cartProduct: ICartProduct): Observable<ICartProduct> {
     return this.httpClient
       .post<ICartProduct>(`${this.BASE_URL}/cart`, cartProduct)
       .pipe(
@@ -60,7 +59,7 @@ export class CartWishlistService implements OnDestroy {
       );
   }
 
-  getWishListProducts(): Observable<IProductInfo[]> {
+  public getWishListProducts(): Observable<IProductInfo[]> {
     const loggedInUserEmail = this.authService.getLoggedInEmail();
     return this.httpClient
       .get<Array<IWishList>>(
@@ -69,9 +68,8 @@ export class CartWishlistService implements OnDestroy {
       .pipe(
         takeUntil(this.serviceDestroyed$),
         switchMap((wishlistProducts) => {
-          this.wishListProducts = wishlistProducts;
           let filterString = '';
-          this.wishListProducts.forEach((w) => {
+          wishlistProducts.forEach((w) => {
             filterString += `id=${w.productId}&`;
           });
           filterString = filterString.substring(0, filterString.length - 1);
@@ -82,52 +80,37 @@ export class CartWishlistService implements OnDestroy {
       );
   }
 
-  getCartProducts(): Observable<Array<ICartProduct>> {
+  public getCartProducts(): Observable<Array<ICartProduct>> {
     const loggedInUserEmail = this.authService.getLoggedInEmail();
     return this.httpClient
       .get<Array<ICartProduct>>(
         `${this.BASE_URL}/cart?userEmail=${loggedInUserEmail}`
-      )
-      .pipe(
-        takeUntil(this.serviceDestroyed$),
-        tap((cartProducts) => {
-          this.cartProducts = cartProducts;
-        })
       );
   }
 
-  removeFromCart(cartProductId: number): Observable<any> {
+  public removeFromCart(cartProductId: number): Observable<any> {
     return this.httpClient
-      .delete(`${this.BASE_URL}/cart/${cartProductId}`)
-      .pipe(
-        takeUntil(this.serviceDestroyed$),
-        tap((_) => {
-          this.cartUpdated.next();
-        })
-      );
+      .delete(`${this.BASE_URL}/cart/${cartProductId}`);
   }
 
-  removeFromWishList(wishListProductId: number): Observable<any> {
+  public removeFromWishList(wishListProductId: number): Observable<any> {
     return this.httpClient
-      .delete(`${this.BASE_URL}/wish-list/${wishListProductId}`)
-      .pipe(
-        takeUntil(this.serviceDestroyed$),
-        tap((_) => {
-          this.wishListUpdated.next();
-        })
-      );
+      .delete(`${this.BASE_URL}/wish-list/${wishListProductId}`);
   }
 
-  clearCart(): Observable<any> {
-    const cartremoveRequest$: any[] = [];
-    this.cartProducts.forEach((cartProduct) => {
-      const removeCartReq = this.removeFromCart(cartProduct.id as number);
-      cartremoveRequest$.push(removeCartReq);
-    });
-    return forkJoin(cartremoveRequest$);
+  public clearCart(): Observable<any> {
+    
+    return this.getCartProducts().pipe(switchMap(cartProducts => {
+      const cartremoveRequest$: any[] = [];
+      cartProducts.forEach((cartProduct) => {
+        const removeCartReq = this.removeFromCart(cartProduct.id as number);
+        cartremoveRequest$.push(removeCartReq);
+      });
+      return forkJoin(cartremoveRequest$);
+    }))
   }
 
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this.serviceDestroyed$.next();
   }
 }

@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { IProductInfoConfig } from 'src/app/features/product/interfaces/product-info.interface';
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
-import { CartWishlistService } from '../../services/cart-wishlist.service';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { takeUntil } from 'rxjs';
+import { selectCartProducts, selectWishlistProducts } from '../../store/cart-wishlist.selectors';
+import { IAppState } from 'src/app/core/store/app.state';
+import { Store } from '@ngrx/store';
 
 @Component({
   selector: 'rimss-wishlist',
@@ -11,7 +13,7 @@ import { takeUntil } from 'rxjs';
   styleUrls: ['./wishlist.component.scss'],
 })
 export class WishlistComponent extends BaseComponent implements OnInit {
-  constructor(private cartWishListService: CartWishlistService) {
+  constructor(private store: Store<IAppState>) {
     super();
   }
 
@@ -25,8 +27,7 @@ export class WishlistComponent extends BaseComponent implements OnInit {
   }
 
   private getWishListProducts(): void {
-    this.cartWishListService
-      .getWishListProducts()
+    this.store.select(selectWishlistProducts)
       .pipe(takeUntil(this.componentDestroyed$))
       .subscribe({
         next: (products) => {
