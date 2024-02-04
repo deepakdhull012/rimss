@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { of, switchMap, takeLast, takeUntil } from 'rxjs';
+import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import {
   IOrder,
-  IOrderProduct,
   IOrderProductUI,
 } from 'src/app/shared/interfaces/client/order.interface';
-import { OrderService } from 'src/app/shared/services/order.service';
+import { IAppState } from 'src/app/core/store/app.state';
+import { Store } from '@ngrx/store';
+import { selectOrders } from '../../store/orders.selectors';
+import * as OrdersActions from './../../store/orders.actions';
 
 @Component({
   selector: 'rimss-orders',
@@ -17,7 +19,7 @@ export class OrdersComponent extends BaseComponent implements OnInit {
   private orders: IOrder[] = [];
   public orderProducts: IOrderProductUI[] = [];
 
-  constructor(private orderService: OrderService) {
+  constructor(private store: Store<IAppState>) {
     super();
   }
 
@@ -26,12 +28,15 @@ export class OrdersComponent extends BaseComponent implements OnInit {
   }
 
   private fetchOrders(): void {
-    this.orderService
-      .fetchOrder()
+    this.store.dispatch(OrdersActions.fetchOrders());
+    this.store
+      .select(selectOrders)
       .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((orders) => {
-        this.orders = orders;
-        this.mapToOrderProductsUI();
+      .subscribe({
+        next: (orders) => {
+          this.orders = orders;
+          this.mapToOrderProductsUI();
+        },
       });
   }
 

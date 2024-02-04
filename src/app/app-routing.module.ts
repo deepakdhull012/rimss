@@ -27,11 +27,6 @@ const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
-    path: "checkout",
-    loadChildren: () => import('./features/checkout/checkout.module').then(module => module.CheckoutModule),
-    canActivate: [AuthGuard]
-  },
-  {
     path: "thank-you",
     loadChildren: () => import('./features/thank-you/thank-you.module').then(module => module.ThankYouModule),
   },

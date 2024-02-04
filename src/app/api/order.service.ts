@@ -3,7 +3,7 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { AuthService } from 'src/app/features/authentication/services/auth.service';
 import { environment } from 'src/environments/environment';
-import { IOrder } from '../interfaces/client/order.interface';
+import { IOrder } from '../shared/interfaces/client/order.interface';
 
 @Injectable({
   providedIn: 'root'

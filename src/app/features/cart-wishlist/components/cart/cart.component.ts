@@ -55,7 +55,7 @@ export class CartComponent extends BaseComponent implements OnInit {
       couponDiscount: this.couponDiscount,
       fromcart: true,
     };
-    this.router.navigate(['checkout'], {
+    this.router.navigate(['orders', 'checkout'], {
       state: {
         orderSummary: this.orderSummary,
       },
@@ -106,6 +106,7 @@ export class CartComponent extends BaseComponent implements OnInit {
   }
 
   private fetchCartProducts(): void {
+    this.store.dispatch(CartWishlistActions.fetchCartProducts());
     this.store
       .select(selectCartProducts)
       .pipe(takeUntil(this.componentDestroyed$))

@@ -7,12 +7,13 @@ import { AuthService } from 'src/app/features/authentication/services/auth.servi
 import { IAddress } from 'src/app/features/user/interfaces/profile.interface';
 import { UserService } from 'src/app/features/user/services/user.service';
 import { IOrderSummary } from 'src/app/shared/interfaces/client/order.interface';
-import { OrderService } from 'src/app/shared/services/order.service';
 import { PaymentMode } from '../../interfaces/payment.interface';
 import { Store } from '@ngrx/store';
-import * as CartWishlistActions from './../../../cart-wishlist/store/cart-wishlist.actions';
+import * as CartWishlistActions from '../../../cart-wishlist/store/cart-wishlist.actions';
+import * as OrdersActions from '../../../orders/store/orders.actions';
 import { selectCartProducts } from 'src/app/features/cart-wishlist/store/cart-wishlist.selectors';
 import { IAppState } from 'src/app/core/store/app.state';
+import { selectOrders } from '../../store/orders.selectors';
 
 @Component({
   selector: 'rimss-checkout',
@@ -31,7 +32,6 @@ export class CheckoutComponent extends BaseComponent implements OnInit {
   public paymentMethod = PaymentMode.CASH_ON_DELIVERY;
   constructor(
     private router: Router,
-    private orderService: OrderService,
     private userService: UserService,
     private authService: AuthService,
     private store: Store<IAppState>
@@ -53,29 +53,34 @@ export class CheckoutComponent extends BaseComponent implements OnInit {
   public makeOrder(): void {
     const user = this.authService.getUser();
     if (this.orderSummary && this.defaultAddressIdForOrder && user) {
-      this.orderService
-        .makeOrder({
-          addressId: this.defaultAddressIdForOrder,
-          deliveryCharges: this.orderSummary?.deliveryCharges,
-          discountedPrice: this.orderSummary?.discountedPrice,
-          orderAmount: this.orderSummary.orderAmount,
-          originalPrice: this.orderSummary.originalPrice,
-          productOrders: this.orderSummary.productOrders,
-          tax: this.orderSummary.tax,
-          userId: user.id as number,
-          couponCode: this.orderSummary.couponCode,
-          orderDate: new Date(),
+      this.store.dispatch(
+        OrdersActions.createOrder({
+          order: {
+            addressId: this.defaultAddressIdForOrder,
+            deliveryCharges: this.orderSummary?.deliveryCharges,
+            discountedPrice: this.orderSummary?.discountedPrice,
+            orderAmount: this.orderSummary.orderAmount,
+            originalPrice: this.orderSummary.originalPrice,
+            productOrders: this.orderSummary.productOrders,
+            tax: this.orderSummary.tax,
+            userId: user.id as number,
+            couponCode: this.orderSummary.couponCode,
+            orderDate: new Date(),
+          },
         })
+      );
+      this.store
+        .select(selectOrders)
         .pipe(takeUntil(this.componentDestroyed$))
         .subscribe((_) => {
           if (this.orderSummary?.fromcart) {
-            // this.store.dispatch(CartWishlistActions.clearCartItems());
-            // this.store
-            //   .select(selectCartProducts)
-            //   .pipe(takeUntil(this.componentDestroyed$))
-            //   .subscribe((_) => {
-            //     this.router.navigate(['orders']);
-            //   });
+            this.store.dispatch(CartWishlistActions.clearCartItems());
+            this.store
+              .select(selectCartProducts)
+              .pipe(takeUntil(this.componentDestroyed$))
+              .subscribe((_) => {
+                this.router.navigate(['orders']);
+              });
           }
         });
     }
