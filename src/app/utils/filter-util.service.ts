@@ -1,47 +1,20 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable, OnDestroy } from '@angular/core';
-import { Observable, of, Subject, takeUntil } from 'rxjs';
-import { environment } from 'src/environments/environment';
-import {
-  IBrand,
-  IFilterObject,
-  IPriceRange,
-} from '../interfaces/filter-config.interface';
+import { Injectable } from '@angular/core';
+import { IFilterObject, IPriceRange } from '../features/filter/interfaces/filter-config.interface';
 
-@Injectable()
-export class FilterService implements OnDestroy {
-  private BASE_URL = environment.BASE_API_URL;
+@Injectable({
+  providedIn: 'root'
+})
+export class FilterUtilService {
 
-  private serviceDestroyed$ = new Subject<void>();
-  public onClear: Subject<void> = new Subject<void>();
-
-  constructor(private http: HttpClient) {}
-
-  public getBrands(): Observable<Array<IBrand>> {
-    return this.http
-      .get<Array<IBrand>>(`${this.BASE_URL}/brands`)
-      .pipe(takeUntil(this.serviceDestroyed$));
-  }
-
-  public getPriceBreakPoint(): Observable<Array<number>> {
-    return of([500, 1000, 1500, 2000, 5000]);
-  }
-
-  public getDiscountBreakPoints(): Observable<Array<number>> {
-    return of([10, 20, 30, 40, 50]);
-  }
-
-  public getSizes(): Observable<Array<string>> {
-    return of(['SM', 'M', 'L', 'XL', 'XXL']);
-  }
+  constructor() { }
 
   public getFilterString(filterObj: IFilterObject): string {
     let filterString = '';
-    filterString = this.appendBrandString(filterString, filterObj.brandIds);
-    filterString = this.appendPriceString(filterString, filterObj.priceRange);
-    filterString = this.appendRatingString(filterString, filterObj.rating);
-    filterString = this.appendSizeString(filterString, filterObj.size);
-    filterString = this.appendDiscountString(filterString, filterObj.discount);
+    filterString = this.appendBrandString(filterString, filterObj.selectedBrands);
+    filterString = this.appendPriceString(filterString, filterObj.selectedPriceRanges);
+    filterString = this.appendRatingString(filterString, filterObj.selectedRating);
+    filterString = this.appendSizeString(filterString, filterObj.selectedSizes);
+    filterString = this.appendDiscountString(filterString, filterObj.selectedDiscountRanges);
     return filterString;
   }
 
@@ -97,9 +70,5 @@ export class FilterService implements OnDestroy {
       initialFilterString += `&productDiscountInPercentage_gte=${discount}`;
     }
     return initialFilterString;
-  }
-
-  public ngOnDestroy(): void {
-    this.serviceDestroyed$.next();
   }
 }

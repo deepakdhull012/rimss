@@ -11,7 +11,11 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { StarRatingModule } from 'angular-star-rating';
-import { FilterService } from './services/filter.service';
+import { FilterService } from '../../api/filter.service';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { filterReducer, filtersFeatureKey } from './store/filter.reducers';
+import { FiltersEffect } from './store/filter.effects';
 
 @NgModule({
   declarations: [
@@ -29,6 +33,8 @@ import { FilterService } from './services/filter.service';
     MatDividerModule,
     MatExpansionModule,
     MatButtonModule,
+    StoreModule.forFeature(filtersFeatureKey, filterReducer),
+    EffectsModule.forFeature(FiltersEffect),
   ],
   exports: [
     PriceFilterComponent,

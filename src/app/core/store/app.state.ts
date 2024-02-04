@@ -6,6 +6,8 @@ import { cartWishlistFeatureKey } from 'src/app/features/cart-wishlist/store/car
 import { ICartWishListState } from 'src/app/features/cart-wishlist/store/cart-wishlist.state';
 import { ordersFeatureKey } from 'src/app/features/orders/store/orders.reducers';
 import { IOrderState } from 'src/app/features/orders/store/orders.state';
+import { filtersFeatureKey } from 'src/app/features/filter/store/filter.reducers';
+import { IFilterState } from 'src/app/features/filter/store/filter.state';
 
 export interface ICoreState {
   categories: ICategory[];
@@ -15,4 +17,5 @@ export interface IAppState {
   [productsFeatureKey]: IProductState;
   [cartWishlistFeatureKey]: ICartWishListState;
   [ordersFeatureKey]: IOrderState;
+  [filtersFeatureKey]: IFilterState;
 }

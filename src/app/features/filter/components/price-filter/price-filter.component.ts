@@ -3,7 +3,10 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { IPriceRange } from '../../interfaces/filter-config.interface';
-import { FilterService } from '../../services/filter.service';
+import { Store } from '@ngrx/store';
+import { IAppState } from 'src/app/core/store/app.state';
+import * as FiltersAction from './../../store/filter.actions';
+import { selectPriceBreakPoints } from '../../store/filter.selectors';
 
 @Component({
   selector: 'rimss-price-filter',
@@ -15,43 +18,48 @@ export class PriceFilterComponent extends BaseComponent implements OnInit {
   public priceRange: Array<IPriceRange> = [];
 
   public selectedPriceRange: Array<IPriceRange> = [];
-  @Output() priceRangeChange: EventEmitter<Array<IPriceRange>> =
-    new EventEmitter<Array<IPriceRange>>();
 
-  constructor(private filterService: FilterService) {
+  constructor(private store: Store<IAppState>) {
     super();
   }
 
   public ngOnInit(): void {
-    this.handleClear();
     this.fetchPriceBreakPoints();
   }
 
   public onPriceChange(event: MatCheckboxChange): void {
     const index = +event.source.value;
     if (event.checked) {
-      this.selectedPriceRange.push(this.priceRange[index]);
+      console.error(
+        'selected price range',
+        this.selectedPriceRange,
+        this.priceRange[index],
+        index
+      );
+      this.selectedPriceRange = [
+        ...this.selectedPriceRange,
+        this.priceRange[index],
+      ];
     } else {
       const matchingIndex = this.selectedPriceRange.findIndex((priceRange) => {
         return priceRange.index === index;
       });
-      this.selectedPriceRange.splice(matchingIndex, 1);
-    }
-    this.priceRangeChange.next(this.selectedPriceRange);
-  }
 
-  private handleClear(): void {
-    this.filterService.onClear
-      .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((_) => {
-        this.selectedPriceRange = [];
-        this.priceRangeChange.next(this.selectedPriceRange);
-      });
+      this.selectedPriceRange = this.selectedPriceRange.filter(
+        (pr, index) => index !== matchingIndex
+      );
+    }
+    this.store.dispatch(
+      FiltersAction.priceRangeChanged({
+        priceRange: this.selectedPriceRange,
+      })
+    );
   }
 
   private fetchPriceBreakPoints(): void {
-    this.filterService
-      .getPriceBreakPoint()
+    this.store.dispatch(FiltersAction.fetchPriceBreakPoints());
+    this.store
+      .select(selectPriceBreakPoints)
       .pipe(takeUntil(this.componentDestroyed$))
       .subscribe({
         next: (priceRange) => {

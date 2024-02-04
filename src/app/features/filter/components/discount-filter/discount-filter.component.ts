@@ -2,7 +2,12 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
-import { FilterService } from '../../services/filter.service';
+import * as FiltersActions from './../../store/filter.actions';
+import {
+  selectDiscountBreakPoints,
+} from '../../store/filter.selectors';
+import { IAppState } from 'src/app/core/store/app.state';
+import { Store } from '@ngrx/store';
 
 @Component({
   selector: 'rimss-discount-filter',
@@ -16,12 +21,11 @@ export class DiscountFilterComponent extends BaseComponent implements OnInit {
     Array<number>
   >();
 
-  constructor(private filterService: FilterService) {
+  constructor(private store: Store<IAppState>) {
     super();
   }
 
   public ngOnInit(): void {
-    this.handleClear();
     this.fetchDiscountBreakPoints();
   }
 
@@ -35,22 +39,14 @@ export class DiscountFilterComponent extends BaseComponent implements OnInit {
     this.discountChange.next(this.selectedDiscounts);
   }
 
-  private handleClear(): void {
-    this.filterService.onClear
-      .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((_) => {
-        this.selectedDiscounts = [];
-        this.discountChange.next(this.selectedDiscounts);
-      });
-  }
-
   private fetchDiscountBreakPoints(): void {
-    this.filterService
-      .getDiscountBreakPoints()
+    this.store.dispatch(FiltersActions.fetchDiscountBreakpoints());
+    this.store
+      .select(selectDiscountBreakPoints)
       .pipe(takeUntil(this.componentDestroyed$))
       .subscribe({
-        next: (discounts) => {
-          this.discounts = discounts;
+        next: (discountBreakPoints) => {
+          this.discounts = discountBreakPoints;
         },
       });
   }

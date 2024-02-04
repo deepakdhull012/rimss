@@ -2,10 +2,6 @@ import { createAction, props } from '@ngrx/store';
 
 import { IOrder } from 'src/app/shared/interfaces/client/order.interface';
 
-export const requestLoadProducts = createAction(
-  '[Product/API] Request Load Products'
-);
-
 export const fetchOrders = createAction(
   '[Orders] Fetch Orders'
 );

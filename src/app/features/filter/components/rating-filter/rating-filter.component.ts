@@ -1,9 +1,11 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
-import { takeUntil } from 'rxjs';
+import { min, takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { IFilterRating } from '../../interfaces/filter-config.interface';
-import { FilterService } from '../../services/filter.service';
+import { IAppState } from 'src/app/core/store/app.state';
+import * as FiltersActions from './../../store/filter.actions';
+import { Store } from '@ngrx/store';
 
 @Component({
   selector: 'rimss-rating-filter',
@@ -17,35 +19,29 @@ export class RatingFilterComponent extends BaseComponent implements OnInit {
     Array<number>
   >();
 
-  constructor(private filterService: FilterService) {
+  constructor(private store: Store<IAppState>) {
     super();
   }
 
   public ngOnInit(): void {
-    this.handleClear();
     this.initRatingOptions();
   }
 
   onRatingChange(event: MatCheckboxChange): void {
     const minRating = +event.source.value;
     if (event.checked) {
-      this.selectedRatingOptions.push(minRating);
+      this.selectedRatingOptions = [...this.selectedRatingOptions, minRating];
     } else {
       const matchingIndex = this.selectedRatingOptions.indexOf(minRating);
-      this.selectedRatingOptions.splice(matchingIndex, 1);
+      this.selectedRatingOptions = this.selectedRatingOptions.filter(
+        (r, i) => i !== matchingIndex
+      );
     }
-    this.ratingChange.next(this.selectedRatingOptions);
-  }
-
-  private handleClear(): void {
-    this.filterService.onClear
-      .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe({
-        next: (_) => {
-          this.selectedRatingOptions = [];
-          this.ratingChange.next(this.selectedRatingOptions);
-        },
-      });
+    this.store.dispatch(
+      FiltersActions.ratingChanged({
+        ratings: this.selectedRatingOptions,
+      })
+    );
   }
 
   private initRatingOptions(): void {
