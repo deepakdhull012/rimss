@@ -2,8 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
 import { Observable, of, Subject, takeUntil, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { IUser } from '../../authentication/interfaces/user.interface';
-import { IAddress } from '../interfaces/profile.interface';
+import { IUser } from '../features/authentication/interfaces/user.interface';
+import { IAddress } from '../features/user/interfaces/profile.interface';
 import { AuthUtilService } from 'src/app/utils/auth-util.service';
 
 @Injectable()
@@ -41,9 +41,9 @@ export class UserService implements OnDestroy {
       }));
   }
 
-  public updateAddress(addressPayload: IAddress, addressId: number): Observable<void> {
+  public updateAddress(addressPayload: IAddress): Observable<void> {
     return this.http
-      .put<void>(`${this.BASE_URL}/addresses/${addressId}`, addressPayload)
+      .put<void>(`${this.BASE_URL}/addresses/${addressPayload.id}`, addressPayload)
       .pipe(takeUntil(this.serviceDestroyed$),
       tap(_ => {
         this.addressUpdated$.next();

@@ -10,6 +10,8 @@ import { filtersFeatureKey } from 'src/app/features/filter/store/filter.reducers
 import { IFilterState } from 'src/app/features/filter/store/filter.state';
 import { authFeatureKey } from 'src/app/features/authentication/store/auth.reducers';
 import { IAuthState } from 'src/app/features/authentication/store/auth.state';
+import { userFeatureKey } from 'src/app/features/user/store/users.reducers';
+import { IUserState } from 'src/app/features/user/store/users.state';
 
 export interface ICoreState {
   categories: ICategory[];
@@ -21,4 +23,5 @@ export interface IAppState {
   [ordersFeatureKey]: IOrderState;
   [filtersFeatureKey]: IFilterState;
   [authFeatureKey]: IAuthState;
+  [userFeatureKey]: IUserState;
 }

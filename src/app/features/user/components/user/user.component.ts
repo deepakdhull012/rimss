@@ -4,8 +4,11 @@ import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { IUser } from 'src/app/features/authentication/interfaces/user.interface';
 import { IAddress } from '../../interfaces/profile.interface';
-import { UserService } from '../../services/user.service';
 import { AuthUtilService } from 'src/app/utils/auth-util.service';
+import { IAppState } from 'src/app/core/store/app.state';
+import { Store } from '@ngrx/store';
+import * as UserActions from './../../store/users.actions';
+import { selectAddresses } from '../../store/users.selectors';
 
 @Component({
   selector: 'rimss-user',
@@ -18,7 +21,7 @@ export class UserComponent extends BaseComponent implements OnInit {
 
   constructor(
     private authUtilService: AuthUtilService,
-    private userService: UserService,
+    private store: Store<IAppState>,
     private router: Router
   ) {
     super();
@@ -26,26 +29,18 @@ export class UserComponent extends BaseComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    this.userService.addressUpdated$
+    this.store.dispatch(UserActions.fetchAddresses());
+    this.store
+      .select(selectAddresses)
       .pipe(takeUntil(this.componentDestroyed$))
       .subscribe({
-        next: (_) => {
-          this.getAddresses();
+        next: (addresses) => {
+          this.addresses = addresses;
         },
       });
-    this.getAddresses();
   }
 
   public addAddress(): void {
     this.router.navigate(['profile', 'addresses']);
-  }
-
-  private getAddresses(): void {
-    this.userService
-      .getUserAddresses()
-      .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((addresses) => {
-        this.addresses = addresses;
-      });
   }
 }

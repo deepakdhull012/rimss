@@ -4,22 +4,22 @@ import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { IUser } from 'src/app/features/authentication/interfaces/user.interface';
 import { IAddress } from 'src/app/features/user/interfaces/profile.interface';
-import { UserService } from 'src/app/features/user/services/user.service';
 import { IOrderSummary } from 'src/app/shared/interfaces/client/order.interface';
 import { PaymentMode } from '../../interfaces/payment.interface';
 import { Store } from '@ngrx/store';
 import * as CartWishlistActions from '../../../cart-wishlist/store/cart-wishlist.actions';
 import * as OrdersActions from '../../../orders/store/orders.actions';
+import * as UserActions from '../../../user/store/users.actions';
 import { selectCartProducts } from 'src/app/features/cart-wishlist/store/cart-wishlist.selectors';
 import { IAppState } from 'src/app/core/store/app.state';
 import { selectOrders } from '../../store/orders.selectors';
 import { AuthUtilService } from 'src/app/utils/auth-util.service';
+import { selectAddresses } from 'src/app/features/user/store/users.selectors';
 
 @Component({
   selector: 'rimss-checkout',
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.scss'],
-  providers: [UserService],
 })
 export class CheckoutComponent extends BaseComponent implements OnInit {
   public loggedInEmail?: string;
@@ -32,7 +32,6 @@ export class CheckoutComponent extends BaseComponent implements OnInit {
   public paymentMethod = PaymentMode.CASH_ON_DELIVERY;
   constructor(
     private router: Router,
-    private userService: UserService,
     private authUtilService: AuthUtilService,
     private store: Store<IAppState>
   ) {
@@ -87,8 +86,9 @@ export class CheckoutComponent extends BaseComponent implements OnInit {
   }
 
   public fetchAddresses(): void {
-    this.userService
-      .getUserAddresses()
+    this.store.dispatch(UserActions.fetchAddresses());
+    this.store
+      .select(selectAddresses)
       .pipe(takeUntil(this.componentDestroyed$))
       .subscribe({
         next: (addresses) => {

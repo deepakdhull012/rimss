@@ -4,8 +4,11 @@ import { Router } from '@angular/router';
 import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { IAddress } from '../../interfaces/profile.interface';
-import { UserService } from '../../services/user.service';
 import { AuthUtilService } from 'src/app/utils/auth-util.service';
+import { Store } from '@ngrx/store';
+import { IAppState } from 'src/app/core/store/app.state';
+import * as UserActions from './../../store/users.actions';
+import { selectAddresses } from '../../store/users.selectors';
 
 @Component({
   selector: 'rimss-address',
@@ -21,8 +24,8 @@ export class AddressComponent extends BaseComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private authUtilService: AuthUtilService,
-    private userService: UserService,
-    private router: Router
+    private router: Router,
+    private store: Store<IAppState>
   ) {
     super();
   }
@@ -35,8 +38,13 @@ export class AddressComponent extends BaseComponent implements OnInit {
     this.isSubmitted = true;
     if (this.addressForm.valid) {
       const addressToPost = this.mapToAddressInfo();
-      this.userService
-        .addAddress(addressToPost)
+      this.store.dispatch(
+        UserActions.createAddress({
+          address: addressToPost,
+        })
+      );
+      this.store
+        .select(selectAddresses)
         .pipe(takeUntil(this.componentDestroyed$))
         .subscribe({
           next: (_) => {
