@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  BASE_API_URL: "https://99uiw554cj.execute-api.ap-south-1.amazonaws.com/dev/"
+  BASE_API_URL: "http://localhost:3000"
 };
 
 /*

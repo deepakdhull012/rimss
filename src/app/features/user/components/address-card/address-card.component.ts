@@ -1,35 +1,38 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { IAddress } from '../../interfaces/profile.interface';
-import { UserService } from '../../services/user.service';
+import { Store } from '@ngrx/store';
+import { IAppState } from 'src/app/core/store/app.state';
+import * as UserActions from './../../store/users.actions';
 
 @Component({
   selector: 'rimss-address-card',
   templateUrl: './address-card.component.html',
-  styleUrls: ['./address-card.component.scss']
+  styleUrls: ['./address-card.component.scss'],
 })
-export class AddressCardComponent extends BaseComponent implements OnInit {
-
+export class AddressCardComponent extends BaseComponent {
   @Input() address?: IAddress;
   @Input() readMode = false;
 
-  constructor(private userService: UserService) { 
+  constructor(private store: Store<IAppState>) {
     super();
   }
 
-  ngOnInit(): void {
+  public makeDefault(): void {
+    this.store.dispatch(
+      UserActions.makePrimaryAddress({
+        addressId: this.address?.id as number,
+      })
+    );
   }
 
-  makeDefault(): void {
-    this.userService.markAsPrimaryAddress(this.address?.id as number).subscribe();
+  public deleteAddress(): void {
+    this.store.dispatch(
+      UserActions.deleteAddress({
+        addressId: this.address?.id as number,
+      })
+    );
   }
 
-  deleteAddress(): void {
-    this.userService.deleteAddress(this.address?.id as number).subscribe();
-  }
-
-  editAddress(): void {
-
-  }
-
+  public editAddress(): void {}
 }

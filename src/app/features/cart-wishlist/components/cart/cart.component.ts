@@ -8,9 +8,14 @@ import {
   IOrderSummary,
 } from 'src/app/shared/interfaces/client/order.interface';
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
-import { ProductsService } from 'src/app/shared/services/products.service';
 import { ICartProduct } from '../../interfaces/cart-product.interface';
-import { CartWishlistService } from '../../services/cart-wishlist.service';
+import { Store } from '@ngrx/store';
+import * as CartWishlistActions from './../../store/cart-wishlist.actions';
+import {
+  selectCartProducts,
+  selectCoupons,
+} from '../../store/cart-wishlist.selectors';
+import { IAppState } from 'src/app/core/store/app.state';
 
 @Component({
   selector: 'rimss-cart',
@@ -18,11 +23,7 @@ import { CartWishlistService } from '../../services/cart-wishlist.service';
   styleUrls: ['./cart.component.scss'],
 })
 export class CartComponent extends BaseComponent implements OnInit {
-  constructor(
-    private router: Router,
-    private cartService: CartWishlistService,
-    private productsService: ProductsService
-  ) {
+  constructor(private router: Router, private store: Store<IAppState>) {
     super();
   }
   public cartProducts: Array<ICartProduct> = [];
@@ -37,12 +38,12 @@ export class CartComponent extends BaseComponent implements OnInit {
   private coupons: ICoupon[] = [];
   public appliedCoupon?: ICoupon;
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.fetchCartProducts();
     this.fetchCoupons();
   }
 
-  checkout(): void {
+  public checkout(): void {
     this.orderSummary = {
       deliveryCharges: this.deliveryCharges,
       tax: this.tax,
@@ -52,16 +53,39 @@ export class CartComponent extends BaseComponent implements OnInit {
       productOrders: this.prepareOrderProducts(),
       couponCode: this.appliedCoupon?.name,
       couponDiscount: this.couponDiscount,
-      fromcart: true
+      fromcart: true,
     };
-    this.router.navigate(['checkout'], {
+    this.router.navigate(['orders', 'checkout'], {
       state: {
         orderSummary: this.orderSummary,
       },
     });
   }
 
-  prepareOrderProducts(): IOrderProduct[] {
+  public removeFromCart(cartProduct: ICartProduct): void {
+    this.store.dispatch(
+      CartWishlistActions.removeFromCart({
+        productId: cartProduct.id as number,
+      })
+    );
+  }
+
+  public applyCoupon(couponName: string): void {
+    this.appliedCoupon = this.coupons.find((coupon) => {
+      return coupon.name === couponName;
+    });
+    this.updateAmounts();
+  }
+
+  public updateQuantity(selectEvent: Event, cartItemIndex: number) {
+    if (selectEvent.target) {
+      const qty: number = (selectEvent.target as any).value;
+      this.cartProducts[cartItemIndex].quantity = qty;
+    }
+    this.updateAmounts();
+  }
+
+  private prepareOrderProducts(): IOrderProduct[] {
     const orderProducts: IOrderProduct[] = [];
     this.cartProducts.forEach((cartProduct) => {
       const orderProduct: IOrderProduct = {
@@ -73,7 +97,7 @@ export class CartComponent extends BaseComponent implements OnInit {
         productId: cartProduct.productId,
         productSummary: cartProduct.productBrief,
         productImage: cartProduct.cartProductImage,
-        qty: cartProduct.quantity
+        qty: cartProduct.quantity,
       };
       orderProducts.push(orderProduct);
     });
@@ -81,46 +105,34 @@ export class CartComponent extends BaseComponent implements OnInit {
     return orderProducts;
   }
 
-  removeFromCart(cartProduct: ICartProduct): void {
-    this.cartService
-      .removeFromCart(cartProduct.id as number)
+  private fetchCartProducts(): void {
+    this.store.dispatch(CartWishlistActions.fetchCartProducts());
+    this.store
+      .select(selectCartProducts)
       .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((res) => {
-        this.fetchCartProducts();
+      .subscribe({
+        next: (cartProducts) => {
+          this.cartProducts = cartProducts;
+          this.updateAmounts();
+        },
       });
   }
 
-  fetchCartProducts(): void {
-    this.cartService
-      .getCartProducts()
+  private fetchCoupons(): void {
+    this.store.dispatch(CartWishlistActions.fetchCoupons());
+    this.store
+      .select(selectCoupons)
       .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((cartProducts) => {
-        this.cartProducts = cartProducts;
-        this.updateAmounts();
+      .subscribe({
+        next: (coupons) => {
+          this.coupons = coupons;
+        },
       });
   }
 
-  fetchCoupons(): void {
-    this.productsService
-      .fetchCoupons()
-      .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((coupons) => {
-        this.coupons = coupons;
-      });
-  }
-
-  fetchRecommendedProducts(): void {}
-
-  applyCoupon(couponName: string): void {
-    this.appliedCoupon = this.coupons.find((coupon) => {
-      return coupon.name === couponName;
-    });
-    this.updateAmounts();
-  }
-
-  checkCoupon(): void {
+  private checkCoupon(): void {
     if (this.appliedCoupon) {
-      console.error(this.discountedPriceSum, this.appliedCoupon.minAmount)
+      console.error(this.discountedPriceSum, this.appliedCoupon.minAmount);
       if (this.discountedPriceSum >= this.appliedCoupon.minAmount) {
         this.couponDiscount =
           this.appliedCoupon.type === 'flat'
@@ -132,14 +144,6 @@ export class CartComponent extends BaseComponent implements OnInit {
     } else {
       this.couponDiscount = 0;
     }
-  }
-
-  updateQuantity(selectEvent: Event, cartItemIndex: number) {
-    if (selectEvent.target) {
-      const qty: number = (selectEvent.target as any).value;
-      this.cartProducts[cartItemIndex].quantity = qty;
-    }
-    this.updateAmounts();
   }
 
   private updateAmounts(): void {

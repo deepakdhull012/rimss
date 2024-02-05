@@ -1,8 +1,13 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { MatCheckboxChange } from '@angular/material';
+import { MatCheckboxChange } from '@angular/material/checkbox';
 import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
-import { FilterService } from '../../services/filter.service';
+import * as FiltersActions from './../../store/filter.actions';
+import {
+  selectDiscountBreakPoints,
+} from '../../store/filter.selectors';
+import { IAppState } from 'src/app/core/store/app.state';
+import { Store } from '@ngrx/store';
 
 @Component({
   selector: 'rimss-discount-filter',
@@ -12,26 +17,19 @@ import { FilterService } from '../../services/filter.service';
 export class DiscountFilterComponent extends BaseComponent implements OnInit {
   public discounts: Array<number> = [];
   public selectedDiscounts: Array<number> = [];
-  @Output() discountChange: EventEmitter<Array<number>> = new EventEmitter<Array<number>>();
+  @Output() discountChange: EventEmitter<Array<number>> = new EventEmitter<
+    Array<number>
+  >();
 
-  constructor(private filterService: FilterService) {
+  constructor(private store: Store<IAppState>) {
     super();
   }
 
-  ngOnInit(): void {
-    this.filterService.onClear.pipe(takeUntil(this.componentDestroyed$)).subscribe(_ => {
-      this.selectedDiscounts = [];
-      this.discountChange.next(this.selectedDiscounts);
-    });
-    this.filterService
-      .getDiscountBreakPoints()
-      .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((discounts) => {
-        this.discounts = discounts;
-      });
+  public ngOnInit(): void {
+    this.fetchDiscountBreakPoints();
   }
 
-  onDiscountChange(event: MatCheckboxChange): void {
+  public onDiscountChange(event: MatCheckboxChange): void {
     if (event.checked) {
       this.selectedDiscounts.push(+event.source.value);
     } else {
@@ -39,5 +37,17 @@ export class DiscountFilterComponent extends BaseComponent implements OnInit {
       this.selectedDiscounts.splice(index, 1);
     }
     this.discountChange.next(this.selectedDiscounts);
+  }
+
+  private fetchDiscountBreakPoints(): void {
+    this.store.dispatch(FiltersActions.fetchDiscountBreakpoints());
+    this.store
+      .select(selectDiscountBreakPoints)
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe({
+        next: (discountBreakPoints) => {
+          this.discounts = discountBreakPoints;
+        },
+      });
   }
 }

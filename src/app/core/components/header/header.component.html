@@ -5,7 +5,7 @@
             <div class="col-12">
                 <nav class="main-nav">
                     <!-- ***** Logo Start ***** -->
-                    <a (click)="navigateTo(['/']);$event.stopPropagation()" class="logo">
+                    <a [routerLink]="['/']" class="logo">
                         RIMSS
                     </a>
                     <!-- ***** Logo End ***** -->
@@ -14,22 +14,22 @@
                         <li>
                             <input type="text" #searchHolder (keyup.enter)="searchProducts(searchHolder.value)" class="search-hover" name="" placeholder="search here..." />
                         </li>
-                        <li class="scroll-to-section"><a (click)="navigateTo(['/'])" class="active">Home</a></li>
+                        <li class="scroll-to-section"><a [routerLink]="['/']" class="active">Home</a></li>
                         <li class="submenu" *ngFor="let category of categories" (click)="navigateTo(['products', 'list'], [category.catId])">
                             <a>{{category.name}}</a>
                             <ul>
-                                <li (click)="navigateTo(['products', 'list'], [category.catId, subcategory.catId]);$event.stopPropagation()" *ngFor="let subcategory of category.child"><a routerLink="/about">{{subcategory.name}}</a></li>
+                                <li (click)="navigateTo(['products', 'list'], [category.catId, subcategory.catId]);$event.stopPropagation()" *ngFor="let subcategory of category.child"><a>{{subcategory.name}}</a></li>
                             </ul>
                         </li>
                         <li class="submenu">
                             <a>Account</a>
                             <ul>
-                                <li (click)="navigateTo(['user', 'cart']);$event.stopPropagation()"><a>Cart</a></li>
-                                <li (click)="navigateTo(['orders']);$event.stopPropagation()"><a>Orders</a></li>
-                                <li (click)="navigateTo(['profile']);$event.stopPropagation()"><a>Profile</a></li>
-                                <li (click)="navigateTo(['user', 'wish-list']);$event.stopPropagation()"><a>Wish-list</a></li>
-                                <li *ngIf="isLoggedIn" (click)="logout();$event.stopPropagation()"><a>Logout</a></li>
-                                <li *ngIf="!isLoggedIn" (click)="login();$event.stopPropagation()"><a>Login</a></li>
+                                <li [routerLink]="['user', 'cart']"><a>Cart</a></li>
+                                <li [routerLink]="['orders']"><a>Orders</a></li>
+                                <li [routerLink]="['profile']"><a>Profile</a></li>
+                                <li [routerLink]="['user', 'wish-list']"><a>Wish-list</a></li>
+                                <li *ngIf="isLoggedIn" (click)="logout()"><a>Logout</a></li>
+                                <li *ngIf="!isLoggedIn" (click)="login()"><a>Login</a></li>
                             </ul>
                         </li>
                     </ul>        

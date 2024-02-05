@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { MatSelectModule } from '@angular/material';
+import { MatSelectModule } from '@angular/material/select';
 import { StarRatingModule } from 'angular-star-rating';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { FilterModule } from '../filter/filter.module';
@@ -9,6 +9,13 @@ import { ProductDetailComponent } from './components/product-detail/product-deta
 import { ProductInfoComponent } from './components/product-info/product-info.component';
 import { ProductListComponent } from './components/product-list/product-list.component';
 import { ProductRoutingModule } from './product.routes';
+import { CoreModule } from 'src/app/core/core.module';
+import { SharedModule } from 'src/app/shared/shared.module';
+import { StoreModule } from '@ngrx/store';
+import { productReducer, productsFeatureKey } from "./store/products.reducers";
+import { EffectsModule } from '@ngrx/effects';
+import { ProductsEffects } from "./store/products.effects";
+import { CartWishlistModule } from '../cart-wishlist/cart-wishlist.module';
 
 
 
@@ -24,7 +31,10 @@ import { ProductRoutingModule } from './product.routes';
     ProductRoutingModule,
     NgxPaginationModule,
     StarRatingModule.forRoot(),
-    MatSelectModule
+    MatSelectModule,
+    SharedModule,
+    StoreModule.forFeature(productsFeatureKey, productReducer),
+    EffectsModule.forFeature(ProductsEffects)
   ],
   exports: [
     ProductInfoComponent

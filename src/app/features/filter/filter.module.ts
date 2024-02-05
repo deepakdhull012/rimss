@@ -6,11 +6,16 @@ import { RatingFilterComponent } from './components/rating-filter/rating-filter.
 import { DiscountFilterComponent } from './components/discount-filter/discount-filter.component';
 import { SizeFilterComponent } from './components/size-filter/size-filter.component';
 import { FilterComponent } from './filter.component';
-import { MatButtonModule, MatCheckboxModule, MatDividerModule, MatExpansionModule } from '@angular/material';
-import { StarRatingModule } from 'angular-star-rating'
-
-
-
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { StarRatingModule } from 'angular-star-rating';
+import { FilterService } from '../../api/filter.service';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { filterReducer, filtersFeatureKey } from './store/filter.reducers';
+import { FiltersEffect } from './store/filter.effects';
 
 @NgModule({
   declarations: [
@@ -19,7 +24,7 @@ import { StarRatingModule } from 'angular-star-rating'
     RatingFilterComponent,
     DiscountFilterComponent,
     SizeFilterComponent,
-    FilterComponent
+    FilterComponent,
   ],
   imports: [
     CommonModule,
@@ -27,8 +32,9 @@ import { StarRatingModule } from 'angular-star-rating'
     MatCheckboxModule,
     MatDividerModule,
     MatExpansionModule,
-    MatButtonModule
-    
+    MatButtonModule,
+    StoreModule.forFeature(filtersFeatureKey, filterReducer),
+    EffectsModule.forFeature(FiltersEffect),
   ],
   exports: [
     PriceFilterComponent,
@@ -36,7 +42,8 @@ import { StarRatingModule } from 'angular-star-rating'
     RatingFilterComponent,
     DiscountFilterComponent,
     SizeFilterComponent,
-    FilterComponent
-  ]
+    FilterComponent,
+  ],
+  providers: [FilterService],
 })
-export class FilterModule { }
+export class FilterModule {}

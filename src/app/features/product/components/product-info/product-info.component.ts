@@ -1,15 +1,21 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Route, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
-import { AuthService } from 'src/app/features/authentication/services/auth.service';
-import { CartWishlistService } from 'src/app/features/cart-wishlist/services/cart-wishlist.service';
 import { BannerType } from 'src/app/shared/interfaces/client/banner.interface';
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
 import { BannerService } from 'src/app/shared/services/banner.service';
-import { ProductsService } from 'src/app/shared/services/products.service';
 import { IProductInfoConfig } from '../../interfaces/product-info.interface';
-import { ProductDetailService } from '../../services/product-detail.service';
+import { Store } from '@ngrx/store';
+import { IAppState } from 'src/app/core/store/app.state';
+import * as ProductsActions from './../../store/products.actions';
+import {
+  selectCartProducts,
+  selectWishlistProducts,
+} from 'src/app/features/cart-wishlist/store/cart-wishlist.selectors';
+import { ICartProduct } from 'src/app/features/cart-wishlist/interfaces/cart-product.interface';
+import * as CartWishlistActions from './../../../cart-wishlist/store/cart-wishlist.actions';
+import { AuthUtilService } from 'src/app/utils/auth-util.service';
 
 @Component({
   selector: 'rimss-product-info',
@@ -21,44 +27,52 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
   @Input() productInfoConfig?: IProductInfoConfig;
 
   constructor(
-    private cartWishListService: CartWishlistService,
-    private productService: ProductsService,
-    private authService: AuthService,
+    private authUtilService: AuthUtilService,
     private bannerService: BannerService,
-    private router: Router
+    private router: Router,
+    private store: Store<IAppState>
   ) {
     super();
   }
 
-  ngOnInit(): void {
+  private cartProducts: ICartProduct[] = [];
+  private wishlistProducts: IProductInfo[] = [];
+
+  public ngOnInit(): void {
     this.updateCartStatus();
     this.updateWishListStatus();
-    this.cartWishListService.cartUpdated.pipe(takeUntil(this.componentDestroyed$)).subscribe(_ => {
-      this.cartWishListService.getCartProducts().subscribe(_ => {
+    this.store
+      .select(selectCartProducts)
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe((cartProducts) => {
+        this.cartProducts = cartProducts;
         this.updateCartStatus();
       });
-    })
-    this.cartWishListService.wishListUpdated.pipe(takeUntil(this.componentDestroyed$)).subscribe(_ => {
-      this.cartWishListService.getWishListProducts().subscribe(_ => {
+    this.store
+      .select(selectWishlistProducts)
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe((wishlistProducts) => {
+        this.wishlistProducts = wishlistProducts;
         this.updateWishListStatus();
       });
-    })
   }
 
-  addToWishList(): void {
-    const loggedInUserEmail = this.authService.getLoggedInEmail();
-    const productInWishList = this.cartWishListService.wishListProducts.find(
-      (p) => {
-        return p.productId === this.productInfo.id;
-      }
-    );
+  public addToWishList(): void {
+    const loggedInUserEmail = this.authUtilService.getLoggedInEmail();
+    console.error(this.wishlistProducts, this.productInfo.id)
+    const productInWishList = this.wishlistProducts.find((p) => {
+      return p.id === this.productInfo.id;
+    });
     if (productInWishList) {
       this.removeFromWishList();
     } else {
       if (loggedInUserEmail) {
-        this.cartWishListService
-          .addProductToWishList(this.productInfo.id, loggedInUserEmail)
-          .subscribe();
+        this.store.dispatch(
+          CartWishlistActions.addProductToWishlist({
+            productId: this.productInfo.id,
+            email: loggedInUserEmail,
+          })
+        );
       } else {
         this.bannerService.displayBanner.next({
           closeIcon: true,
@@ -70,82 +84,97 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
     }
   }
 
-  
-
-  goToDetailPage(productInfo: IProductInfo): void {
-    
-    this.productService.productSelected = productInfo;
+  public goToDetailPage(productInfo: IProductInfo): void {
+    this.store.dispatch(
+      ProductsActions.selectProduct({ selectedproduct: productInfo })
+    );
     this.router.navigate([`products`, `details`, `${productInfo.id}`]);
   }
 
-  addToCart(): void { 
-    const loggedInUserEmail =  this.authService.getLoggedInEmail();
+  public addToCart(): void {
+    const loggedInUserEmail = this.authUtilService.getLoggedInEmail();
     if (loggedInUserEmail) {
-      this.cartWishListService
-      .addProductToCart({
-        cartAddDate: new Date(),
-        cartProductImage: this.productInfo.mainImage,
-        productBrief: this.productInfo.productBrief,
-        productId: this.productInfo.id,
-        productName: this.productInfo.productName,
-        quantity: 1,
-        unitCurrency: this.productInfo.currency,
-        unitPrice: this.productInfo.price,
-        discountedPrice: this.productInfo.priceAfterDiscount,
-        userEmail: loggedInUserEmail,
-      })
-      .subscribe((res) => {
-        this.bannerService.displayBanner.next({
-          closeIcon: true,
-          closeTime: 1000,
-          message: "Product added to cart",
-          type: BannerType.SUCCESS
+      this.store.dispatch(
+        CartWishlistActions.addProductToCart({
+          cartProduct: {
+            cartAddDate: new Date(),
+            cartProductImage: this.productInfo.mainImage,
+            productBrief: this.productInfo.productBrief,
+            productId: this.productInfo.id,
+            productName: this.productInfo.productName,
+            quantity: 1,
+            unitCurrency: this.productInfo.currency,
+            unitPrice: this.productInfo.price,
+            discountedPrice: this.productInfo.priceAfterDiscount,
+            userEmail: loggedInUserEmail,
+          },
         })
-      }); 
+      );
+      this.store
+        .select(selectCartProducts)
+        .pipe(takeUntil(this.componentDestroyed$))
+        .subscribe({
+          next: (cartProducts) => {
+            this.bannerService.displayBanner.next({
+              closeIcon: true,
+              closeTime: 1000,
+              message: 'Product added to cart',
+              type: BannerType.SUCCESS,
+            });
+          },
+        });
     } else {
-
       this.bannerService.displayBanner.next({
         closeIcon: true,
         closeTime: 2000,
-        message: "Please login to perform the action",
-        type: BannerType.WARN
-      })
-    }
-    
-  }
-
-  updateCartStatus(): void {
-    const productInCart = this.cartWishListService.cartProducts.find(p => {
-      return p.productId === this.productInfo.id
-    });
-    this.productInfo.isInCart = !!productInCart;
-  }
-
-  updateWishListStatus(): void {
-    const productInWishList = this.cartWishListService.wishListProducts.find(wishListProduct => {
-      return wishListProduct.productId === this.productInfo.id
-    });
-    this.productInfo.isInWishList = !!productInWishList;
-  }
-
-  removeFromCart(): void {
-    const cartProductId = this.cartWishListService.cartProducts.find(cartP => {
-      return cartP.productId === this.productInfo.id
-    })?.id;
-    if (cartProductId) {
-      this.cartWishListService.removeFromCart(cartProductId).subscribe();
-    }
-  }
-
-  removeFromWishList(): void {
-    const productInWishList = this.cartWishListService.wishListProducts.find(wishListProduct => {
-      return wishListProduct.productId === this.productInfo.id
-    });
-    if (productInWishList) {
-      this.cartWishListService.removeFromWishList(productInWishList?.id).subscribe(_ => {
-        this.cartWishListService.wishListUpdated.next();
+        message: 'Please login to perform the action',
+        type: BannerType.WARN,
       });
     }
-    
+  }
+
+  public removeFromCart(): void {
+    const cartProductId = this.cartProducts.find(
+      (cartP) => {
+        return cartP.productId === this.productInfo.id;
+      }
+    )?.id;
+    if (cartProductId) {
+      this.store.dispatch(CartWishlistActions.removeFromCart({
+        productId: cartProductId
+      }));
+    }
+  }
+
+  private updateCartStatus(): void {
+    const productInCart = this.cartProducts.find((p) => {
+      return p.productId === this.productInfo.id;
+    });
+    this.productInfo = { ...this.productInfo, isInCart: !!productInCart };
+  }
+
+  private updateWishListStatus(): void {
+    const productInWishList = this.wishlistProducts.find(
+      (wishListProduct) => {
+        return wishListProduct.id === this.productInfo.id;
+      }
+    );
+    this.productInfo = {
+      ...this.productInfo,
+      isInWishList: !!productInWishList,
+    };
+  }
+
+  private removeFromWishList(): void {
+    const productInWishList = this.wishlistProducts.find(
+      (wishListProduct) => {
+        return wishListProduct.id === this.productInfo.id;
+      }
+    );
+    if (productInWishList) {
+      this.store.dispatch(CartWishlistActions.removeFromWishlist({
+        productId: productInWishList.id
+      }));
+    }
   }
 }

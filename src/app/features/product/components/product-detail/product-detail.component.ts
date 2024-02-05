@@ -2,19 +2,34 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
-import { AuthService } from 'src/app/features/authentication/services/auth.service';
-import { CartWishlistService } from 'src/app/features/cart-wishlist/services/cart-wishlist.service';
 import { BannerType } from 'src/app/shared/interfaces/client/banner.interface';
-import { IOrderProduct, IOrderSummary } from 'src/app/shared/interfaces/client/order.interface';
+import {
+  IOrderProduct,
+  IOrderSummary,
+} from 'src/app/shared/interfaces/client/order.interface';
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
 import { BannerService } from 'src/app/shared/services/banner.service';
-import { ProductsService } from 'src/app/shared/services/products.service';
 import { IProductDetailsTab } from '../../interfaces/product-info.interface';
+import { Store } from '@ngrx/store';
+import { IAppState } from 'src/app/core/store/app.state';
+import * as ProductsAction from './../../store/products.actions';
+import {
+  getSelectedProduct,
+  getSimilarProducts,
+} from '../../store/products.selectors';
+import {
+  selectCartProducts,
+  selectWishlistProducts,
+} from 'src/app/features/cart-wishlist/store/cart-wishlist.selectors';
+import * as CartWishlistActions from './../../../cart-wishlist/store/cart-wishlist.actions';
+import { ICartProduct } from 'src/app/features/cart-wishlist/interfaces/cart-product.interface';
+import { AuthUtilService } from 'src/app/utils/auth-util.service';
 
 @Component({
   selector: 'rimss-product-detail',
   templateUrl: './product-detail.component.html',
   styleUrls: ['./product-detail.component.scss'],
+  providers: [],
 })
 export class ProductDetailComponent extends BaseComponent implements OnInit {
   @Input() product: IProductInfo = null as any as IProductInfo;
@@ -27,89 +42,70 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
   private deliveryCharges = 40;
 
   constructor(
-    private productService: ProductsService,
-    private authService: AuthService,
+    private authUtilService: AuthUtilService,
     private bannerService: BannerService,
-    private cartWishlistService: CartWishlistService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private store: Store<IAppState>
   ) {
     super();
   }
 
-  ngOnInit(): void {
-    this.product = this.productService.productSelected;
+  private cartProducts: ICartProduct[] = [];
+  private wishListProducts: IProductInfo[] = [];
 
-    this.cartWishlistService.cartUpdated
+  public ngOnInit(): void {
+    this.store
+      .select(getSelectedProduct)
       .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((_) => {
-        this.cartWishlistService.getCartProducts().subscribe((_) => {
-          this.updateCartStatus();
-        });
-      });
-    this.cartWishlistService.wishListUpdated
-      .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((_) => {
-        this.cartWishlistService.getWishListProducts().subscribe((_) => {
-          this.updateWishListStatus();
-        });
-      });
-
-    if (!this.product?.id) {
-      const pId = this.route.snapshot.params['id'];
-
-      this.productService
-        .fetchProductById(pId)
-        .pipe(takeUntil(this.componentDestroyed$))
-        .subscribe((product) => {
-          this.product = product;
+      .subscribe((selectedProduct) => {
+        if (selectedProduct) {
+          this.product = selectedProduct;
           this.updateCartStatus();
           this.updateWishListStatus();
           this.updateStockQty();
-          console.error('this.route', this.route, this.product);
           const categories = this.product.productCategory?.length
             ? [this.product.productCategory[0]]
             : [];
-          console.error('categories', categories);
-          this.productService
-            .filterProductsByCriteria({
-              category: categories,
-            })
-            .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe((products) => {
-              this.similarProducts = products;
-            });
-        });
-    } else {
-      this.updateStockQty();
-      this.updateCartStatus();
-      this.updateWishListStatus();
-      const categories = this.product.productCategory?.length
-        ? [this.product.productCategory[0]]
-        : [];
-      console.error('categories', categories);
-      this.productService
-        .filterProductsByCriteria({
-          category: categories,
+          this.fetchSimilarProducts(categories);
+        }
+      });
+
+    this.store.select(getSimilarProducts).subscribe((similarProducts) => {
+      console.error('similarProducts', similarProducts);
+      this.similarProducts = similarProducts || [];
+    });
+    this.store.dispatch(CartWishlistActions.fetchCartProducts());
+    this.store.dispatch(CartWishlistActions.fetchWishlistProducts());
+    this.store
+      .select(selectCartProducts)
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe((cartProducts) => {
+        this.cartProducts = cartProducts;
+        this.updateCartStatus();
+      });
+
+    this.store
+      .select(selectWishlistProducts)
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe((wishlistProducts) => {
+        this.wishListProducts = wishlistProducts;
+        this.updateWishListStatus();
+      });
+
+    if (!this.product?.id) {
+      const productId: number = this.route.snapshot.params['id'];
+      this.store.dispatch(
+        ProductsAction.fetchProductById({
+          productId: productId,
         })
-        .pipe(takeUntil(this.componentDestroyed$))
-        .subscribe((products) => {
-          this.similarProducts = products;
-        });
+      );
     }
   }
 
-  updateStockQty(): void {
-    let noOfQty = 0;
-    this.product.sku?.forEach((sku) => {
-      noOfQty += sku.units_in_stock;
-    });
-    this.noOfUnitsInStock = noOfQty;
-  }
-
-  gotoCheckout(): void {
-    
-    const preTaxAmount = (this.product.priceAfterDiscount * this.qty) + this.deliveryCharges;
+  public gotoCheckout(): void {
+    const preTaxAmount =
+      this.product.priceAfterDiscount * this.qty + this.deliveryCharges;
     const tax = preTaxAmount / 10;
     const orderAmount = preTaxAmount + tax;
     this.orderSummary = {
@@ -119,9 +115,9 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
       originalPrice: this.product.price,
       orderAmount,
       productOrders: this.prepareOrderProducts(),
-      couponCode: "",
+      couponCode: '',
       couponDiscount: 0,
-      fromcart: false
+      fromcart: false,
     };
     this.router.navigate(['checkout'], {
       state: {
@@ -129,48 +125,38 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
       },
     });
   }
-  private prepareOrderProducts(): IOrderProduct[] {
-    const orderProducts: IOrderProduct[] = [];
-      const orderProduct: IOrderProduct = {
-        deliveryInfo: {
-          orderUpdateEvents: [],
-        },
-        discountedPrice: this.product.priceAfterDiscount,
-        originalPrice: this.product.price,
-        productId: this.product.id,
-        productSummary: this.product.productBrief,
-        productImage: this.product.mainImage,
-        qty: this.qty
-      };
-      orderProducts.push(orderProduct);
 
-    return orderProducts;
-  }
-
-
-  addToCart(): void {
-    const loggedInUserEmail = this.authService.getLoggedInEmail();
+  public addToCart(): void {
+    const loggedInUserEmail = this.authUtilService.getLoggedInEmail();
     if (loggedInUserEmail) {
-      this.cartWishlistService
-        .addProductToCart({
-          cartAddDate: new Date(),
-          cartProductImage: this.product.mainImage,
-          productBrief: this.product.productBrief,
-          productId: this.product.id,
-          productName: this.product.productName,
-          quantity: this.qty,
-          unitCurrency: this.product.currency,
-          unitPrice: this.product.price,
-          userEmail: loggedInUserEmail,
-          discountedPrice: this.product.priceAfterDiscount
+      this.store.dispatch(
+        CartWishlistActions.addProductToCart({
+          cartProduct: {
+            cartAddDate: new Date(),
+            cartProductImage: this.product.mainImage,
+            productBrief: this.product.productBrief,
+            productId: this.product.id,
+            productName: this.product.productName,
+            quantity: this.qty,
+            unitCurrency: this.product.currency,
+            unitPrice: this.product.price,
+            userEmail: loggedInUserEmail,
+            discountedPrice: this.product.priceAfterDiscount,
+          },
         })
-        .subscribe((res) => {
-          this.bannerService.displayBanner.next({
-            closeIcon: true,
-            closeTime: 1000,
-            message: 'Product added to cart successfully',
-            type: BannerType.SUCCESS,
-          });
+      );
+      this.store
+        .select(selectCartProducts)
+        .pipe(takeUntil(this.componentDestroyed$))
+        .subscribe({
+          next: (_) => {
+            this.bannerService.displayBanner.next({
+              closeIcon: true,
+              closeTime: 1000,
+              message: 'Product added to cart successfully',
+              type: BannerType.SUCCESS,
+            });
+          },
         });
     } else {
       this.bannerService.displayBanner.next({
@@ -182,12 +168,15 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
     }
   }
 
-  addToWishList(): void {
-    const loggedInUserEmail = this.authService.getLoggedInEmail();
+  public addToWishList(): void {
+    const loggedInUserEmail = this.authUtilService.getLoggedInEmail();
     if (loggedInUserEmail) {
-      this.cartWishlistService
-        .addProductToWishList(this.product.id, loggedInUserEmail)
-        .subscribe();
+      this.store.dispatch(
+        CartWishlistActions.addProductToWishlist({
+          productId: this.product.id,
+          email: loggedInUserEmail,
+        })
+      );
     } else {
       this.bannerService.displayBanner.next({
         closeIcon: true,
@@ -198,55 +187,92 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
     }
   }
 
-  removeFromCart(): void {
-    const cartProductId = this.cartWishlistService.cartProducts.find(
-      (cartP) => {
-        return cartP.productId === this.product.id;
-      }
-    )?.id;
+  public removeFromCart(): void {
+    const cartProductId = this.cartProducts.find((cartP) => {
+      return cartP.productId === this.product.id;
+    })?.id;
     if (cartProductId) {
-      this.cartWishlistService.removeFromCart(cartProductId).subscribe();
+      this.store.dispatch(
+        CartWishlistActions.removeFromCart({
+          productId: cartProductId,
+        })
+      );
     }
   }
 
-  updateCartStatus(): void {
-    const productInCart = this.cartWishlistService.cartProducts.find((p) => {
-      return p.id === this.product.id;
-    });
-    this.product.isInCart = !!productInCart;
-  }
-
-  updateWishListStatus(): void {
-    const productInWishList = this.cartWishlistService.wishListProducts.find(
-      (p) => {
-        return p.productId === this.product.id;
-      }
-    );
-    console.error("productInWishList", this.product.id, productInWishList, this.cartWishlistService.wishListProducts)
-    this.product.isInWishList = !!productInWishList;
-  }
-
-
-  removeFromWishList(): void {
-    const productInWishList = this.cartWishlistService.wishListProducts.find(wishListProduct => {
-      return wishListProduct.productId === this.product.id
+  public removeFromWishList(): void {
+    const productInWishList = this.wishListProducts.find((wishListProduct) => {
+      return wishListProduct.id === this.product.id;
     });
     if (productInWishList) {
-      this.cartWishlistService.removeFromWishList(productInWishList?.id).subscribe(_ => {
-        this.cartWishlistService.wishListUpdated.next();
-      });
+      this.store.dispatch(
+        CartWishlistActions.removeFromWishlist({
+          productId: productInWishList.id,
+        })
+      );
     }
-    
   }
 
-  activateTab(tab: IProductDetailsTab): void {
+  public activateTab(tab: IProductDetailsTab): void {
     this.activeTab = tab;
   }
 
-  updateQty(count: number): void {
-    if ((count === -1 && this.qty > 1) || (count === 1 && this.qty < this.noOfUnitsInStock)) {
-      this.qty+= count;
+  public updateQty(count: number): void {
+    if (
+      (count === -1 && this.qty > 1) ||
+      (count === 1 && this.qty < this.noOfUnitsInStock)
+    ) {
+      this.qty += count;
     }
-    
+  }
+
+  private fetchSimilarProducts(categories: string[]): void {
+    console.error('fetch similar prod function', categories);
+    this.store.dispatch(
+      ProductsAction.fetchSimilarProducts({
+        filterCriteria: {
+          category: categories,
+        },
+      })
+    );
+  }
+
+  private updateStockQty(): void {
+    let noOfQty = 0;
+    this.product.sku?.forEach((sku) => {
+      noOfQty += sku.units_in_stock;
+    });
+    this.noOfUnitsInStock = noOfQty;
+  }
+
+  private prepareOrderProducts(): IOrderProduct[] {
+    const orderProducts: IOrderProduct[] = [];
+    const orderProduct: IOrderProduct = {
+      deliveryInfo: {
+        orderUpdateEvents: [],
+      },
+      discountedPrice: this.product.priceAfterDiscount,
+      originalPrice: this.product.price,
+      productId: this.product.id,
+      productSummary: this.product.productBrief,
+      productImage: this.product.mainImage,
+      qty: this.qty,
+    };
+    orderProducts.push(orderProduct);
+    return orderProducts;
+  }
+
+  private updateCartStatus(): void {
+    const productInCart = this.cartProducts.find((p) => {
+      return p.id === this.product.id;
+    });
+    this.product = { ...this.product, isInCart: !!productInCart };
+  }
+
+  private updateWishListStatus(): void {
+    const productInWishList = this.wishListProducts.find((p) => {
+      return p.id === this.product.id;
+    });
+    this.product = { ...this.product, isInWishList: !!productInWishList };
   }
 }

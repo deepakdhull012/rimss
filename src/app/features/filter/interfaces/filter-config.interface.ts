@@ -24,9 +24,9 @@ export interface IBrand {
 }
 
 export interface IFilterObject {
-    brandIds: Array<number>;
-    priceRange: Array<IPriceRange>;
-    rating: Array<number>;
-    size: Array<string>;
-    discount: Array<number>;
+    selectedBrands: number[];
+    selectedPriceRanges: IPriceRange[];
+    selectedDiscountRanges: number[];
+    selectedSizes: string[];
+    selectedRating: number[];
 }

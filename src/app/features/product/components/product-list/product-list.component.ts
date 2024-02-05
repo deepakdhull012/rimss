@@ -1,10 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
-import { filter, takeUntil } from 'rxjs';
+import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
-import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
-import { ProductsService } from 'src/app/shared/services/products.service';
+import {
+  IFilterCriteria,
+  IProductInfo,
+} from 'src/app/shared/interfaces/client/product.interface';
 import { SortBy } from '../../interfaces/product-info.interface';
+import { Store } from '@ngrx/store';
+import { IAppState } from 'src/app/core/store/app.state';
+import * as ProductsActions from './../../store/products.actions';
+import { selectProductState } from '../../store/products.selectors';
 
 @Component({
   selector: 'rimss-product-list',
@@ -12,28 +18,38 @@ import { SortBy } from '../../interfaces/product-info.interface';
   styleUrls: ['./product-list.component.scss'],
 })
 export class ProductListComponent extends BaseComponent implements OnInit {
-  private saleId?: number;
-  private categories: Array<string> = [];
-  private filterString?: string;
-  private sortByValue?: SortBy;
+  public products: Array<IProductInfo> = [];
+  public page: number = 1;
+  public SortBy = SortBy;
+  public loading = false;
+
   constructor(
-    private productsService: ProductsService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private store: Store<IAppState>
   ) {
     super();
   }
 
-  public products: Array<IProductInfo> = [];
-  public page: number = 1;
-  public SortBy = SortBy;
+  private saleId?: number;
+  private categories: Array<string> = [];
+  private filterString?: string;
+  private sortByValue?: SortBy;
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.router.events
       .pipe(takeUntil(this.componentDestroyed$))
       .subscribe((event) => {
         if (event instanceof NavigationStart) {
           this.page = 1;
+        }
+      });
+    this.store
+      .select(selectProductState)
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe((state) => {
+        if (state.products) {
+          this.products = state.products;
         }
       });
     this.route.queryParams.subscribe((params) => {
@@ -51,31 +67,31 @@ export class ProductListComponent extends BaseComponent implements OnInit {
         this.categories = [this.categories[this.categories.length - 1]];
       }
 
-      if (mode === 'banner-sale') {
-        this.fetchproductsBasedOnCriteria();
-      } else if (mode === 'search') {
-        this.productsService
-          .getProductsBySearch(searchText)
-          .subscribe((products) => {
-            this.products = products;
-          });
+      if (mode === 'search') {
+        this.store.dispatch(
+          ProductsActions.fetchProductsBySearchCritera({
+            searchtext: searchText,
+          })
+        );
       } else {
         this.fetchproductsBasedOnCriteria();
       }
     });
   }
 
-  goToDetailPage(product: IProductInfo) {
-    this.productsService.productSelected = product;
+  public goToDetailPage(product: IProductInfo) {
+    this.store.dispatch(
+      ProductsActions.selectProduct({ selectedproduct: product })
+    );
     this.router.navigate(['product', `${product.id}`]);
   }
 
-  onFilterChange(filterString: string): void {
+  public onFilterChange(filterString: string): void {
     this.filterString = filterString;
     this.fetchproductsBasedOnCriteria();
   }
 
-  onSortByChange(sortEvent: Event) {
+  public onSortByChange(sortEvent: Event) {
     if (sortEvent.target) {
       const sortBy: SortBy = (sortEvent.target as any).value;
       this.sortByValue = sortBy;
@@ -84,17 +100,15 @@ export class ProductListComponent extends BaseComponent implements OnInit {
   }
 
   private fetchproductsBasedOnCriteria(): void {
-    this.productsService
-      .filterProductsByCriteria(
-        {
-          category: this.categories,
-          filterString: this.filterString,
-          saleId: this.saleId,
-        },
-        this.sortByValue
-      )
-      .subscribe((products) => {
-        this.products = products;
-      });
+    const filterCritera: IFilterCriteria = {
+      category: this.categories,
+      filterString: this.filterString,
+      saleId: this.saleId,
+    };
+    this.store.dispatch(
+      ProductsActions.fetchProductsByCatgory({
+        filterCriteria: filterCritera,
+      })
+    );
   }
 }

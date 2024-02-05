@@ -1,15 +1,15 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { StarRatingModule } from 'angular-star-rating';
-import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CoreModule } from './core/core.module';
-import { CartWishlistModule } from './features/cart-wishlist/cart-wishlist.module';
-import { LandingModule } from './features/landing/landing.module';
-import { ProductModule } from './features/product/product.module';
 import { SharedModule } from './shared/shared.module';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { cartWishlistFeatureKey, cartWishlistReducer } from './features/cart-wishlist/store/cart-wishlist.reducers';
+import { CartWishlistEffects } from './features/cart-wishlist/store/cart-wishlist.effects';
 
 @NgModule({
   declarations: [
@@ -17,12 +17,16 @@ import { SharedModule } from './shared/shared.module';
   ],
   imports: [
     HttpClientModule,
-    
     NoopAnimationsModule,
     BrowserModule,
     AppRoutingModule,
     CoreModule,
-    SharedModule
+    SharedModule,
+    StoreModule.forRoot({}),
+    EffectsModule.forRoot({}),
+    // Cart wish list module may not be available yet but we may need to access cart, wishlist products
+    StoreModule.forFeature(cartWishlistFeatureKey, cartWishlistReducer),
+    EffectsModule.forFeature(CartWishlistEffects)
   ],
   providers: [],
   bootstrap: [AppComponent]
