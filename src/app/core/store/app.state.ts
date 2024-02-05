@@ -8,6 +8,8 @@ import { ordersFeatureKey } from 'src/app/features/orders/store/orders.reducers'
 import { IOrderState } from 'src/app/features/orders/store/orders.state';
 import { filtersFeatureKey } from 'src/app/features/filter/store/filter.reducers';
 import { IFilterState } from 'src/app/features/filter/store/filter.state';
+import { authFeatureKey } from 'src/app/features/authentication/store/auth.reducers';
+import { IAuthState } from 'src/app/features/authentication/store/auth.state';
 
 export interface ICoreState {
   categories: ICategory[];
@@ -18,4 +20,5 @@ export interface IAppState {
   [cartWishlistFeatureKey]: ICartWishListState;
   [ordersFeatureKey]: IOrderState;
   [filtersFeatureKey]: IFilterState;
+  [authFeatureKey]: IAuthState;
 }

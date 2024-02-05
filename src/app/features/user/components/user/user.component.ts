@@ -3,9 +3,9 @@ import { Router } from '@angular/router';
 import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { IUser } from 'src/app/features/authentication/interfaces/user.interface';
-import { AuthService } from 'src/app/features/authentication/services/auth.service';
 import { IAddress } from '../../interfaces/profile.interface';
 import { UserService } from '../../services/user.service';
+import { AuthUtilService } from 'src/app/utils/auth-util.service';
 
 @Component({
   selector: 'rimss-user',
@@ -17,12 +17,12 @@ export class UserComponent extends BaseComponent implements OnInit {
   public addresses: IAddress[] = [];
 
   constructor(
-    private authService: AuthService,
+    private authUtilService: AuthUtilService,
     private userService: UserService,
     private router: Router
   ) {
     super();
-    this.user = this.authService.getUser();
+    this.user = this.authUtilService.getUser();
   }
 
   public ngOnInit(): void {

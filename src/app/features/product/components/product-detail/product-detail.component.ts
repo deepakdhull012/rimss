@@ -2,7 +2,6 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
-import { AuthService } from 'src/app/features/authentication/services/auth.service';
 import { BannerType } from 'src/app/shared/interfaces/client/banner.interface';
 import {
   IOrderProduct,
@@ -24,6 +23,7 @@ import {
 } from 'src/app/features/cart-wishlist/store/cart-wishlist.selectors';
 import * as CartWishlistActions from './../../../cart-wishlist/store/cart-wishlist.actions';
 import { ICartProduct } from 'src/app/features/cart-wishlist/interfaces/cart-product.interface';
+import { AuthUtilService } from 'src/app/utils/auth-util.service';
 
 @Component({
   selector: 'rimss-product-detail',
@@ -42,7 +42,7 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
   private deliveryCharges = 40;
 
   constructor(
-    private authService: AuthService,
+    private authUtilService: AuthUtilService,
     private bannerService: BannerService,
     private route: ActivatedRoute,
     private router: Router,
@@ -127,7 +127,7 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
   }
 
   public addToCart(): void {
-    const loggedInUserEmail = this.authService.getLoggedInEmail();
+    const loggedInUserEmail = this.authUtilService.getLoggedInEmail();
     if (loggedInUserEmail) {
       this.store.dispatch(
         CartWishlistActions.addProductToCart({
@@ -169,7 +169,7 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
   }
 
   public addToWishList(): void {
-    const loggedInUserEmail = this.authService.getLoggedInEmail();
+    const loggedInUserEmail = this.authUtilService.getLoggedInEmail();
     if (loggedInUserEmail) {
       this.store.dispatch(
         CartWishlistActions.addProductToWishlist({

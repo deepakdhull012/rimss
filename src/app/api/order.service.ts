@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
 import { Observable, Subject, takeUntil } from 'rxjs';
-import { AuthService } from 'src/app/features/authentication/services/auth.service';
 import { environment } from 'src/environments/environment';
 import { IOrder } from '../shared/interfaces/client/order.interface';
 
@@ -13,7 +12,7 @@ export class OrderService implements OnDestroy {
   private BASE_URL = environment.BASE_API_URL;
   private serviceDestroyed$ = new Subject<void>();
 
-  constructor(private http: HttpClient, private authService: AuthService) { }
+  constructor(private http: HttpClient) { }
 
   /**
    * Create the order

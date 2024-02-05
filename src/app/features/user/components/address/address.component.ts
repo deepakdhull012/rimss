@@ -1,11 +1,11 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
-import { AuthService } from 'src/app/features/authentication/services/auth.service';
 import { IAddress } from '../../interfaces/profile.interface';
 import { UserService } from '../../services/user.service';
+import { AuthUtilService } from 'src/app/utils/auth-util.service';
 
 @Component({
   selector: 'rimss-address',
@@ -20,7 +20,7 @@ export class AddressComponent extends BaseComponent implements OnInit {
   @Output() addressSave: EventEmitter<void> = new EventEmitter<void>();
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService,
+    private authUtilService: AuthUtilService,
     private userService: UserService,
     private router: Router
   ) {
@@ -101,7 +101,7 @@ export class AddressComponent extends BaseComponent implements OnInit {
       firstName: this.addressForm.get('firstName')?.value,
       lastName: this.addressForm.get('lastName')?.value,
       city: this.addressForm.get('city')?.value,
-      userEmail: this.authService.getLoggedInEmail() || '',
+      userEmail: this.authUtilService.getLoggedInEmail() || '',
       line1: this.addressForm.get('line1')?.value,
       line2: this.addressForm.get('line2')?.value,
       mobile: this.addressForm.get('mobile')?.value,

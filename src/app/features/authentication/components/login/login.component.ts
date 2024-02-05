@@ -3,24 +3,30 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BannerType } from 'src/app/shared/interfaces/client/banner.interface';
 import { BannerService } from 'src/app/shared/services/banner.service';
-import { PASSWORD_MIN_LENGTH } from '../../consts/auth.const';
-import { AuthService } from '../../services/auth.service';
+import { Store } from '@ngrx/store';
+import { IAppState } from 'src/app/core/store/app.state';
+import * as AuthActions from './../../store/auth.actions';
+import { selectAuthState, selectLoginStatus } from '../../store/auth.selectors';
+import { skip, takeUntil } from 'rxjs';
+import { BaseComponent } from 'src/app/core/components/base/base.component';
 
 @Component({
   selector: 'rimss-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent extends BaseComponent implements OnInit {
   public loginForm: FormGroup = {} as FormGroup;
   private isSubmitted = false;
 
   constructor(
     private router: Router,
     private fb: FormBuilder,
-    private authService: AuthService,
+    private store: Store<IAppState>,
     private bannerService: BannerService
-  ) {}
+  ) {
+    super();
+  }
 
   public ngOnInit(): void {
     this.composeForm();
@@ -29,45 +35,55 @@ export class LoginComponent implements OnInit {
   public login(): void {
     this.isSubmitted = true;
     if (this.loginForm.valid) {
-      this.authService
-      .login({
-        email: this.loginForm.value['email'],
-        password: this.loginForm.value['password'],
-      })
-      .subscribe((success: boolean) => {
-        if (success) {
-          const redirectionPage = sessionStorage.getItem('redirectionPage');
-          if (!redirectionPage) {
-            this.router.navigate(['products', 'list']);
+      this.store.dispatch(
+        AuthActions.login({
+          credentials: {
+            email: this.loginForm.value['email'],
+            password: this.loginForm.value['password'],
+          },
+        })
+      );
+      this.store
+        .select(selectLoginStatus)
+        .pipe(takeUntil(this.componentDestroyed$), skip(1))
+        .subscribe((success: boolean) => {
+          console.error("login status", success)
+          if (success) {
+            
+            const redirectionPage = sessionStorage.getItem('redirectionPage');
+            if (!redirectionPage) {
+              this.router.navigate(['products', 'list']);
+            }
+          } else {
+            this.bannerService.displayBanner.next({
+              closeIcon: true,
+              closeTime: 3000,
+              message: 'Invalid credentials',
+              type: BannerType.ERROR,
+            });
           }
-        } else {
-          this.bannerService.displayBanner.next({
-            closeIcon: true,
-            closeTime: 3000,
-            message: "Invalid credentials",
-            type: BannerType.ERROR
-          })
-        }
-      });
+        });
     } else {
       this.bannerService.displayBanner.next({
         closeIcon: true,
         closeTime: 3000,
-        message: "Please correct the errors",
-        type: BannerType.ERROR
-      })
+        message: 'Please correct the errors',
+        type: BannerType.ERROR,
+      });
     }
   }
 
   public getError(controlName: string): string | null {
-    const hasError = this.isControlTouched(controlName) ? this.loginForm.get(controlName)?.invalid || false : false;
+    const hasError = this.isControlTouched(controlName)
+      ? this.loginForm.get(controlName)?.invalid || false
+      : false;
     if (hasError) {
       const errors = this.loginForm.get(controlName)?.errors;
-      if (errors && errors["required"]) {
+      if (errors && errors['required']) {
         return `${controlName} is required.`;
-      } else if (errors && errors["email"]) {
+      } else if (errors && errors['email']) {
         return `Invalid email.`;
-      }  else {
+      } else {
         return null;
       }
     }
@@ -80,7 +96,6 @@ export class LoginComponent implements OnInit {
       password: ['', [Validators.required]],
     });
   }
-
 
   private isControlTouched(controlName: string): boolean {
     return this.loginForm.get(controlName)?.touched || this.isSubmitted;

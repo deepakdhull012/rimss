@@ -3,8 +3,8 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { Observable, of, Subject, takeUntil, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { IUser } from '../../authentication/interfaces/user.interface';
-import { AuthService } from '../../authentication/services/auth.service';
 import { IAddress } from '../interfaces/profile.interface';
+import { AuthUtilService } from 'src/app/utils/auth-util.service';
 
 @Injectable()
 export class UserService implements OnDestroy {
@@ -13,8 +13,8 @@ export class UserService implements OnDestroy {
   private BASE_URL = environment.BASE_API_URL;
   public addressUpdated$ = new Subject<void>();
 
-  constructor(private authService: AuthService, private http: HttpClient) {
-    this.userEmail = this.authService.getLoggedInEmail();
+  constructor(private authUtilService: AuthUtilService, private http: HttpClient) {
+    this.userEmail = this.authUtilService.getLoggedInEmail();
   }
 
   public getUserAddresses(): Observable<IAddress[]> {
@@ -51,7 +51,7 @@ export class UserService implements OnDestroy {
   }
 
   public markAsPrimaryAddress(addressId: number): Observable<void> {
-    const user: IUser | undefined = this.authService.getUser();
+    const user: IUser | undefined = this.authUtilService.getUser();
     if (user) {
       return this.http
       .patch<void>(`${this.BASE_URL}/users/${user.id}`, {

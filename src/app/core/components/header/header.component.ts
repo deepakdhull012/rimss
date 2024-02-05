@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from 'src/app/features/authentication/services/auth.service';
 import { ICategory } from 'src/app/shared/interfaces/client/category.interface';
 import { BaseComponent } from '../base/base.component';
 import { takeUntil } from 'rxjs';
@@ -8,6 +7,7 @@ import { Store } from '@ngrx/store';
 import { IAppState } from '../../store/app.state';
 import * as RootActions from './../../store/app.actions';
 import { selectCategories } from '../../store/app.selectors';
+import { AuthUtilService } from 'src/app/utils/auth-util.service';
 
 @Component({
   selector: 'rimss-header',
@@ -19,7 +19,7 @@ export class HeaderComponent extends BaseComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private authService: AuthService,
+    private authUtilService: AuthUtilService,
     private store: Store<IAppState>
   ) {
     super();
@@ -30,7 +30,7 @@ export class HeaderComponent extends BaseComponent implements OnInit {
   public categories: Array<ICategory> = [];
 
   public ngOnInit(): void {
-    this.isLoggedIn = !!this.authService.getLoggedInEmail();
+    this.isLoggedIn = !!this.authUtilService.getLoggedInEmail();
     this.fetchAllCategories();
   }
 
@@ -64,7 +64,7 @@ export class HeaderComponent extends BaseComponent implements OnInit {
   }
 
   public logout(): void {
-    this.authService.logout();
+    this.authUtilService.logout();
   }
 
   public login(): void {

@@ -10,8 +10,8 @@ import {
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
 import { IWishList } from 'src/app/shared/interfaces/client/wish-list.interface';
 import { environment } from 'src/environments/environment';
-import { AuthService } from '../features/authentication/services/auth.service';
 import { ICartProduct } from '../features/cart-wishlist/interfaces/cart-product.interface';
+import { AuthUtilService } from '../utils/auth-util.service';
 
 @Injectable({
   providedIn: "root"
@@ -26,7 +26,7 @@ export class CartWishlistService implements OnDestroy {
   private BASE_URL = environment.BASE_API_URL;
   constructor(
     private httpClient: HttpClient,
-    private authService: AuthService
+    private authUtilService: AuthUtilService
   ) {
    
   }
@@ -60,7 +60,7 @@ export class CartWishlistService implements OnDestroy {
   }
 
   public getWishListProducts(): Observable<IProductInfo[]> {
-    const loggedInUserEmail = this.authService.getLoggedInEmail();
+    const loggedInUserEmail = this.authUtilService.getLoggedInEmail();
     return this.httpClient
       .get<Array<IWishList>>(
         `${this.BASE_URL}/wish-list?email=${loggedInUserEmail}`
@@ -81,7 +81,7 @@ export class CartWishlistService implements OnDestroy {
   }
 
   public getCartProducts(): Observable<Array<ICartProduct>> {
-    const loggedInUserEmail = this.authService.getLoggedInEmail();
+    const loggedInUserEmail = this.authUtilService.getLoggedInEmail();
     return this.httpClient
       .get<Array<ICartProduct>>(
         `${this.BASE_URL}/cart?userEmail=${loggedInUserEmail}`

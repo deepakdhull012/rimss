@@ -6,9 +6,12 @@ import { AuthenticationRoutingModule } from './authentication.routes';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { AuthService } from './services/auth.service';
 import { CoreModule } from 'src/app/core/core.module';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { authFeatureKey, authReducer } from './store/auth.reducers';
+import { AuthEffect } from './store/auth.effects';
 
 
 
@@ -24,7 +27,9 @@ import { SharedModule } from 'src/app/shared/shared.module';
     ReactiveFormsModule,
     MatRadioModule,
     AuthenticationRoutingModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    StoreModule.forFeature(authFeatureKey, authReducer),
+    EffectsModule.forFeature(AuthEffect),
   ],
   providers: []
 })

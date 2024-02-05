@@ -3,16 +3,16 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { map, mergeMap, Observable, of, switchMap } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { ILoginCredentials, IUser } from '../interfaces/user.interface';
+import { ILoginCredentials, IUser } from '../features/authentication/interfaces/user.interface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private BASE_URL = environment.BASE_API_URL;
-  public loggedInUser?: IUser;
+  
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient) {}
 
   public signup(user: IUser): Observable<boolean> {
     return this.http.post(`${this.BASE_URL}/users`, user).pipe(
@@ -31,10 +31,9 @@ export class AuthService {
         map((matchingUsers: any[]) => {
           if (matchingUsers?.length) {
             const matchingUserEmail = matchingUsers[0].email;
-            this.loggedInUser = matchingUsers[0];
             localStorage.setItem(
               'loggedInUser',
-              JSON.stringify(this.loggedInUser)
+              JSON.stringify(matchingUsers[0])
             );
             localStorage.setItem('loggedInEmail', matchingUserEmail);
             return true;
@@ -43,26 +42,5 @@ export class AuthService {
           }
         })
       );
-  }
-
-  public getUser(): IUser | undefined {
-    return (
-      this.loggedInUser ||
-      JSON.parse(localStorage.getItem('loggedInUser') || '{}')
-    );
-  }
-
-  public logout(): void {
-    localStorage.removeItem('loggedInEmail');
-    localStorage.removeItem('loggedInUser');
-    this.router.navigate(['auth']);
-  }
-
-  public getLoggedInEmail(): string | undefined {
-    if (localStorage.getItem('loggedInUser')) {
-      return localStorage.getItem('loggedInEmail') || undefined;
-    } else {
-      return undefined;
-    }
   }
 }

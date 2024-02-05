@@ -5,7 +5,9 @@ import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { PASSWORD_MIN_LENGTH } from '../../consts/auth.const';
 import { IUser } from '../../interfaces/user.interface';
-import { AuthService } from '../../services/auth.service';
+import { Store } from '@ngrx/store';
+import { IAppState } from 'src/app/core/store/app.state';
+import * as AuthActions from "./../../store/auth.actions";
 
 @Component({
   selector: 'rimss-signup',
@@ -20,7 +22,7 @@ export class SignupComponent extends BaseComponent implements OnInit {
   constructor(
     private router: Router,
     private fb: FormBuilder,
-    private authService: AuthService
+    private store: Store<IAppState>
   ) {
     super();
   }
@@ -37,7 +39,9 @@ export class SignupComponent extends BaseComponent implements OnInit {
     this.isSubmitted = true;
     if (this.signupForm.valid) {
       const userToPost = this.mapToUserInfo();
-      this.authService.signup(userToPost).pipe(takeUntil(this.componentDestroyed$)).subscribe();
+      this.store.dispatch(AuthActions.signUp({
+        user: userToPost
+      }));
     }
   }
 

@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { IUser } from 'src/app/features/authentication/interfaces/user.interface';
-import { AuthService } from 'src/app/features/authentication/services/auth.service';
 import { IAddress } from 'src/app/features/user/interfaces/profile.interface';
 import { UserService } from 'src/app/features/user/services/user.service';
 import { IOrderSummary } from 'src/app/shared/interfaces/client/order.interface';
@@ -14,6 +13,7 @@ import * as OrdersActions from '../../../orders/store/orders.actions';
 import { selectCartProducts } from 'src/app/features/cart-wishlist/store/cart-wishlist.selectors';
 import { IAppState } from 'src/app/core/store/app.state';
 import { selectOrders } from '../../store/orders.selectors';
+import { AuthUtilService } from 'src/app/utils/auth-util.service';
 
 @Component({
   selector: 'rimss-checkout',
@@ -33,15 +33,15 @@ export class CheckoutComponent extends BaseComponent implements OnInit {
   constructor(
     private router: Router,
     private userService: UserService,
-    private authService: AuthService,
+    private authUtilService: AuthUtilService,
     private store: Store<IAppState>
   ) {
     super();
   }
 
   public ngOnInit(): void {
-    this.loggedInEmail = this.authService.getLoggedInEmail();
-    this.loggedInUser = this.authService.getUser();
+    this.loggedInEmail = this.authUtilService.getLoggedInEmail();
+    this.loggedInUser = this.authUtilService.getUser();
     this.orderSummary = window.history.state?.orderSummary;
     this.fetchAddresses();
   }
@@ -51,7 +51,7 @@ export class CheckoutComponent extends BaseComponent implements OnInit {
   }
 
   public makeOrder(): void {
-    const user = this.authService.getUser();
+    const user = this.authUtilService.getUser();
     if (this.orderSummary && this.defaultAddressIdForOrder && user) {
       this.store.dispatch(
         OrdersActions.createOrder({
