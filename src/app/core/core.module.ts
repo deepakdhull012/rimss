@@ -9,6 +9,7 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { coreFeatureKey, coreReducer } from './store/app.reducers';
 import { CoreEffects } from './store/app.effects';
+import { TranslateModule } from '@ngx-translate/core';
 
 const components: Array<any> = [HeaderComponent, FooterComponent];
 const directives: Array<any> = [BaseComponent];
@@ -22,8 +23,9 @@ const directives: Array<any> = [BaseComponent];
       level: NgxLoggerLevel.DEBUG,
       serverLogLevel: NgxLoggerLevel.ERROR,
     }),
+    TranslateModule,
     StoreModule.forFeature(coreFeatureKey, coreReducer),
-    EffectsModule.forFeature(CoreEffects)
+    EffectsModule.forFeature(CoreEffects),
   ],
   exports: [...components],
 })

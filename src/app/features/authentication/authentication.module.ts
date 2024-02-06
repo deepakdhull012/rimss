@@ -12,6 +12,7 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { authFeatureKey, authReducer } from './store/auth.reducers';
 import { AuthEffect } from './store/auth.effects';
+import { TranslateModule } from '@ngx-translate/core';
 
 
 
@@ -28,6 +29,7 @@ import { AuthEffect } from './store/auth.effects';
     MatRadioModule,
     AuthenticationRoutingModule,
     MatFormFieldModule,
+    TranslateModule.forChild(),
     StoreModule.forFeature(authFeatureKey, authReducer),
     EffectsModule.forFeature(AuthEffect),
   ],

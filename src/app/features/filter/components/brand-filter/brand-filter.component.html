@@ -2,7 +2,7 @@
 <mat-accordion>
     <mat-expansion-panel [expanded]="true">
       <mat-expansion-panel-header [collapsedHeight]="'auto'" [expandedHeight]="'auto'">
-        <mat-panel-title> Brands </mat-panel-title>
+        <mat-panel-title>{{"filter.brands.label" | translate}}</mat-panel-title>
       </mat-expansion-panel-header>
 
       <ng-container *ngFor="let brand of brands">

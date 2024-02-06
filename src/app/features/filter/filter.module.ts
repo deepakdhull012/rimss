@@ -16,6 +16,7 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { filterReducer, filtersFeatureKey } from './store/filter.reducers';
 import { FiltersEffect } from './store/filter.effects';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { FiltersEffect } from './store/filter.effects';
     MatButtonModule,
     StoreModule.forFeature(filtersFeatureKey, filterReducer),
     EffectsModule.forFeature(FiltersEffect),
+    TranslateModule.forChild()
   ],
   exports: [
     PriceFilterComponent,

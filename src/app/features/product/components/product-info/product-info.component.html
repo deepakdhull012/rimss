@@ -20,7 +20,7 @@
         *ngIf="productInfoConfig?.displayNewIcon"
         class="badge bg-danger fr"
       >
-        New
+      {{"product.product_info.new" | translate}}
       </span>
     </span>
     <a class="pImg" (click)="goToDetailPage(productInfo)"
@@ -41,10 +41,10 @@
     </div>
     <!-- price-wrap.// -->
     <button *ngIf="!productInfo.isInCart" (click)="addToCart()" class="btn btn-primary w-100 mt-16">
-      Add to cart
+      {{"product.product_info.add_to_cart" | translate}}
     </button>
     <button *ngIf="productInfo.isInCart" (click)="removeFromCart()" class="btn btn-danger w-100 mt-16">
-      Remove from cart
+      {{"product.product_info.remove_from_cart" | translate}}
     </button>
   </figcaption>
 </figure>

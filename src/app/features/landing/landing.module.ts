@@ -6,6 +6,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { ProductModule } from '../product/product.module';
 import { LandingRoutingModule } from './landing.routes';
 import { CoreModule } from 'src/app/core/core.module';
+import { TranslateModule } from '@ngx-translate/core';
 
 
 
@@ -19,7 +20,8 @@ import { CoreModule } from 'src/app/core/core.module';
     LandingRoutingModule,
     ProductModule,
     NgxCarouselModule,
-    CoreModule
+    CoreModule,
+    TranslateModule.forChild()
   ],
 
 })

@@ -1,40 +1,43 @@
- <!-- ***** Header Area Start ***** -->
- <header class="header-area header-sticky">
+<header class="header-area header-sticky">
     <div class="container">
         <div class="row">
             <div class="col-12">
                 <nav class="main-nav">
                     <!-- ***** Logo Start ***** -->
                     <a [routerLink]="['/']" class="logo">
-                        RIMSS
+                        {{"core.header.appName" | translate}}
                     </a>
                     <!-- ***** Logo End ***** -->
                     <!-- ***** Menu Start ***** -->
                     <ul class="nav" [ngClass]="{'sideNavVisible': sideNavVisible}">
                         <li>
-                            <input type="text" #searchHolder (keyup.enter)="searchProducts(searchHolder.value)" class="search-hover" name="" placeholder="search here..." />
+                            <input type="text" #searchHolder (keyup.enter)="searchProducts(searchHolder.value)"
+                                class="search-hover" name="" placeholder="search here..." />
                         </li>
-                        <li class="scroll-to-section"><a [routerLink]="['/']" class="active">Home</a></li>
-                        <li class="submenu" *ngFor="let category of categories" (click)="navigateTo(['products', 'list'], [category.catId])">
+                        <li class="scroll-to-section"><a [routerLink]="['/']" class="active">{{"core.header.home" |
+                                translate}}</a></li>
+                        <li class="submenu" *ngFor="let category of categories"
+                            (click)="navigateTo(['products', 'list'], [category.catId])">
                             <a>{{category.name}}</a>
                             <ul>
-                                <li (click)="navigateTo(['products', 'list'], [category.catId, subcategory.catId]);$event.stopPropagation()" *ngFor="let subcategory of category.child"><a>{{subcategory.name}}</a></li>
+                                <li (click)="navigateTo(['products', 'list'], [category.catId, subcategory.catId]);$event.stopPropagation()"
+                                    *ngFor="let subcategory of category.child"><a>{{subcategory.name}}</a></li>
                             </ul>
                         </li>
                         <li class="submenu">
-                            <a>Account</a>
+                            <a>{{"core.header.menu.account.label" | translate}}</a>
                             <ul>
-                                <li [routerLink]="['user', 'cart']"><a>Cart</a></li>
-                                <li [routerLink]="['orders']"><a>Orders</a></li>
-                                <li [routerLink]="['profile']"><a>Profile</a></li>
-                                <li [routerLink]="['user', 'wish-list']"><a>Wish-list</a></li>
-                                <li *ngIf="isLoggedIn" (click)="logout()"><a>Logout</a></li>
-                                <li *ngIf="!isLoggedIn" (click)="login()"><a>Login</a></li>
+                                <li [routerLink]="['user', 'cart']"><a>{{"core.header.menu.account.cart" | translate}}</a></li>
+                                <li [routerLink]="['orders']"><a>{{"core.header.menu.account.orders" | translate}}</a></li>
+                                <li [routerLink]="['profile']"><a>{{"core.header.menu.account.profile" | translate}}</a></li>
+                                <li [routerLink]="['user', 'wish-list']"><a>{{"core.header.menu.account.wish-list" | translate}}</a></li>
+                                <li *ngIf="isLoggedIn" (click)="logout()"><a>{{"core.header.menu.account.logout" | translate}}</a></li>
+                                <li *ngIf="!isLoggedIn" (click)="login()"><a>{{"core.header.menu.account.login" | translate}}</a></li>
                             </ul>
                         </li>
-                    </ul>        
+                    </ul>
                     <a class='menu-trigger' (click)="openSideNav()">
-                        <span>Menu</span>
+                        <span>{{"core.header.menu.label" | translate}}</span>
                     </a>
                     <!-- ***** Menu End ***** -->
                 </nav>
@@ -43,4 +46,3 @@
     </div>
 </header>
 <div class="clearfix"></div>
-<!-- ***** Header Area End ***** -->

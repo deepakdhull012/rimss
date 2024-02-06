@@ -4,7 +4,7 @@
     <div class="row justify-content-center">
       <div class="col-lg-6">
         <div class="content text-center">
-          <h1 class="mb-3">Orders</h1>
+          <h1 class="mb-3">{{"orders.order.label" | translate}}</h1>
 
           <!-- <nav aria-label="breadcrumb">
             <ol class="breadcrumb bg-transparent justify-content-center">
@@ -25,12 +25,12 @@
         <table class="table table-bordered orders-holder">
           <thead>
             <tr>
-              <th scope="col">Product</th>
-              <th scope="col">Product Name</th>
-              <th scope="col">Order Date</th>
-              <th scope="col">Order Status</th>
-              <th scope="col">Amount</th>
-              <th scope="col">Actions</th>
+              <th scope="col">{{"orders.order.order_info.product" | translate}}</th>
+              <th scope="col">{{"orders.order.order_info.product_name" | translate}}</th>
+              <th scope="col">{{"orders.order.order_info.order_date" | translate}}</th>
+              <th scope="col">{{"orders.order.order_info.status" | translate}}</th>
+              <th scope="col">{{"orders.order.order_info.amount" | translate}}</th>
+              <th scope="col">{{"orders.order.order_info.actions.label" | translate}}</th>
             </tr>
           </thead>
           <tbody>
@@ -40,17 +40,17 @@
                 </th>
               <th scope="row">{{order.productSummary}}</th>
               <td>{{ order.orderDate | date}}</td>
-              <td>Order Accepted</td>
+              <td>{{"orders.order.order_accepted" | translate}}</td>
               <td>{{order.discountedPrice}} Rs\-</td>
               <td>
-                <div><a routerLink="/order" class="btn btn-dark btn-small">View Product</a></div>
-                <div><a routerLink="/order" class="btn btn-dark btn-small">Track Order</a></div>
-                <div><a routerLink="/order" class="btn btn-dark btn-small">Cancel Order</a></div>
+                <div><a routerLink="/order" class="btn btn-dark btn-small">{{"orders.order.order_info.actions.view_product" | translate}}</a></div>
+                <div><a routerLink="/order" class="btn btn-dark btn-small">{{"orders.order.order_info.actions.track_order" | translate}}</a></div>
+                <div><a routerLink="/order" class="btn btn-dark btn-small">{{"orders.order.order_info.actions.cancel_order" | translate}}</a></div>
               </td>
             </tr>
             <tr *ngIf="!orderProducts.length">
               <th colspan="6" class="order-image-holder">
-                  No Orders found
+                {{"orders.order.order_info.no_order_found" | translate}}
               </th>
             
           </tr>

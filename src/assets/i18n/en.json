@@ -1,0 +1,207 @@
+{
+  "app": {},
+  "core": {
+    "header": {
+      "appName": "RIMSS",
+      "home": "Home",
+      "menu": {
+        "label": "Menu",
+        "account": {
+          "label": "Account",
+          "cart": "Cart",
+          "orders": "Orders",
+          "profile": "Profile",
+          "wish-list": "Wish-list",
+          "logout": "Logout",
+          "login": "Login"
+        }
+      }
+    },
+    "footer": {
+      "copyright": "Copyright © 2023.",
+      "design": "Design",
+      "rimss": {
+        "india": "RIMSS India"
+      }
+    }
+  },
+  "shared": {
+    "home": "Home"
+  },
+  "auth": {
+    "login": {
+      "label": "Login",
+      "forgot_password": "Forgot Password?",
+      "no_account": "Don’t have an account?",
+      "create_account": "Create a free account"
+    },
+    "signup": {
+      "label": "Sign up",
+      "already_have_account": "Already have an account?",
+      "login_now": "Login now"
+    }
+  },
+  "cart-wishlist": {
+    "cart": {
+      "label": "Shopping cart",
+      "your_cart": "Your shopping cart",
+      "remove": "Remove",
+      "delivery_time": "Free Delivery within 1-2 weeks",
+      "delivery_instruction": "Delivery instruction goes here.",
+      "have_coupon": "Have coupon?",
+      "apply": "Apply",
+      "total": "Total Price:",
+      "discount": "Discount:",
+      "tax": "Tax:",
+      "delivery_charges": "Delivery charges:",
+      "coupon_discount": "Coupon discount:",
+      "net": "Net amount:",
+      "make_purchase": "Make purchase",
+      "back_to_shop": "Back to shop",
+      "recommended_items": "Recommended items"
+    },
+    "wishlist": {
+      "label": "Your wishlist"
+    }
+  },
+  "filter": {
+    "brands": {
+      "label": "Brands"
+    },
+    "discount": {
+      "label": "Discounts"
+    },
+    "price": {
+      "label": "Price"
+    },
+    "rating": {
+      "label": "Rating"
+    },
+    "size": {
+      "label": "Size"
+    },
+    "clear_all": "Clear all filters"
+  },
+  "landing": {
+    "new_arrivals": "New arrivals",
+    "recommended": "Recommended Products"
+  },
+  "orders": {
+    "checkout": {
+      "breadcrumb": {
+        "home": "1. Home",
+        "shopping_cart": "2. Shopping Cart",
+        "order_info": "3. Order info",
+        "payment": "4. Payment"
+      },
+      "register": "Register",
+      "sign_in": "Sign in",
+      "have_account": "Have an account?",
+      "addresses": {
+        "choose_address": "Please choose from belowe addresses",
+        "default_address": "Below address will be used for both shipping and billing address by default",
+        "provide_address": "Please provide delivery address",
+        "add_new_address": "Add new address"
+      },
+      "payment": {
+        "cash": "Cash on delivery",
+        "card": "Pay via credit/debit card",
+        "net_banking": "Pay via net banking",
+        "wallet": "Pay via wallet"
+      },
+      "confirm": "Confirm order",
+      "summary": "Summary",
+      "order_info": {
+        "products_price": "Products Price:",
+        "discount": "Discount:",
+        "tax": "Tax:",
+        "delivery_charges": "Delivery charges:",
+        "coupon_discount": "Coupon discount:",
+        "net": "Net amount:"
+      },
+      "apply": "Apply",
+      "coupon_code": "Coupon code",
+      "already_applied": "already applied"
+    },
+    "order": {
+      "label": "Orders",
+      "order_info": {
+        "product": "Product",
+        "product_name": "Product name",
+        "order_date": "Order date",
+        "status": "Status",
+        "amount": "Amount",
+        "actions": {
+          "label": "Actions",
+          "view_product": "View product",
+          "track_order": "Track order",
+          "cancel_order": "Cancel order"
+        },
+        "order_accepted": "Order accepted",
+        "no_order_found": "No orders found"
+      }
+
+    }
+  },
+  "payment": {},
+  "product": {
+    "product_detail": {
+      "in_stock": "In stock",
+      "units": "units",
+      "out_of_stock": "Out of stock",
+      "size": "Size",
+      "qty": "Quantity",
+      "buy": "Buy now",
+      "add_to_cart": "Add to cart",
+      "remove_from_cart": "Remove from cart",
+      "add_to_wishlist": "Add to WishList",
+      "remove_from_wishlist": "Remove from WishList",
+      "specification": "Specification",
+      "warranty": "Warranty info",
+      "shipping_info": "Shipping info",
+      "seller_profile": "Seller profile",
+      "similar_items": "Similar items"
+    },
+    "product_info": {
+      "new": "New",
+      "add_to_cart": "Add to cart",
+      "remove_from_cart": "Remove from cart"
+    },
+    "product_list": {
+      "label": "Product Listing section",
+      "sorting": {
+        "default": "Default",
+        "price_low_to_high": "Price (Low To High)",
+        "price_high_to_low": "Price (High To Low)",
+        "high_rated": "High rated",
+        "found": "found",
+        "no_product_found": "No product found"
+      }
+    }
+  },
+  "user": {
+    "address": {
+      "save": "Save address"
+    },
+    "address_card": {
+      "default": "Default",
+      "make_default": "Mark default",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "user_card": {
+      "hi": "Hi",
+      "no_address": "No addresses found",
+      "add_address": "Add new address",
+      "default_address": "The following addresses will be used on the checkout page by default."
+    }
+  },
+  "thank-you": {
+    "thank": "Thank you for order",
+    "msg": "We are pleased to serve you.",
+    "order_received": "Order received",
+    "confirmation": "Confirmation",
+    "delivery": "Delivery",
+    "download_invoice": "Download invoice"
+  }
+}

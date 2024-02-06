@@ -36,12 +36,12 @@
       </aside>
       <main class="col-lg-6">
         <article class="ps-lg-3">
-          <h4 class="title text-dark">{{ product.productBrief }} Briefffff</h4>
+          <h4 class="title text-dark">{{ product.productBrief }}</h4>
           <div class="rating-wrap">
             <star-rating [starType]="'svg'" [rating]="product.rating"></star-rating>
           </div>
-          <span *ngIf="noOfUnitsInStock > 0" class="label-rating text-success">In stock {{noOfUnitsInStock }} units</span>
-          <span *ngIf="!(noOfUnitsInStock > 0)" class="out-of-stock">Out of stock</span>
+          <span *ngIf="noOfUnitsInStock > 0" class="label-rating text-success">{{"product.product_detail.in_stock" | translate}} {{noOfUnitsInStock }} {{"product.product_detail.units" | translate}}</span>
+          <span *ngIf="!(noOfUnitsInStock > 0)" class="out-of-stock">{{"product.product_detail.out_of_stock" | translate}}</span>
 
           <div class="price-holder">
             <var class="price h5"
@@ -50,7 +50,7 @@
             <span class="text-muted">/{{ product.priceInfo }}</span>
           </div>
 
-          <p>{{ product.productDescription }} Description Description Description Description Description Description Description Description Description Description Description Description Description Description Description </p>
+          <p>{{ product.productDescription }}</p>
 
           <div class="meta-data">
             <ng-container *ngFor="let metadata of product.metadata | keyvalue">
@@ -62,7 +62,7 @@
 
           <div class="row mb-4">
             <div class="col-md-4 col-6 mb-2" *ngIf="product.sizes?.length">
-              <label class="form-label">Size</label>
+              <label class="form-label">{{"product.product_detail.size" | translate}}</label>
               <select class="form-select size-holder">
                 {{ product.sizes | json }}
                 <ng-container *ngFor="let size of product.sizes">
@@ -72,7 +72,7 @@
             </div>
             <!-- col.// -->
             <div class="">
-              <label class="form-label d-block">Quantity</label>
+              <label class="form-label d-block">{{"product.product_detail.qty" | translate}}</label>
               <div class="input-group input-spinner qty-holder">
                 <button class="btn btn-icon btn-light qty-btn" type="button" (click)="updateQty(-1)">
                   <svg
@@ -108,19 +108,19 @@
           </div>
           <!-- row.// -->
           <div class="button-holder">
-            <button class="btn btn-warning" [disabled]="!(noOfUnitsInStock > 0)" (click)="gotoCheckout()"> Buy now </button>
+            <button class="btn btn-warning" [disabled]="!(noOfUnitsInStock > 0)" (click)="gotoCheckout()">{{"product.product_detail.buy" | translate}}</button>
           <button *ngIf="!product.isInCart" class="btn btn-primary" [disabled]="!(noOfUnitsInStock > 0)" (click)="addToCart()">
-            <i class="me-1 fa fa-shopping-basket"></i> Add to cart
+            <i class="me-1 fa fa-shopping-basket"></i> {{"product.product_detail.add_to_cart" | translate}}
           </button>
           <button *ngIf="product.isInCart" (click)="removeFromCart()" class="btn btn-danger">
-            Remove from cart
+            {{"product.product_detail.remove_from_cart" | translate}}
           </button>
           <button *ngIf="!product.isInWishList" (click)="addToWishList()" class="btn btn-light">
-            <i class="me-1 fa fa-heart"></i> Add to WishList
+            <i class="me-1 fa fa-heart"></i> {{"product.product_detail.add_to_wishlist" | translate}}
           </button>
 
           <button *ngIf="product.isInWishList" (click)="removeFromWishList()" class="btn btn-light">
-            <i class="me-1 fa fa-heart in-wishlist"></i> Remove from WishList
+            <i class="me-1 fa fa-heart in-wishlist"></i> {{"product.product_detail.remove_from_wishlist" | translate}}
           </button>
           </div>
           
@@ -150,7 +150,7 @@
                   data-bs-target="#tab_specs"
                   data-bs-toggle="tab"
                   class="nav-link active"
-                  >Specification</a
+                  >{{"product.product_detail.specification" | translate}}</a
                 >
               </li>
               <li class="nav-item">
@@ -159,7 +159,7 @@
                   data-bs-target="#tab_warranty"
                   data-bs-toggle="tab"
                   class="nav-link"
-                  >Warranty info</a
+                  >{{"product.product_detail.warranty" | translate}}</a
                 >
               </li>
               <li class="nav-item">
@@ -168,7 +168,7 @@
                   data-bs-target="#tab_shipping"
                   data-bs-toggle="tab"
                   class="nav-link"
-                  >Shipping info</a
+                  >{{"product.product_detail.shipping_info" | translate}}</a
                 >
               </li>
               <li class="nav-item">
@@ -177,7 +177,7 @@
                   data-bs-target="#tab_seller"
                   data-bs-toggle="tab"
                   class="nav-link"
-                  >Seller profile</a
+                  >{{"product.product_detail.seller_profile" | translate}}</a
                 >
               </li>
             </ul>
@@ -269,7 +269,7 @@
         <!-- =================== COMPONENT ADDINGS ====================== -->
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Similar items</h5>
+            <h5 class="card-title">{{"product.product_detail.similar_items" | translate}}</h5>
             <ng-container *ngFor="let product of similarProducts">
               <article class="itemside mb-3">
                 <a href="#" class="aside">

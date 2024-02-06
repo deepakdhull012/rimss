@@ -5,7 +5,7 @@
         [collapsedHeight]="'auto'"
         [expandedHeight]="'auto'"
       >
-        <mat-panel-title> Rating </mat-panel-title>
+        <mat-panel-title>{{"filter.rating.label" | translate}}</mat-panel-title>
       </mat-expansion-panel-header>
 <ng-container *ngFor="let ratingOption of ratingOptions">
       <mat-checkbox [checked]="selectedRatingOptions.includes(ratingOption.minRating)" [value]="ratingOption.minRating.toString()" (change)="onRatingChange($event)" class="price-cb">
