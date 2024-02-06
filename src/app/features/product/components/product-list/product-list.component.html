@@ -2,7 +2,7 @@
 <rimss-loader *ngIf="loading"></rimss-loader>
 <section class="bg-primary py-5">
   <div class="container">
-    <div class="text-white py-5 breadcrumb"><h2>Product Listing section</h2></div>
+    <div class="text-white py-5 breadcrumb"><h2>{{"product.product_list.label" | translate}}</h2></div>
   </div>
   <!-- container //  -->
 </section>
@@ -24,15 +24,15 @@
               (change)="onSortByChange($event)"
             >
             <option value="null">
-              Default
+              {{"product.product_list.sorting.default" | translate}}
             </option>
               <option value="{{ SortBy.PRICE_LOW_TO_HIGH }}">
-                Price (Low To High)
+                {{"product.product_list.sorting.price_low_to_high" | translate}}
               </option>
               <option value="{{ SortBy.PRICE_HIGH_TO_LOW }}">
-                Price (High To Low)
+                {{"product.product_list.sorting.price_high_to_low" | translate}}
               </option>
-              <option value="{{ SortBy.HIGH_RATED }}">High rated</option>
+              <option value="{{ SortBy.HIGH_RATED }}">{{"product.product_list.sorting.high_rated" | translate}}</option>
             </select>
             <div class="btn-group grid-btns">
               <a
@@ -56,10 +56,10 @@
             >{{ products.length }} Product<span *ngIf="products.length > 1"
               >s</span
             >
-            found
+            {{"product.product_list.sorting.found" | translate}}
           </strong>
           <strong *ngIf="!products.length" class="fr py-2"
-            >No Product found
+            >{{"product.product_list.sorting.no_product_found" | translate}}
           </strong>
           <div class="clearfix"></div>
         </header>

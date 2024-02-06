@@ -1,4 +1,4 @@
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
@@ -8,13 +8,21 @@ import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
-import { cartWishlistFeatureKey, cartWishlistReducer } from './features/cart-wishlist/store/cart-wishlist.reducers';
+import {
+  cartWishlistFeatureKey,
+  cartWishlistReducer,
+} from './features/cart-wishlist/store/cart-wishlist.reducers';
 import { CartWishlistEffects } from './features/cart-wishlist/store/cart-wishlist.effects';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+
+// AoT requires an exported function for factories
+export function HttpLoaderFactory(httpClient: HttpClient) {
+  return new TranslateHttpLoader(httpClient);
+}
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
+  declarations: [AppComponent],
   imports: [
     HttpClientModule,
     NoopAnimationsModule,
@@ -24,11 +32,18 @@ import { CartWishlistEffects } from './features/cart-wishlist/store/cart-wishlis
     SharedModule,
     StoreModule.forRoot({}),
     EffectsModule.forRoot({}),
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [HttpClient],
+      },
+    }),
     // Cart wish list module may not be available yet but we may need to access cart, wishlist products
     StoreModule.forFeature(cartWishlistFeatureKey, cartWishlistReducer),
-    EffectsModule.forFeature(CartWishlistEffects)
+    EffectsModule.forFeature(CartWishlistEffects),
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

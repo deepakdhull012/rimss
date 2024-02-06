@@ -1,28 +1,28 @@
 <section class="user-dashboard page-wrapper">
   <div class="container">
     <h3>
-      Hi, {{ user?.firstName | titlecase }} {{ user?.lastName | titlecase }},
+      {{"user.user_card.hi" | translate}}, {{ user?.firstName | titlecase }} {{ user?.lastName | titlecase }},
       
     </h3>
     <p> {{user?.email}}</p>
     <br />
     <ng-container *ngIf="!addresses.length">
-      <div>No addresses found</div>
+      <div>{{"user.user_card.no_address" | translate}}</div>
       <br/>
-      <button mat-button mat-raised-button (click)="addAddress()">Add new address</button>
+      <button mat-button mat-raised-button (click)="addAddress()">{{"user.user_card.add_address" | translate}}</button>
     </ng-container>
     <div class="row" *ngIf="addresses.length">
       <div class="col-12 col-md-7 col-sm-12 col-lg-9">
         
         <p>
-          The following addresses will be used on the checkout page by default.
+          {{"user.user_card.default_address" | translate}}
         </p>
         <br />
         <ng-container *ngFor="let address of addresses">
           <rimss-address-card class="mt-32" [address]="address"></rimss-address-card>
         </ng-container>
         <br/>
-        <button mat-button mat-raised-button (click)="addAddress()">Add new address</button>
+        <button mat-button mat-raised-button (click)="addAddress()">{{"user.user_card.add_address" | translate}}</button>
       </div>
     </div>
   </div>

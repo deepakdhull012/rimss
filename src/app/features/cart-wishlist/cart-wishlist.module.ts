@@ -6,6 +6,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { ProductModule } from '../product/product.module';
 import { CartWishListRoutingModule } from './cart-wishlist.routes';
 import { MatButtonModule } from '@angular/material/button';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   declarations: [CartComponent, WishlistComponent],
@@ -14,7 +15,8 @@ import { MatButtonModule } from '@angular/material/button';
     SharedModule,
     CartWishListRoutingModule,
     ProductModule,
-    MatButtonModule
+    MatButtonModule,
+    TranslateModule.forChild()
   ],
   providers: [],
 })

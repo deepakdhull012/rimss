@@ -4,8 +4,8 @@
         <div class="col-lg-6 col-lg-offset-3">
           <div class="login-form border p-5">
             <div class="text-center heading">
-              <h2 class="mb-2">Sign Up</h2>
-              <p class="lead">Already have an account? <a (click)="navigateTo(['auth'])"> Login now</a></p>
+              <h2 class="mb-2">{{"auth.signup.label" | translate}}</h2>
+              <p class="lead">{{"auth.signup.already_have_account" | translate}}<a (click)="navigateTo(['auth'])">{{"auth.signup.login_now" | translate}}</a></p>
             </div>
   
             <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
@@ -40,8 +40,8 @@
                   <mat-radio-button value="F">Female</mat-radio-button>
                 </mat-radio-group>
               </div>
-              <a class="float-right" href="">Forget password?</a>
-              <button type="submit" class="btn btn-primary mt-16 btn-block">Signup</button>
+              <a class="float-right" href="">{{"auth.login.forgot_password" | translate}}</a>
+              <button type="submit" class="btn btn-primary mt-16 btn-block">{{"auth.signup.label" | translate}}</button>
             </form>
           </div>
         </div>

@@ -1,0 +1,16 @@
+{
+  "app": {},
+  "core": {
+    "appName": "RIMSS GERMAN"
+  },
+  "shared": {},
+  "auth": {},
+  "cart-wishlist": {},
+  "filter": {},
+  "landing": {},
+  "orders": {},
+  "payment": {},
+  "product": {},
+  "user": {},
+  "thank-you": {}
+}

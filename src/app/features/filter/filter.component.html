@@ -8,5 +8,5 @@
     <rimss-size-filter *ngIf="filterConfig.sizeFilter"></rimss-size-filter>
     <mat-divider></mat-divider>
     <rimss-discount-filter *ngIf="filterConfig.discountFilter"></rimss-discount-filter>
-    <button mat-button (click)="clearAll()">Clear all filters</button>
+    <button mat-button (click)="clearAll()">{{"filter.clear_all" | translate}}</button>
 </div>

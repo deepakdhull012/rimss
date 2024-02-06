@@ -2,8 +2,8 @@
 <section class="bg-primary padding-y-sm">
     <div class="container">
       <ol class="breadcrumb ondark mb-0">
-        <li class="breadcrumb-item"> <a href="#">Home</a>  </li>
-        <li class="breadcrumb-item active"> Shopping cart  </li>
+        <li class="breadcrumb-item"> <a href="#">{{"shared.home" | translate}}</a>  </li>
+        <li class="breadcrumb-item active">{{"cart-wishlist.cart.label" | translate}}</li>
       </ol>
     </div> <!-- container //  -->
     </section>
@@ -18,7 +18,7 @@
     
         <div class="card">
         <div class="content-body">
-          <h4 class="card-title mb-4">Your shopping cart</h4>
+          <h4 class="card-title mb-4">{{"cart-wishlist.cart.your_cart" | translate}}</h4>
           <ng-container *ngIf="!cartProducts.length">
             <img class="img-fluid cart-image" src="./../../../../../assets/my-images/no-products.jpg"/>
           </ng-container>
@@ -47,7 +47,7 @@
             </div>
             <div class="col-lg-3 col-sm-4 mt-16">
               <div class="float-lg-end">
-                <a (click)="removeFromCart(cartProduct)" class="btn btn-light text-danger"> Remove</a>
+                <a (click)="removeFromCart(cartProduct)" class="btn btn-light text-danger">{{"cart-wishlist.cart.remove" | translate}}</a>
               </div>
             </div>
           </article> <!-- row.// -->
@@ -55,10 +55,8 @@
         </div> <!-- card-body .// -->
     
         <div class="content-body border-top" *ngIf="cartProducts.length">
-          <p><i class="me-2 text-muted fa-lg fa fa-truck"></i> Free Delivery within 1-2 weeks</p>
-          <p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-          quis nostrud exercitation ullamco laboris nisi ut aliquip</p>
+          <p><i class="me-2 text-muted fa-lg fa fa-truck"></i>{{"cart-wishlist.cart.delivery_time" | translate}}</p>
+          <p class="text-muted">{{"cart-wishlist.cart.delivery_instruction" | translate}}</p>
         </div> <!-- card-body.// -->
     
         </div> <!-- card.// -->
@@ -69,10 +67,10 @@
         <div class="card mb-3">
         <div class="card-body">
           <div class="form-group">
-            <label class="form-label">Have coupon?</label>
+            <label class="form-label">{{"cart-wishlist.cart.have_coupon" | translate}}</label>
             <div class="input-group">
               <input #couponName type="text" class="form-control coupon-input" name="" placeholder="Coupon code">
-              <button (click)="applyCoupon(couponName.value)" color="primary" mat-button class="mat-button mat-raised-button apply-coupon">Apply</button>
+              <button (click)="applyCoupon(couponName.value)" color="primary" mat-button class="mat-button mat-raised-button apply-coupon">{{"cart-wishlist.cart.apply" | translate}}</button>
             </div>
           </div>
         </div> <!-- card-body.// -->
@@ -81,34 +79,34 @@
         <div class="card">
         <div class="card-body">
           <dl class="dlist-align">
-            <dt>Total price:</dt>
+            <dt>{{"cart-wishlist.cart.total" | translate}}</dt>
             <dd class="text-end"> {{ originalPriceSum }} Rs/-</dd>
           </dl>
           <dl class="dlist-align">
-            <dt>Discount:</dt>
+            <dt>{{"cart-wishlist.cart.discount" | translate}}</dt>
             <dd class="text-end text-success"> {{ originalPriceSum - discountedPriceSum }} Rs/-</dd>
           </dl>
           <dl class="dlist-align">
-            <dt>TAX:</dt>
+            <dt>{{"cart-wishlist.cart.tax" | translate}}</dt>
             <dd class="text-end"> {{ tax }} Rs/-</dd>
           </dl>
           <dl class="dlist-align">
-            <dt>Delivery Charges:</dt>
+            <dt>{{"cart-wishlist.cart.delivery_charges" | translate}}</dt>
             <dd class="text-end"> {{ deliveryCharges }} Rs/-</dd>
           </dl>
           <dl class="dlist-align" *ngIf="appliedCoupon">
-            <dt>Coupon Discount:</dt>
+            <dt>{{"cart-wishlist.cart.coupon_discount" | translate}}</dt>
             <dd class="text-end"> {{ couponDiscount }} Rs/-</dd>
           </dl>
           <hr>
           <dl class="dlist-align">
-            <dt>Total:</dt>
+            <dt>{{"cart-wishlist.cart.net" | translate}}</dt>
             <dd class="text-end text-dark h5"> {{ orderAmount }} Rs/- </dd>
           </dl>
           
           <div class="d-grid gap-2 my-3">
-            <a class="btn btn-success w-100 mt-16" (click)="checkout()"> Make Purchase </a>
-            <a class="btn btn-light w-100 mt-16"> Back to shop </a>
+            <a class="btn btn-success w-100 mt-16" (click)="checkout()">{{"cart-wishlist.cart.make_purchase" | translate}}</a>
+            <a class="btn btn-light w-100 mt-16">{{"cart-wishlist.cart.back_to_shop" | translate}}</a>
           </div>
         </div> <!-- card-body.// -->
         </div> <!-- card.// -->
@@ -129,7 +127,7 @@
     <section class="padding-y border-top">
     <div class="container">
       <header class="section-heading">
-        <h4 class="section-title">Recommended items</h4>
+        <h4 class="section-title">{{"cart-wishlist.cart.recommended_items" | translate}}</h4>
       </header> 
     
       <div class="row">
