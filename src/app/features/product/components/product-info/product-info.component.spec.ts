@@ -6,7 +6,6 @@ import { ProductInfoComponent } from './product-info.component';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { productsFeatureKey } from '../../store/products.reducers';
 
 describe('ProductInfoComponent', () => {
   let component: ProductInfoComponent;

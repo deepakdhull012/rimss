@@ -23,10 +23,11 @@
             <article *ngFor="let cartProduct of cartProducts; let i = index;" class="row gy-3 mb-4 mt-16">
               <div class="col-lg-5">
                 <figure class="itemside me-lg-5">
-                  <div class="aside"><a (click)="goToProductDetailPage(cartProduct)"><img alt="thumbnail"
+                  <div class="aside"><a (keyup)="goToProductDetailPage(cartProduct)" tabindex="0"
+                      (click)="goToProductDetailPage(cartProduct)"><img alt="thumbnail"
                         src="{{cartProduct.cartProductImage}}" class="img-lg"></a></div>
                   <figcaption class="product-info">
-                    <a (click)="goToProductDetailPage(cartProduct)" class="title">{{cartProduct.productBrief}}</a>
+                    <a (keyup)="goToProductDetailPage(cartProduct)" tabindex="1" (click)="goToProductDetailPage(cartProduct)" class="title">{{cartProduct.productBrief}}</a>
                     <p class="text-muted">{{cartProduct.productName}}</p>
                   </figcaption>
                 </figure>
@@ -48,7 +49,7 @@
               </div>
               <div class="col-lg-3 col-sm-4 mt-16">
                 <div class="float-lg-end">
-                  <a (keyup)="removeFromCart(cartProduct)" tabindex="0" (click)="removeFromCart(cartProduct)"
+                  <a (keyup)="removeFromCart(cartProduct)" tabindex="2" (click)="removeFromCart(cartProduct)"
                     class="btn btn-light text-danger">{{"cart-wishlist.cart.remove" | translate}}</a>
                 </div>
               </div>

@@ -35,7 +35,6 @@ export class HeaderComponent extends BaseComponent implements OnInit {
       .select(selectLoginStatus)
       .pipe(takeUntil(this.componentDestroyed$))
       .subscribe((loginStatus) => {
-        alert("header" + loginStatus)
         this.isLoggedIn = loginStatus;
       });
     this.isLoggedIn = !!this.authUtilService.getLoggedInEmail();

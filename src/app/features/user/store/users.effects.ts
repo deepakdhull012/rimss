@@ -3,8 +3,10 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { EMPTY, of } from 'rxjs';
 import { map, catchError, mergeMap } from 'rxjs/operators';
 import * as UsersActions from './users.actions';
+import * as AuthActions from './../../authentication/store/auth.actions';
 import { UserService } from 'src/app/api/user.service';
 import { NGXLogger } from 'ngx-logger';
+import { AuthUtilService } from 'src/app/utils/auth-util.service';
 
 @Injectable()
 export class UserEffect {
@@ -77,8 +79,10 @@ export class UserEffect {
                 this.logger.log(
                   `Users effect: Success for action: ${action.type}`
                 );
+                const loggedInUser = this.authUtilService.getUser();
                 return {
-                  type: UsersActions.fetchAddresses.type,
+                  type: AuthActions.fetchUserDetails.type,
+                  userId: loggedInUser?.id
                 };
               }),
               catchError(() => {
@@ -122,6 +126,7 @@ export class UserEffect {
   constructor(
     private actions$: Actions,
     private userService: UserService,
-    private logger: NGXLogger
+    private logger: NGXLogger,
+    private authUtilService: AuthUtilService
   ) {}
 }

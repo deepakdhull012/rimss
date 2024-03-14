@@ -16,7 +16,6 @@ import {
 import { ICartProduct } from 'src/app/features/cart-wishlist/interfaces/cart-product.interface';
 import * as CartWishlistActions from './../../../cart-wishlist/store/cart-wishlist.actions';
 import { AuthUtilService } from 'src/app/utils/auth-util.service';
-import { IWishListProduct } from 'src/app/shared/interfaces/client/wish-list.interface';
 
 @Component({
   selector: 'rimss-product-info',

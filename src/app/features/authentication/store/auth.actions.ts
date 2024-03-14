@@ -12,3 +12,18 @@ export const updateLoginStatus = createAction(
   '[Auth] Update Login Status',
   props<{ isLoggedIn: boolean }>()
 );
+
+export const updateSignupStatus = createAction(
+  '[Auth] Update Signup Status',
+  props<{ signupStatus: boolean }>()
+);
+
+export const fetchUserDetails = createAction(
+  '[Auth] Fetch User Details',
+  props<{ userId: number }>()
+);
+
+export const setUserDetails = createAction(
+  '[Auth] Set User Details',
+  props<{ user: IUser }>()
+);

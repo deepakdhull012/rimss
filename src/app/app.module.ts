@@ -16,6 +16,8 @@ import { CartWishlistEffects } from './features/cart-wishlist/store/cart-wishlis
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { CategoryService } from './api/category.service';
+import { authFeatureKey, authReducer } from './features/authentication/store/auth.reducers';
+import { AuthEffect } from './features/authentication/store/auth.effects';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(httpClient: HttpClient) {
@@ -43,6 +45,9 @@ export function HttpLoaderFactory(httpClient: HttpClient) {
     // Cart wish list module may not be available yet but we may need to access cart, wishlist products
     StoreModule.forFeature(cartWishlistFeatureKey, cartWishlistReducer),
     EffectsModule.forFeature(CartWishlistEffects),
+
+    StoreModule.forFeature(authFeatureKey, authReducer),
+    EffectsModule.forFeature(AuthEffect),
   ],
   providers: [CategoryService],
   bootstrap: [AppComponent],

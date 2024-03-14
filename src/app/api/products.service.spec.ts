@@ -4,7 +4,6 @@ import { RouterTestingModule } from '@angular/router/testing';
 
 import { ProductsService } from './products.service';
 import { IProductServer } from '../shared/interfaces/client/product.interface';
-import { takeUntil } from 'rxjs';
 import { SortBy } from '../features/product/interfaces/product-info.interface';
 
 describe('ProductsService', () => {

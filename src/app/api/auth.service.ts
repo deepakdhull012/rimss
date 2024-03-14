@@ -7,7 +7,9 @@ import {
   IUser,
 } from '../features/authentication/interfaces/user.interface';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class AuthService {
   private BASE_URL = environment.BASE_API_URL;
 
@@ -19,6 +21,10 @@ export class AuthService {
         return true;
       })
     );
+  }
+
+  public getUserById(userId: number): Observable<IUser> {
+    return this.http.get<IUser>(`${this.BASE_URL}/users/${userId}`);
   }
 
   public login(credentials: ILoginCredentials): Observable<boolean> {
