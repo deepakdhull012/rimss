@@ -10,7 +10,11 @@ import { NGXLogger } from 'ngx-logger';
 export class AuthEffect {
   authEffect$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(AuthActions.login, AuthActions.signUp),
+      ofType(
+        AuthActions.login,
+        AuthActions.signUp,
+        AuthActions.fetchUserDetails
+      ),
       mergeMap((action) => {
         this.logger.log(`Auth effect: received action ${action.type}`);
         switch (action.type) {
@@ -32,6 +36,24 @@ export class AuthEffect {
                 return EMPTY;
               })
             );
+          case AuthActions.fetchUserDetails.type:
+            return this.authService.getUserById(action.userId).pipe(
+              map((user) => {
+                this.logger.log(
+                  `Auth effect: Success for action: ${action.type} with response ${user}`
+                );
+                return {
+                  type: AuthActions.setUserDetails.type,
+                  user,
+                };
+              }),
+              catchError(() => {
+                this.logger.error(
+                  'Auth effect: Error in action: ' + action.type
+                );
+                return EMPTY;
+              })
+            );
           case AuthActions.signUp.type:
             return this.authService.signup(action.user).pipe(
               map(() => {
@@ -39,8 +61,8 @@ export class AuthEffect {
                   `Auth effect: Success for action: ${action.type}`
                 );
                 return {
-                  type: AuthActions.updateLoginStatus.type,
-                  isLoggedIn: false,
+                  type: AuthActions.updateSignupStatus.type,
+                  signupStatus: true,
                 };
               }),
               catchError(() => {

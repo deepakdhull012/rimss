@@ -84,3 +84,9 @@ mat-checkbox, mat-radio-group {
 .clearfix {
     clear: both;
 }
+
+mat-radio-button .mdc-form-field {
+    .mdc-label {
+        margin-bottom: 0;
+    }
+}

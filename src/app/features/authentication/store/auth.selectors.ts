@@ -8,3 +8,9 @@ export const selectLoginStatus = createSelector(
   selectAuthState,
   (state: IAuthState) => state.isLoggedIn
 );
+
+
+export const selectSignupStatus = createSelector(
+  selectAuthState,
+  (state: IAuthState) => state.isLoggedIn
+);

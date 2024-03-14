@@ -1,3 +1,7 @@
+import { IUser } from "../interfaces/user.interface";
+
 export interface IAuthState {
-    isLoggedIn: boolean
+    isLoggedIn: boolean;
+    signUpStatus?: boolean;
+    user?: IUser
 }

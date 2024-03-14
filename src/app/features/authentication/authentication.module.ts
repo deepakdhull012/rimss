@@ -32,6 +32,6 @@ import { AuthService } from 'src/app/api/auth.service';
     StoreModule.forFeature(authFeatureKey, authReducer),
     EffectsModule.forFeature(AuthEffect),
   ],
-  providers: [AuthService]
+  providers: []
 })
 export class AuthenticationModule { }

@@ -10,8 +10,8 @@
     <span *ngIf="address?.isPrimaryAddress" class="primary-badge">{{"user.address_card.default" | translate}}</span>
   </mat-card-content>
   <mat-card-actions *ngIf="!readMode" align="end">
-    <button (click)="makeDefault()" [disabled]="address?.isPrimaryAddress" mat-button mat-raised-button color="primary">{{"user.address_card.make_default" | translate}}</button>
-    <button (click)="editAddress()" mat-button mat-raised-button>{{"user.address_card.edit" | translate}}</button>
-    <button (click)="deleteAddress()" mat-button mat-raised-button color="warn">{{"user.address_card.delete" | translate}}</button>
+    <button class="mr-2" (click)="makeDefault()" [disabled]="address?.isPrimaryAddress" mat-button mat-raised-button color="primary">{{"user.address_card.make_default" | translate}}</button>
+    <button class="mr-2" (click)="editAddress()" mat-button mat-raised-button>{{"user.address_card.edit" | translate}}</button>
+    <button class="mr-2" (click)="deleteAddress()" mat-button mat-raised-button color="warn">{{"user.address_card.delete" | translate}}</button>
   </mat-card-actions>
 </mat-card>

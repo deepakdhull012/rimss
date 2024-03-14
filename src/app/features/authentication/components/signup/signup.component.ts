@@ -6,7 +6,14 @@ import { PASSWORD_MIN_LENGTH } from '../../consts/auth.const';
 import { IUser } from '../../interfaces/user.interface';
 import { Store } from '@ngrx/store';
 import { IAppState } from 'src/app/core/store/app.state';
-import * as AuthActions from "./../../store/auth.actions";
+import * as AuthActions from './../../store/auth.actions';
+import {
+  selectLoginStatus,
+  selectSignupStatus,
+} from '../../store/auth.selectors';
+import { skip, take, takeUntil } from 'rxjs';
+import { BannerService } from 'src/app/shared/services/banner.service';
+import { BannerType } from 'src/app/shared/interfaces/client/banner.interface';
 
 @Component({
   selector: 'rimss-signup',
@@ -14,20 +21,35 @@ import * as AuthActions from "./../../store/auth.actions";
   styleUrls: ['./signup.component.scss'],
 })
 export class SignupComponent extends BaseComponent implements OnInit {
-
   public signupForm: FormGroup = {} as FormGroup;
   public isSubmitted = false;
-  
+
   constructor(
     private router: Router,
     private fb: FormBuilder,
-    private store: Store<IAppState>
+    private store: Store<IAppState>,
+    private bannerService: BannerService
   ) {
     super();
   }
 
   public ngOnInit(): void {
     this.composeForm();
+    this.store
+      .select(selectSignupStatus)
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe(_ => {
+        if (this.isSubmitted) {
+          this.bannerService.displayBanner.next({
+            type: BannerType.SUCCESS,
+            message: 'Sign up success',
+            closeIcon: true,
+            closeTime: 3000,
+          });
+          this.router.navigate(['auth']);
+        }
+      });
+    
   }
 
   public navigateTo(path: Array<string>): void {
@@ -38,21 +60,25 @@ export class SignupComponent extends BaseComponent implements OnInit {
     this.isSubmitted = true;
     if (this.signupForm.valid) {
       const userToPost = this.mapToUserInfo();
-      this.store.dispatch(AuthActions.signUp({
-        user: userToPost
-      }));
+      this.store.dispatch(
+        AuthActions.signUp({
+          user: userToPost,
+        })
+      );
     }
   }
 
   public getError(controlName: string): string | null {
-    const hasError = this.isControlTouched(controlName) ? this.signupForm.get(controlName)?.invalid || false : false;
+    const hasError = this.isControlTouched(controlName)
+      ? this.signupForm.get(controlName)?.invalid || false
+      : false;
     if (hasError) {
       const errors = this.signupForm.get(controlName)?.errors;
-      if (errors && errors["required"]) {
+      if (errors && errors['required']) {
         return `${controlName} is reuired`;
-      } else if (errors && errors["email"]) {
+      } else if (errors && errors['email']) {
         return `Invalid email`;
-      } else if (errors && errors["minlength"]) {
+      } else if (errors && errors['minlength']) {
         return `Password should be at-least 8 characters long`;
       } else {
         return null;
@@ -71,8 +97,8 @@ export class SignupComponent extends BaseComponent implements OnInit {
       lastName: this.signupForm.get('lastName')?.value,
       email: this.signupForm.get('email')?.value,
       password: this.signupForm.get('password')?.value,
-      gender: this.signupForm.get('gender')?.value
-    }
+      gender: this.signupForm.get('gender')?.value,
+    };
   }
 
   private composeForm(): void {
@@ -80,9 +106,15 @@ export class SignupComponent extends BaseComponent implements OnInit {
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(PASSWORD_MIN_LENGTH)]],
-      confirmPassword: ['', [Validators.required, Validators.minLength(PASSWORD_MIN_LENGTH)]],
-      gender: ['M', Validators.required]
-    })
+      password: [
+        '',
+        [Validators.required, Validators.minLength(PASSWORD_MIN_LENGTH)],
+      ],
+      confirmPassword: [
+        '',
+        [Validators.required, Validators.minLength(PASSWORD_MIN_LENGTH)],
+      ],
+      gender: ['M', Validators.required],
+    });
   }
 }
