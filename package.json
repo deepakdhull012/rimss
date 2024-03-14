@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --prod --base-href http://rimss.s3-website.ap-south-1.amazonaws.com/ --deploy-url=http://rimss.s3-website.ap-south-1.amazonaws.com/",
+    "build": "ng build --production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "server": "ts-node ./server/server.ts --watch",
