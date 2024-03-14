@@ -10,6 +10,7 @@ describe('OrderService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientModule, RouterTestingModule],
+      providers:[OrderService]
     });
     service = TestBed.inject(OrderService);
   });

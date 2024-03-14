@@ -27,7 +27,7 @@ export class UserService implements OnDestroy {
     return this.http
       .post<void>(`${this.BASE_URL}/addresses`, addressPayload)
       .pipe(takeUntil(this.serviceDestroyed$),
-      tap(_ => {
+      tap(() => {
         this.addressUpdated$.next();
       }));
   }
@@ -36,7 +36,7 @@ export class UserService implements OnDestroy {
     return this.http
       .delete<void>(`${this.BASE_URL}/addresses/${addressId}`)
       .pipe(takeUntil(this.serviceDestroyed$),
-      tap(_ => {
+      tap(() => {
         this.addressUpdated$.next();
       }));
   }
@@ -45,7 +45,7 @@ export class UserService implements OnDestroy {
     return this.http
       .put<void>(`${this.BASE_URL}/addresses/${addressPayload.id}`, addressPayload)
       .pipe(takeUntil(this.serviceDestroyed$),
-      tap(_ => {
+      tap(() => {
         this.addressUpdated$.next();
       }));
   }
@@ -58,7 +58,7 @@ export class UserService implements OnDestroy {
         primaryAddressId: addressId
       })
       .pipe(takeUntil(this.serviceDestroyed$),
-      tap(_ => {
+      tap(() => {
         this.addressUpdated$.next();
       }));
     } else {

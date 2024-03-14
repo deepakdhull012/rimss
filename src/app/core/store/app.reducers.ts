@@ -10,7 +10,6 @@ export const coreFeatureKey = 'coreState';
 export const coreReducer = createReducer(
   intialAppState,
   on(RootActions.loadCategories, (state, payload) => {
-    console.log('load categories', payload);
     return { ...state, categories: payload.categories };
   })
 );

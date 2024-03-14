@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ThankYouComponent } from './components/thank-you/thank-you.component';
 import { ThankYouRoutingModule } from './thank-you.routes';
+import { CoreModule } from 'src/app/core/core.module';
 
 
 
@@ -11,7 +12,8 @@ import { ThankYouRoutingModule } from './thank-you.routes';
   ],
   imports: [
     CommonModule,
-    ThankYouRoutingModule
+    ThankYouRoutingModule,
+    CoreModule
   ]
 })
 export class ThankYouModule { }

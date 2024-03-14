@@ -17,11 +17,13 @@ export interface IProductServer {
   availableColors?: Array<string>;
   sizes?: Array<string>;
   sku?: Array<IProductSKU>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   metadata?: any;
 }
 
 export interface IProductInfo extends IProductServer{
   isInWishList?: boolean;
+  wishListId?: number | null;
   isInCart?: boolean;
 }
 

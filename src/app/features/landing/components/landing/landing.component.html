@@ -7,8 +7,8 @@
         <div ngx-light-carousel-container>
             <div  ngx-light-carousel-item  *ngFor="let bannerSale of bannerSales; let i = index">
                 <div class="sale w-100">
-                    <a (click)="goToSalePage(bannerSale)">
-                        <img class="sliderImage img-fluid w-100" src="{{bannerSale.saleImage}}" title="{{bannerSale.title}}">
+                    <a (keyup)="goToSalePage(bannerSale)" (click)="goToSalePage(bannerSale)" tabindex="0">
+                        <img alt="slider image" class="sliderImage img-fluid w-100" src="{{bannerSale.saleImage}}" title="{{bannerSale.title}}">
                     </a>
                     <!-- <h3 class="title">{{slide.title}}</h3> -->
                 </div>
@@ -22,7 +22,7 @@
         <div>
             <div class="slide w-100">
                 <a>
-                    <img class="w-100" src="{{slide.saleImage}}">
+                    <img alt="sale image" class="w-100" src="{{slide.saleImage}}">
                 </a>
                 <!-- <h3 class="title">{{slide.title}}</h3> -->
             </div>

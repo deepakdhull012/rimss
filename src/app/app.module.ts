@@ -15,6 +15,7 @@ import {
 import { CartWishlistEffects } from './features/cart-wishlist/store/cart-wishlist.effects';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { CategoryService } from './api/category.service';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(httpClient: HttpClient) {
@@ -43,7 +44,7 @@ export function HttpLoaderFactory(httpClient: HttpClient) {
     StoreModule.forFeature(cartWishlistFeatureKey, cartWishlistReducer),
     EffectsModule.forFeature(CartWishlistEffects),
   ],
-  providers: [],
+  providers: [CategoryService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

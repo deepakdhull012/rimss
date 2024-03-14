@@ -6,7 +6,7 @@ import { BannerService } from 'src/app/shared/services/banner.service';
 import { Store } from '@ngrx/store';
 import { IAppState } from 'src/app/core/store/app.state';
 import * as AuthActions from './../../store/auth.actions';
-import { selectAuthState, selectLoginStatus } from '../../store/auth.selectors';
+import { selectLoginStatus } from '../../store/auth.selectors';
 import { skip, takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 
@@ -47,9 +47,7 @@ export class LoginComponent extends BaseComponent implements OnInit {
         .select(selectLoginStatus)
         .pipe(takeUntil(this.componentDestroyed$), skip(1))
         .subscribe((success: boolean) => {
-          console.error("login status", success)
           if (success) {
-            
             const redirectionPage = sessionStorage.getItem('redirectionPage');
             if (!redirectionPage) {
               this.router.navigate(['products', 'list']);

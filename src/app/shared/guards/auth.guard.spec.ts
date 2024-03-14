@@ -13,4 +13,16 @@ describe('AuthGuard', () => {
   it('should be created', () => {
     expect(guard).toBeTruthy();
   });
+
+  it('should not activate', () => {
+    const localStorageSpy = spyOn(localStorage, 'getItem').and.returnValue(null);
+    const canActivate = guard.canActivate();
+    expect(canActivate).toBeFalsy();
+  })
+
+  it('should allow activate', () => {
+    const localStorageSpy = spyOn(localStorage, 'getItem').and.returnValue('user');
+    const canActivate = guard.canActivate();
+    expect(canActivate).toBeTruthy();
+  })
 });

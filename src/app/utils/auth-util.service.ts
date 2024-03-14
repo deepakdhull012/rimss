@@ -7,6 +7,8 @@ import { Router } from '@angular/router';
 })
 export class AuthUtilService {
 
+
+
   constructor(private router: Router) { }
 
   public getUser(): IUser | undefined {

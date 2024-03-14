@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
@@ -16,6 +16,7 @@ import {
 import { ICartProduct } from 'src/app/features/cart-wishlist/interfaces/cart-product.interface';
 import * as CartWishlistActions from './../../../cart-wishlist/store/cart-wishlist.actions';
 import { AuthUtilService } from 'src/app/utils/auth-util.service';
+import { IWishListProduct } from 'src/app/shared/interfaces/client/wish-list.interface';
 
 @Component({
   selector: 'rimss-product-info',
@@ -59,7 +60,6 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
 
   public addToWishList(): void {
     const loggedInUserEmail = this.authUtilService.getLoggedInEmail();
-    console.error(this.wishlistProducts, this.productInfo.id)
     const productInWishList = this.wishlistProducts.find((p) => {
       return p.id === this.productInfo.id;
     });
@@ -114,7 +114,7 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
         .select(selectCartProducts)
         .pipe(takeUntil(this.componentDestroyed$))
         .subscribe({
-          next: (cartProducts) => {
+          next: () => {
             this.bannerService.displayBanner.next({
               closeIcon: true,
               closeTime: 1000,
@@ -162,6 +162,7 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
     this.productInfo = {
       ...this.productInfo,
       isInWishList: !!productInWishList,
+      wishListId: productInWishList?.wishListId
     };
   }
 
@@ -173,7 +174,7 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
     );
     if (productInWishList) {
       this.store.dispatch(CartWishlistActions.removeFromWishlist({
-        productId: productInWishList.id
+        productId: productInWishList.wishListId as number
       }));
     }
   }

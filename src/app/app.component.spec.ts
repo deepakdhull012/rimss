@@ -2,17 +2,28 @@ import { HttpClientModule } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { LoggerModule, NgxLoggerLevel } from 'ngx-logger';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
         RouterTestingModule,
-        HttpClientModule
+        HttpClientModule,
+        StoreModule.forRoot({}),
+        EffectsModule.forRoot({}),
+        LoggerModule.forRoot({
+          level: NgxLoggerLevel.LOG
+        }),
+        TranslateModule.forRoot()
       ],
-      declarations: [
-        AppComponent
-      ],
+      declarations: [AppComponent],
+      providers: [
+        TranslateService
+      ]
     }).compileComponents();
   });
 
@@ -27,5 +38,4 @@ describe('AppComponent', () => {
     const app = fixture.componentInstance;
     expect(app.title).toEqual('Retail Inventory Software');
   });
-
 });

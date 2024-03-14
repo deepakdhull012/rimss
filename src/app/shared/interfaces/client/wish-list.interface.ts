@@ -1,5 +1,5 @@
-export interface IWishList {
+export interface IWishListProduct {
     id: number;
     productId: number;
-    userName?: string;
+    email: string;
 }

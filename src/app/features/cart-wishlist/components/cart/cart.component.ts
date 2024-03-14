@@ -37,6 +37,8 @@ export class CartComponent extends BaseComponent implements OnInit {
   public couponDiscount = 0;
   private coupons: ICoupon[] = [];
   public appliedCoupon?: ICoupon;
+  public currencyLabel = 'Rs/-';
+  private taxRate = 10;
 
   public ngOnInit(): void {
     this.fetchCartProducts();
@@ -77,10 +79,15 @@ export class CartComponent extends BaseComponent implements OnInit {
     this.updateAmounts();
   }
 
+  public goToProductDetailPage(cartProduct: ICartProduct): void {
+    this.router.navigate(['products', 'details', cartProduct.id]);
+  }
+
   public updateQuantity(selectEvent: Event, cartItemIndex: number) {
     if (selectEvent.target) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const qty: number = (selectEvent.target as any).value;
-      this.cartProducts[cartItemIndex].quantity = qty;
+      this.cartProducts = this.cartProducts.map((cartProduct, index) => index === cartItemIndex ? {...cartProduct,  quantity: qty} : cartProduct)
     }
     this.updateAmounts();
   }
@@ -132,7 +139,6 @@ export class CartComponent extends BaseComponent implements OnInit {
 
   private checkCoupon(): void {
     if (this.appliedCoupon) {
-      console.error(this.discountedPriceSum, this.appliedCoupon.minAmount);
       if (this.discountedPriceSum >= this.appliedCoupon.minAmount) {
         this.couponDiscount =
           this.appliedCoupon.type === 'flat'
@@ -153,7 +159,7 @@ export class CartComponent extends BaseComponent implements OnInit {
       this.originalPriceSum += product.unitPrice * product.quantity;
       this.discountedPriceSum += product.discountedPrice * product.quantity;
     });
-    this.tax = this.discountedPriceSum / 10;
+    this.tax = this.discountedPriceSum * this.taxRate / 100;
     this.checkCoupon();
     this.orderAmount =
       this.discountedPriceSum +

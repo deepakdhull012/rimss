@@ -4,9 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { ICategory } from '../shared/interfaces/client/category.interface';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class CategoryService {
   private BASE_URL = environment.BASE_API_URL;
   private serviceDestroyed$ = new Subject<void>();

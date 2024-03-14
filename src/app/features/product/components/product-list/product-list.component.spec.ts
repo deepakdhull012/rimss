@@ -4,6 +4,9 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { NgxPaginationModule } from 'ngx-pagination';
 
 import { ProductListComponent } from './product-list.component';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 describe('ProductListComponent', () => {
   let component: ProductListComponent;
@@ -11,10 +14,17 @@ describe('ProductListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HttpClientModule, RouterTestingModule, NgxPaginationModule],
-      declarations: [ ProductListComponent ]
-    })
-    .compileComponents();
+      imports: [
+        HttpClientModule,
+        RouterTestingModule,
+        NgxPaginationModule,
+        StoreModule.forRoot({}),
+        EffectsModule.forRoot(),
+        TranslateModule.forRoot(),
+      ],
+      providers: [TranslateService],
+      declarations: [ProductListComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ProductListComponent);
     component = fixture.componentInstance;

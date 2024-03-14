@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { IFooterColumn } from '../../interfaces/footer-column.interface';
 import { BaseComponent } from '../base/base.component';
 import { TranslateService } from '@ngx-translate/core';
-import { takeUntil } from 'rxjs';
 
 @Component({
   selector: 'rimss-footer',
@@ -11,7 +10,6 @@ import { takeUntil } from 'rxjs';
 })
 export class FooterComponent extends BaseComponent implements OnInit {
   public footerColumns: IFooterColumn[] = [];
-  private footerLabels: any;
   constructor(private translate: TranslateService) {
     super();
   }

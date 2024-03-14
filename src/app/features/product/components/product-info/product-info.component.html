@@ -1,43 +1,27 @@
 <figure class="card card-product-grid">
   <div class="img-wrap">
-    <star-rating
-    [readOnly]="true"
-    [showHalfStars]="true"
-    [starType]="'svg'"
-    [rating]="productInfo.rating"
-  ></star-rating>
+    <star-rating [readOnly]="true" [showHalfStars]="true" [starType]="'svg'"
+      [rating]="productInfo.rating"></star-rating>
     <span class="topbar">
-      <a
-        *ngIf="productInfoConfig?.displayFavouriteIcon || true"
-        class="float-end"
-        (click)="addToWishList()"
-        ><i
-          class="fa fa-lg fa-heart wish-list"
-          [ngClass]="{ 'in-wishlist': productInfo.isInWishList }"
-        ></i
-      ></a>
-      <span
-        *ngIf="productInfoConfig?.displayNewIcon"
-        class="badge bg-danger fr"
-      >
-      {{"product.product_info.new" | translate}}
+      <a *ngIf="productInfoConfig?.displayFavouriteIcon || true" class="float-end" (click)="addToWishList()"
+        (keyup)="addToWishList()" tabindex="0"><i class="fa fa-lg fa-heart wish-list"
+          [ngClass]="{ 'in-wishlist': productInfo.isInWishList }"></i></a>
+      <span *ngIf="productInfoConfig?.displayNewIcon" class="badge bg-danger fr">
+        {{"product.product_info.new" | translate}}
       </span>
     </span>
-    <a class="pImg" (click)="goToDetailPage(productInfo)"
-      ><img src="{{ productInfo.mainImage }}"
-    /></a>
+    <a class="pImg" (keyup)="goToDetailPage(productInfo)" tabindex="1" (click)="goToDetailPage(productInfo)"><img
+        alt="main image" src="{{ productInfo.mainImage }}" /></a>
   </div>
   <figcaption class="info-wrap border-top">
-    <span (click)="goToDetailPage(productInfo)" class="title">{{
+    <span (keyup)="goToDetailPage(productInfo)" tabindex="2" (click)="goToDetailPage(productInfo)" class="title">{{
       productInfo.productBrief
-    }}</span>
-   
+      }}</span>
+
     <div class="price-wrap mb-3">
       <del class="price-old">{{ productInfo.price }}/- </del>
-      <strong class="price"
-        >{{ productInfo.priceAfterDiscount }}/-
-        {{ productInfo.currency }}</strong
-      >
+      <strong class="price">{{ productInfo.priceAfterDiscount }}/-
+        {{ productInfo.currency }}</strong>
     </div>
     <!-- price-wrap.// -->
     <button *ngIf="!productInfo.isInCart" (click)="addToCart()" class="btn btn-primary w-100 mt-16">

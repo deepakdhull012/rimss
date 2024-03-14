@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { IAddress } from '../../interfaces/profile.interface';
 import { Store } from '@ngrx/store';

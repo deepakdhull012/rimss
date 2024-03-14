@@ -1,22 +1,21 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { map, mergeMap, Observable, of, switchMap } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { ILoginCredentials, IUser } from '../features/authentication/interfaces/user.interface';
+import {
+  ILoginCredentials,
+  IUser,
+} from '../features/authentication/interfaces/user.interface';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class AuthService {
   private BASE_URL = environment.BASE_API_URL;
-  
 
   constructor(private http: HttpClient) {}
 
   public signup(user: IUser): Observable<boolean> {
     return this.http.post(`${this.BASE_URL}/users`, user).pipe(
-      map((res) => {
+      map(() => {
         return true;
       })
     );
@@ -28,7 +27,7 @@ export class AuthService {
         `${this.BASE_URL}/users?email=${credentials.email}&password=${credentials.password}`
       )
       .pipe(
-        map((matchingUsers: any[]) => {
+        map((matchingUsers: Array<IUser>) => {
           if (matchingUsers?.length) {
             const matchingUserEmail = matchingUsers[0].email;
             localStorage.setItem(

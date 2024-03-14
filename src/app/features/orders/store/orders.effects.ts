@@ -2,10 +2,9 @@ import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { EMPTY, of } from 'rxjs';
 import { map, catchError, mergeMap } from 'rxjs/operators';
-import { ProductsService } from '../../../api/products.service';
 import * as OrdersActions from './orders.actions';
-import { SalesService } from 'src/app/api/sales.service';
 import { OrderService } from 'src/app/api/order.service';
+import { NGXLogger } from 'ngx-logger';
 
 @Injectable()
 export class OrdersEffect {
@@ -13,31 +12,47 @@ export class OrdersEffect {
     this.actions$.pipe(
       ofType(OrdersActions.fetchOrders, OrdersActions.createOrder),
       mergeMap((action) => {
-        console.error('Order Effect for ', action.type);
+        this.logger.log(`Order effect: received action: ${action.type}`);
         switch (action.type) {
           case OrdersActions.fetchOrders.type:
             return this.orderService.fetchOrder().pipe(
               map((orders) => {
+                this.logger.log(
+                  `Order effect: Success for action: ${action.type} with response ${orders}`
+                );
                 return {
                   type: OrdersActions.loadOrders.type,
                   orders,
                 };
               }),
-              catchError(() => EMPTY)
+              catchError(() => {
+                this.logger.error(
+                  'Order effect: Error in action: ' + action.type
+                );
+                return EMPTY;
+              })
             );
           case OrdersActions.createOrder.type:
             return this.orderService.makeOrder(action.order).pipe(
-              map((_) => {
+              map(() => {
+                this.logger.log(
+                  `Order effect: Success for action: ${action.type}`
+                );
                 return {
                   type: OrdersActions.fetchOrders.type,
                 };
               }),
-              catchError(() => EMPTY)
+              catchError(() => {
+                this.logger.error(
+                  'Order effect: Error in action: ' + action.type
+                );
+                return EMPTY;
+              })
             );
 
           default:
             return of(null).pipe(
-              map((_) => ({
+              map(() => ({
                 type: OrdersActions.loadOrders.type,
                 orders: [],
               })),
@@ -48,5 +63,9 @@ export class OrdersEffect {
     )
   );
 
-  constructor(private actions$: Actions, private orderService: OrderService) {}
+  constructor(
+    private actions$: Actions,
+    private orderService: OrderService,
+    private logger: NGXLogger
+  ) {}
 }

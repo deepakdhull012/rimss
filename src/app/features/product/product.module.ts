@@ -15,7 +15,6 @@ import { StoreModule } from '@ngrx/store';
 import { productReducer, productsFeatureKey } from "./store/products.reducers";
 import { EffectsModule } from '@ngrx/effects';
 import { ProductsEffects } from "./store/products.effects";
-import { CartWishlistModule } from '../cart-wishlist/cart-wishlist.module';
 
 
 
@@ -34,7 +33,8 @@ import { CartWishlistModule } from '../cart-wishlist/cart-wishlist.module';
     MatSelectModule,
     SharedModule,
     StoreModule.forFeature(productsFeatureKey, productReducer),
-    EffectsModule.forFeature(ProductsEffects)
+    EffectsModule.forFeature(ProductsEffects),
+    CoreModule
   ],
   exports: [
     ProductInfoComponent

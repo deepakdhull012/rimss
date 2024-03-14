@@ -2,23 +2,25 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
 import {
   forkJoin,
-  Observable, Subject,
+  map,
+  Observable,
+  of,
+  Subject,
   switchMap,
   takeUntil,
-  tap
+  tap,
 } from 'rxjs';
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
-import { IWishList } from 'src/app/shared/interfaces/client/wish-list.interface';
+import { IWishListProduct } from 'src/app/shared/interfaces/client/wish-list.interface';
 import { environment } from 'src/environments/environment';
 import { ICartProduct } from '../features/cart-wishlist/interfaces/cart-product.interface';
 import { AuthUtilService } from '../utils/auth-util.service';
 
 @Injectable({
-  providedIn: "root"
+  providedIn: 'root',
 })
 export class CartWishlistService implements OnDestroy {
   private serviceDestroyed$ = new Subject<void>();
-
 
   public cartUpdated: Subject<void> = new Subject<void>();
   public wishListUpdated: Subject<void> = new Subject<void>();
@@ -27,22 +29,20 @@ export class CartWishlistService implements OnDestroy {
   constructor(
     private httpClient: HttpClient,
     private authUtilService: AuthUtilService
-  ) {
-   
-  }
+  ) {}
 
   public addProductToWishList(
     productId: number,
     email: string
-  ): Observable<IWishList> {
+  ): Observable<IWishListProduct> {
     return this.httpClient
-      .post<IWishList>(`${this.BASE_URL}/wish-list`, {
+      .post<IWishListProduct>(`${this.BASE_URL}/wish-list`, {
         productId,
         email,
       })
       .pipe(
         takeUntil(this.serviceDestroyed$),
-        tap((_) => {
+        tap(() => {
           this.wishListUpdated.next();
         })
       );
@@ -53,7 +53,7 @@ export class CartWishlistService implements OnDestroy {
       .post<ICartProduct>(`${this.BASE_URL}/cart`, cartProduct)
       .pipe(
         takeUntil(this.serviceDestroyed$),
-        tap((_) => {
+        tap(() => {
           this.cartUpdated.next();
         })
       );
@@ -62,52 +62,87 @@ export class CartWishlistService implements OnDestroy {
   public getWishListProducts(): Observable<IProductInfo[]> {
     const loggedInUserEmail = this.authUtilService.getLoggedInEmail();
     return this.httpClient
-      .get<Array<IWishList>>(
+      .get<Array<IWishListProduct>>(
         `${this.BASE_URL}/wish-list?email=${loggedInUserEmail}`
       )
       .pipe(
         takeUntil(this.serviceDestroyed$),
         switchMap((wishlistProducts) => {
-          let filterString = '';
-          wishlistProducts.forEach((w) => {
-            filterString += `id=${w.productId}&`;
-          });
-          filterString = filterString.substring(0, filterString.length - 1);
-          return this.httpClient.get<Array<IProductInfo>>(
-            `${this.BASE_URL}/products?${filterString}`
-          );
+          if (wishlistProducts.length) {
+            let filterString = '';
+            wishlistProducts.forEach((w) => {
+              filterString += `id=${w.productId}&`;
+            });
+            filterString = filterString.substring(0, filterString.length - 1);
+            return this.httpClient
+              .get<Array<IProductInfo>>(
+                `${this.BASE_URL}/products?${filterString}`
+              )
+              .pipe(
+                map((products) =>
+                  this.setWishListId(products, wishlistProducts)
+                )
+              );
+          } else {
+            return of([]);
+          }
         })
       );
   }
 
+  private setWishListId(
+    products: IProductInfo[],
+    wishlistProducts: IWishListProduct[]
+  ): IProductInfo[] {
+    products.forEach((product) => {
+      product.wishListId = this.getWishListIdForProduct(
+        product,
+        wishlistProducts
+      );
+    });
+    return products;
+  }
+
+  private getWishListIdForProduct(
+    product: IProductInfo,
+    wishListProducts: IWishListProduct[]
+  ): number | null {
+    const matchingWishlistProduct = wishListProducts.find(
+      (wp) => wp.productId === product.id
+    );
+    return matchingWishlistProduct ? matchingWishlistProduct.id : null;
+  }
+
   public getCartProducts(): Observable<Array<ICartProduct>> {
     const loggedInUserEmail = this.authUtilService.getLoggedInEmail();
-    return this.httpClient
-      .get<Array<ICartProduct>>(
-        `${this.BASE_URL}/cart?userEmail=${loggedInUserEmail}`
-      );
+    return this.httpClient.get<Array<ICartProduct>>(
+      `${this.BASE_URL}/cart?userEmail=${loggedInUserEmail}`
+    );
   }
 
-  public removeFromCart(cartProductId: number): Observable<any> {
+  public removeFromCart(cartProductId: number): Observable<void> {
     return this.httpClient
-      .delete(`${this.BASE_URL}/cart/${cartProductId}`);
+      .delete(`${this.BASE_URL}/cart/${cartProductId}`)
+      .pipe(map(() => {}));
   }
 
-  public removeFromWishList(wishListProductId: number): Observable<any> {
+  public removeFromWishList(wishListProductId: number): Observable<void> {
     return this.httpClient
-      .delete(`${this.BASE_URL}/wish-list/${wishListProductId}`);
+      .delete(`${this.BASE_URL}/wish-list/${wishListProductId}`)
+      .pipe(map(() => {}));
   }
 
-  public clearCart(): Observable<any> {
-    
-    return this.getCartProducts().pipe(switchMap(cartProducts => {
-      const cartremoveRequest$: any[] = [];
-      cartProducts.forEach((cartProduct) => {
-        const removeCartReq = this.removeFromCart(cartProduct.id as number);
-        cartremoveRequest$.push(removeCartReq);
-      });
-      return forkJoin(cartremoveRequest$);
-    }))
+  public clearCart(): Observable<void> {
+    return this.getCartProducts().pipe(
+      switchMap((cartProducts) => {
+        const cartremoveRequest$: Array<Observable<void>> = [];
+        cartProducts.forEach((cartProduct) => {
+          const removeCartReq = this.removeFromCart(cartProduct.id as number);
+          cartremoveRequest$.push(removeCartReq);
+        });
+        return forkJoin(cartremoveRequest$).pipe(map(() => {}));
+      })
+    );
   }
 
   public ngOnDestroy(): void {

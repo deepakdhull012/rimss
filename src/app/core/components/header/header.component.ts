@@ -8,6 +8,7 @@ import { IAppState } from '../../store/app.state';
 import * as RootActions from './../../store/app.actions';
 import { selectCategories } from '../../store/app.selectors';
 import { AuthUtilService } from 'src/app/utils/auth-util.service';
+import { selectLoginStatus } from 'src/app/features/authentication/store/auth.selectors';
 
 @Component({
   selector: 'rimss-header',
@@ -30,6 +31,13 @@ export class HeaderComponent extends BaseComponent implements OnInit {
   public categories: Array<ICategory> = [];
 
   public ngOnInit(): void {
+    this.store
+      .select(selectLoginStatus)
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe((loginStatus) => {
+        alert("header" + loginStatus)
+        this.isLoggedIn = loginStatus;
+      });
     this.isLoggedIn = !!this.authUtilService.getLoggedInEmail();
     this.fetchAllCategories();
   }
@@ -65,6 +73,7 @@ export class HeaderComponent extends BaseComponent implements OnInit {
 
   public logout(): void {
     this.authUtilService.logout();
+    this.isLoggedIn = false;
   }
 
   public login(): void {

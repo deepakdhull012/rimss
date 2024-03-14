@@ -9,8 +9,10 @@ export const intialAuthState: IAuthState = {
 
 export const authReducer = createReducer(
   intialAuthState,
-  on(AuthActions.updateLoginStatus, (state, payload) => ({
-    ...state,
-    isLoggedIn: payload.isLoggedIn,
-  }))
+  on(AuthActions.updateLoginStatus, (state, payload) => {
+    return ({
+      ...state,
+      isLoggedIn: payload.isLoggedIn,
+    })
+  })
 );

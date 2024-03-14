@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { Router, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
 import { BannerType } from '../interfaces/client/banner.interface';
 import { BannerService } from '../services/banner.service';
@@ -12,9 +12,7 @@ export class AuthGuard  {
 
   }
   
-  public canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+  public canActivate(): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
       const loggedInUser = localStorage.getItem("loggedInUser");
       if (loggedInUser) {
         return true;

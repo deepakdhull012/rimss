@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
@@ -30,12 +30,6 @@ export class PriceFilterComponent extends BaseComponent implements OnInit {
   public onPriceChange(event: MatCheckboxChange): void {
     const index = +event.source.value;
     if (event.checked) {
-      console.error(
-        'selected price range',
-        this.selectedPriceRange,
-        this.priceRange[index],
-        index
-      );
       this.selectedPriceRange = [
         ...this.selectedPriceRange,
         this.priceRange[index],
@@ -69,7 +63,7 @@ export class PriceFilterComponent extends BaseComponent implements OnInit {
       });
   }
 
-  private updateRange() {
+  private updateRange(): void {
     this.priceRange = this.priceBreakPoints.map((priceBreakPoint, index) => {
       if (index === 0) {
         return {
