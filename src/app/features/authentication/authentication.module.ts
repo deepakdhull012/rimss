@@ -12,7 +12,6 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { authFeatureKey, authReducer } from './store/auth.reducers';
 import { AuthEffect } from './store/auth.effects';
-import { AuthService } from 'src/app/api/auth.service';
 
 
 

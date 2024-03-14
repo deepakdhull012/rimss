@@ -4,7 +4,6 @@ import { Observable, Subject, map, takeUntil } from 'rxjs';
 import { SortBy } from 'src/app/features/product/interfaces/product-info.interface';
 import { environment } from 'src/environments/environment';
 import { IFilterCriteria, IProductInfo, IProductServer } from '../shared/interfaces/client/product.interface';
-import { IWishListProduct } from '../shared/interfaces/client/wish-list.interface';
 
 @Injectable({
   providedIn: 'root',

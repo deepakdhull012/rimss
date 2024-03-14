@@ -8,9 +8,6 @@ import { EffectsModule } from '@ngrx/effects';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { IProductInfo } from './../../../../shared/interfaces/client/product.interface';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
-import { MatCheckbox, MatCheckboxChange } from '@angular/material/checkbox';
-import * as ProductActions from './../../store/products.actions';
-import * as CartWishlistActions from './../../../cart-wishlist/store/cart-wishlist.actions';
 import { AuthUtilService } from 'src/app/utils/auth-util.service';
 import { IProductDetailsTab } from '../../interfaces/product-info.interface';
 

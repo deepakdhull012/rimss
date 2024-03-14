@@ -8,10 +8,9 @@ import { Store } from '@ngrx/store';
 import { IAppState } from 'src/app/core/store/app.state';
 import * as AuthActions from './../../store/auth.actions';
 import {
-  selectLoginStatus,
   selectSignupStatus,
 } from '../../store/auth.selectors';
-import { skip, take, takeUntil } from 'rxjs';
+import { takeUntil } from 'rxjs';
 import { BannerService } from 'src/app/shared/services/banner.service';
 import { BannerType } from 'src/app/shared/interfaces/client/banner.interface';
 
@@ -38,7 +37,7 @@ export class SignupComponent extends BaseComponent implements OnInit {
     this.store
       .select(selectSignupStatus)
       .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe(_ => {
+      .subscribe(() => {
         if (this.isSubmitted) {
           this.bannerService.displayBanner.next({
             type: BannerType.SUCCESS,

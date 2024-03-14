@@ -16,8 +16,6 @@ import { CartWishlistEffects } from './features/cart-wishlist/store/cart-wishlis
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { CategoryService } from './api/category.service';
-import { userFeatureKey, userReducer } from './features/user/store/users.reducers';
-import { UserEffect } from './features/user/store/users.effects';
 import { authFeatureKey, authReducer } from './features/authentication/store/auth.reducers';
 import { AuthEffect } from './features/authentication/store/auth.effects';
 
