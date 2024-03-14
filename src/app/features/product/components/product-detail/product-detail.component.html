@@ -1,306 +1,252 @@
-<!-- ============== SECTION PAGETOP ============== -->
-<section class="bg-primary padding-y-sm mt-32"></section>
-<!-- ============== SECTION PAGETOP END// ============== -->
-
-<!-- ============== SECTION CONTENT ============== -->
 <section class="padding-y" *ngIf="product">
   <div class="container">
     <div class="row">
-      <aside class="col-lg-6">
-        <article class="gallery-wrap">
-          <div class="img-big-wrap img-thumbnail">
-            <a
-              data-fslightbox="mygalley"
-              data-type="image"
-              href="{{ product.mainImage }}"
-            >
-              <img height="560" src="{{ product.mainImage }}" />
-            </a>
-          </div>
-          <!-- img-big-wrap.// -->
-          <div class="thumbs-wrap">
-            <ng-container *ngFor="let productImage of product.productImages">
-              <a
-                data-fslightbox="mygalley"
-                data-type="image"
-                class="item-thumb"
-                (click)="product.mainImage = productImage"
-              >
-                <img class="product-detail-image" width="60" height="60" src="{{ productImage }}" />
-              </a>
-            </ng-container>
-          </div>
-          <!-- thumbs-wrap.// -->
-        </article>
-        <!-- gallery-wrap .end// -->
-      </aside>
-      <main class="col-lg-6">
-        <article class="ps-lg-3">
-          <h4 class="title text-dark">{{ product.productBrief }}</h4>
-          <div class="rating-wrap">
-            <star-rating [starType]="'svg'" [rating]="product.rating"></star-rating>
-          </div>
-          <span *ngIf="noOfUnitsInStock > 0" class="label-rating text-success">{{"product.product_detail.in_stock" | translate}} {{noOfUnitsInStock }} {{"product.product_detail.units" | translate}}</span>
-          <span *ngIf="!(noOfUnitsInStock > 0)" class="out-of-stock">{{"product.product_detail.out_of_stock" | translate}}</span>
-
-          <div class="price-holder">
-            <var class="price h5"
-              >{{ product.price }} {{ product.currency }}</var
-            >
-            <span class="text-muted">/{{ product.priceInfo }}</span>
-          </div>
-
-          <p>{{ product.productDescription }}</p>
-
-          <div class="meta-data">
-            <ng-container *ngFor="let metadata of product.metadata | keyvalue">
-              <div><strong>{{ metadata.key }}</strong>: {{ metadata.value }}</div>
-            </ng-container>
-          </div>
-
-          <hr />
-
-          <div class="row mb-4">
-            <div class="col-md-4 col-6 mb-2" *ngIf="product.sizes?.length">
-              <label class="form-label">{{"product.product_detail.size" | translate}}</label>
-              <select class="form-select size-holder">
-                {{ product.sizes | json }}
-                <ng-container *ngFor="let size of product.sizes">
-                  <option>{{ size }}</option>
-                </ng-container>
-              </select>
-            </div>
-            <!-- col.// -->
-            <div class="">
-              <label class="form-label d-block">{{"product.product_detail.qty" | translate}}</label>
-              <div class="input-group input-spinner qty-holder">
-                <button class="btn btn-icon btn-light qty-btn" type="button" (click)="updateQty(-1)">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="22"
-                    height="22"
-                    fill="#999"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M19 13H5v-2h14v2z"></path>
-                  </svg>
-                </button>
-                <input
-                  class="form-control text-center"
-                  placeholder=""
-                  value="{{this.qty}}"
-                />
-                <button class="btn btn-icon btn-light qty-btn" type="button" (click)="updateQty(1)">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="22"
-                    height="22"
-                    fill="#999"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
-                  </svg>
-                </button>
-              </div>
-              <!-- input-group.// -->
-            </div>
-            <!-- col.// -->
-          </div>
-          <!-- row.// -->
-          <div class="button-holder">
-            <button class="btn btn-warning" [disabled]="!(noOfUnitsInStock > 0)" (click)="gotoCheckout()">{{"product.product_detail.buy" | translate}}</button>
-          <button *ngIf="!product.isInCart" class="btn btn-primary" [disabled]="!(noOfUnitsInStock > 0)" (click)="addToCart()">
-            <i class="me-1 fa fa-shopping-basket"></i> {{"product.product_detail.add_to_cart" | translate}}
-          </button>
-          <button *ngIf="product.isInCart" (click)="removeFromCart()" class="btn btn-danger">
-            {{"product.product_detail.remove_from_cart" | translate}}
-          </button>
-          <button *ngIf="!product.isInWishList" (click)="addToWishList()" class="btn btn-light">
-            <i class="me-1 fa fa-heart"></i> {{"product.product_detail.add_to_wishlist" | translate}}
-          </button>
-
-          <button *ngIf="product.isInWishList" (click)="removeFromWishList()" class="btn btn-light">
-            <i class="me-1 fa fa-heart in-wishlist"></i> {{"product.product_detail.remove_from_wishlist" | translate}}
-          </button>
-          </div>
-          
-        </article>
-        <!-- product-info-aside .// -->
-      </main>
-      <!-- col.// -->
+      <ng-template [ngTemplateOutlet]="productImage"></ng-template>
+      <ng-template [ngTemplateOutlet]="productDescription"></ng-template>
     </div>
-    <!-- row.// -->
   </div>
-  <!-- container .//  -->
 </section>
-<!-- ============== SECTION CONTENT END// ============== -->
 
-<!-- ============== SECTION  ============== -->
 <section class="padding-y bg-light border-top">
   <div class="container">
     <div class="row">
-      <div class="col-lg-8">
-        <!-- =================== COMPONENT SPECS ====================== -->
-        <div class="card">
-          <header class="card-header">
-            <ul class="nav nav-tabs card-header-tabs">
-              <li class="nav-item">
-                <a
-                (click)="activateTab(IProductDetailsTab.SPECIFICATION)"
-                  data-bs-target="#tab_specs"
-                  data-bs-toggle="tab"
-                  class="nav-link active"
-                  >{{"product.product_detail.specification" | translate}}</a
-                >
-              </li>
-              <li class="nav-item">
-                <a
-                 (click)="activateTab(IProductDetailsTab.WARRANTY)"
-                  data-bs-target="#tab_warranty"
-                  data-bs-toggle="tab"
-                  class="nav-link"
-                  >{{"product.product_detail.warranty" | translate}}</a
-                >
-              </li>
-              <li class="nav-item">
-                <a
-                (click)="activateTab(IProductDetailsTab.SHIPPING)"
-                  data-bs-target="#tab_shipping"
-                  data-bs-toggle="tab"
-                  class="nav-link"
-                  >{{"product.product_detail.shipping_info" | translate}}</a
-                >
-              </li>
-              <li class="nav-item">
-                <a
-                (click)="activateTab(IProductDetailsTab.SELLER)"
-                  data-bs-target="#tab_seller"
-                  data-bs-toggle="tab"
-                  class="nav-link"
-                  >{{"product.product_detail.seller_profile" | translate}}</a
-                >
-              </li>
-            </ul>
-          </header>
-          <div class="tab-content">
-            <article *ngIf="activeTab === IProductDetailsTab.SPECIFICATION" id="tab_specs" class="card-body">
-              <p>
-                With supporting text below as a natural lead-in to additional
-                content. Lorem ipsum dolor sit amet, consectetur adipisicing
-                elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-                aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis
-                aute irure dolor in reprehenderit in voluptate velit esse cillum
-                dolore eu fugiat nulla pariatur.
-              </p>
-              <ul class="list-check cols-two">
-                <li>Some great feature name here</li>
-                <li>Lorem ipsum dolor sit amet, consectetur</li>
-                <li>Duis aute irure dolor in reprehenderit</li>
-                <li>Optical heart sensor</li>
-                <li>Easy fast and ver good</li>
-                <li>Some great feature name here</li>
-                <li>Modern style and design</li>
-              </ul>
-              <table class="table border table-hover">
-                <tr>
-                  <th>Display:</th>
-                  <td>13.3-inch LED-backlit display with IPS</td>
-                </tr>
-                <tr>
-                  <th>Processor capacity:</th>
-                  <td>2.3GHz dual-core Intel Core i5</td>
-                </tr>
-                <tr>
-                  <th>Camera quality:</th>
-                  <td>720p FaceTime HD camera</td>
-                </tr>
-                <tr>
-                  <th>Memory</th>
-                  <td>8 GB RAM or 16 GB RAM</td>
-                </tr>
-                <tr>
-                  <th>Graphics</th>
-                  <td>Intel Iris Plus Graphics 640</td>
-                </tr>
-              </table>
-            </article>
-            <!-- tab-content.// -->
-            <article  *ngIf="activeTab === IProductDetailsTab.WARRANTY" id="tab_warranty" class="card-body">
-              Tab content or sample information now <br />
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-              reprehenderit in voluptate velit esse cillum dolore eu fugiat
-              nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-              sunt in culpa qui officia deserunt mollit anim id est laborum.
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo
-            </article>
-            <article  *ngIf="activeTab === IProductDetailsTab.SHIPPING" id="tab_shipping" class="card-body">
-              Another tab content or sample information now <br />
-              Dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-              tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-              minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-              aliquip ex ea commodo consequat. Duis aute irure dolor in
-              reprehenderit in voluptate velit esse cillum dolore eu fugiat
-              nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-              sunt in culpa qui officia deserunt mollit anim id est laborum.
-            </article>
-            <article  *ngIf="activeTab === IProductDetailsTab.SELLER" id="tab_seller" class="card-body">
-              Some other tab content or sample information now <br />
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-              reprehenderit in voluptate velit esse cillum dolore eu fugiat
-              nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-              sunt in culpa qui officia deserunt mollit anim id est laborum.
-            </article>
-          </div>
-        </div>
-        <!-- =================== COMPONENT SPECS .// ================== -->
-      </div>
-      <!-- col.// -->
-      <aside class="col-lg-4">
-        <!-- =================== COMPONENT ADDINGS ====================== -->
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">{{"product.product_detail.similar_items" | translate}}</h5>
-            <ng-container *ngFor="let product of similarProducts">
-              <article class="itemside mb-3">
-                <a href="#" class="aside">
-                  <img
-                    src="{{product.mainImage}}"
-                    width="96"
-                    height="96"
-                    class="img-md img-thumbnail"
-                  />
-                </a>
-                <div class="info">
-                  <a href="#" class="title mb-1">
-                    {{product.productBrief}}
-                  </a>
-                  <strong class="price">{{product.price}}</strong>
-                  <!-- price.// -->
-                </div>
-              </article>
-            </ng-container>
-            
-          </div>
-          <!-- card-body .// -->
-        </div>
-        <!-- card .// -->
-        <!-- =================== COMPONENT ADDINGS .// ================== -->
-      </aside>
-      <!-- col.// -->
+      <ng-template [ngTemplateOutlet]="productSpec"></ng-template>
+      <ng-template [ngTemplateOutlet]="similarItems"></ng-template>
     </div>
-
-    <br /><br />
   </div>
-  <!-- container // -->
 </section>
-<!-- =============== SECTION  END// ============== -->
+
+<ng-template #productImage>
+  <aside class="col-lg-6">
+    <article class="gallery-wrap">
+      <div class="img-big-wrap">
+        <a data-fslightbox="mygalley" data-type="image" href="{{ product.mainImage }}">
+          <img alt="img-xl" src="{{ product.mainImage }}" />
+        </a>
+      </div>
+      <div class="thumbs-wrap mt-0 mb-0">
+        <ng-container *ngFor="let productImage of product.productImages">
+          <a class="item-thumb" (keyup)="product.mainImage = productImage" (click)="product.mainImage = productImage"
+            tabindex="0">
+            <img alt="main product image" class="product-detail-image" width="60" height="60"
+              src="{{ productImage }}" />
+          </a>
+        </ng-container>
+      </div>
+    </article>
+  </aside>
+</ng-template>
+
+<ng-template #productDescription>
+  <main class="col-lg-6">
+    <article class="ps-lg-3">
+      <h4 class="title text-dark">{{ product.productBrief }}</h4>
+      <div class="rating-wrap">
+        <star-rating [starType]="'svg'" [rating]="product.rating"></star-rating>
+      </div>
+      <span *ngIf="noOfUnitsInStock > 0" class="label-rating text-success">{{"product.product_detail.in_stock" |
+        translate}} {{noOfUnitsInStock }} {{"product.product_detail.units" | translate}}</span>
+      <span *ngIf="!(noOfUnitsInStock > 0)" class="out-of-stock">{{"product.product_detail.out_of_stock" |
+        translate}}</span>
+
+      <div class="price-holder">
+        <var class="price h5">{{ product.price }} {{ product.currency }}</var>
+        <span class="text-muted">/{{ product.priceInfo }}</span>
+      </div>
+
+      <p>Description: {{ product.productDescription }}</p>
+
+      <div class="meta-data">
+        <ng-container *ngFor="let metadata of product.metadata | keyvalue">
+          <div><strong>{{ metadata.key }}</strong>: {{ metadata.value }}</div>
+        </ng-container>
+      </div>
+
+      <hr />
+
+      <div class="row mb-4">
+        <div class="col-md-4 col-6 mb-2" *ngIf="product.sizes?.length">
+          <div class="form-label">{{"product.product_detail.size" | translate}}</div>
+          <select class="form-select size-holder">
+            <ng-container *ngFor="let size of product.sizes">
+              <option>{{ size }}</option>
+            </ng-container>
+          </select>
+        </div>
+        <div>
+          <div class="form-label d-block">{{"product.product_detail.qty" | translate}}</div>
+          <div class="input-group input-spinner qty-holder">
+            <button class="btn btn-icon btn-light qty-btn" type="button" (click)="updateQty(-1)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="#999" viewBox="0 0 24 24">
+                <path d="M19 13H5v-2h14v2z"></path>
+              </svg>
+            </button>
+            <input class="form-control text-center p-0" placeholder="" value="{{this.qty}}" />
+            <button class="btn btn-icon btn-light qty-btn" type="button" (click)="updateQty(1)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="#999" viewBox="0 0 24 24">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="button-holder">
+        <button class="btn btn-warning" [disabled]="!(noOfUnitsInStock > 0)"
+          (click)="gotoCheckout()">{{"product.product_detail.buy" | translate}}</button>
+        <button *ngIf="!product.isInCart" class="btn btn-primary" [disabled]="!(noOfUnitsInStock > 0)"
+          (click)="addToCart()">
+          <i class="me-1 fa fa-shopping-basket"></i> {{"product.product_detail.add_to_cart" | translate}}
+        </button>
+        <button *ngIf="product.isInCart" (click)="removeFromCart()" class="btn btn-danger">
+          {{"product.product_detail.remove_from_cart" | translate}}
+        </button>
+        <button *ngIf="!product.isInWishList" (click)="addToWishList()" class="btn btn-light">
+          <i class="me-1 fa fa-heart"></i> {{"product.product_detail.add_to_wishlist" | translate}}
+        </button>
+
+        <button *ngIf="product.isInWishList" (click)="removeFromWishList()" class="btn btn-light">
+          <i class="me-1 fa fa-heart in-wishlist"></i> {{"product.product_detail.remove_from_wishlist" | translate}}
+        </button>
+      </div>
+
+    </article>
+  </main>
+</ng-template>
+
+<ng-template #productSpec>
+  <div class="col-lg-8">
+    <!-- =================== COMPONENT SPECS ====================== -->
+    <div class="card">
+      <header class="card-header">
+        <ul class="nav nav-tabs card-header-tabs">
+          <li class="nav-item">
+            <a (keyup)="activateTab(IProductDetailsTab.SPECIFICATION)"
+              (click)="activateTab(IProductDetailsTab.SPECIFICATION)" data-bs-target="#tab_specs" data-bs-toggle="tab"
+              class="nav-link active" [ngClass]="{'active': activeTab === IProductDetailsTab.SPECIFICATION}"
+              tabindex="1">{{"product.product_detail.specification" |
+              translate}}</a>
+          </li>
+          <li class="nav-item">
+            <a (keyup)="activateTab(IProductDetailsTab.WARRANTY)" (click)="activateTab(IProductDetailsTab.WARRANTY)"
+              data-bs-target="#tab_warranty" data-bs-toggle="tab" class="nav-link"
+              [ngClass]="{'active': activeTab === IProductDetailsTab.WARRANTY}"
+              tabindex="2">{{"product.product_detail.warranty" | translate}}</a>
+          </li>
+          <li class="nav-item">
+            <a (keyup)="activateTab(IProductDetailsTab.SHIPPING)" (click)="activateTab(IProductDetailsTab.SHIPPING)"
+              data-bs-target="#tab_shipping" data-bs-toggle="tab" class="nav-link"
+              [ngClass]="{'active': activeTab === IProductDetailsTab.SHIPPING}"
+              tabindex="3">{{"product.product_detail.shipping_info" | translate}}</a>
+          </li>
+          <li class="nav-item">
+            <a (keyup)="activateTab(IProductDetailsTab.SELLER)" (click)="activateTab(IProductDetailsTab.SELLER)"
+              data-bs-target="#tab_seller" data-bs-toggle="tab" class="nav-link"
+              [ngClass]="{'active': activeTab === IProductDetailsTab.SELLER}"
+              tabindex="4">{{"product.product_detail.seller_profile" | translate}}</a>
+          </li>
+        </ul>
+      </header>
+      <div class="tab-content">
+        <article *ngIf="activeTab === IProductDetailsTab.SPECIFICATION" id="tab_specs" class="card-body">
+          <p>
+            With supporting text below as a natural lead-in to additional
+            content. Lorem ipsum dolor sit amet, consectetur adipisicing
+            elit, sed do eiusmod tempor incididunt ut labore et dolore magna
+            aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+            ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis
+            aute irure dolor in reprehenderit in voluptate velit esse cillum
+            dolore eu fugiat nulla pariatur.
+          </p>
+          <ul class="list-check cols-two">
+            <li>Some great feature name here</li>
+            <li>Lorem ipsum dolor sit amet, consectetur</li>
+            <li>Duis aute irure dolor in reprehenderit</li>
+            <li>Optical heart sensor</li>
+            <li>Easy fast and ver good</li>
+            <li>Some great feature name here</li>
+            <li>Modern style and design</li>
+          </ul>
+          <table class="table border table-hover">
+            <tr>
+              <th>Display:</th>
+              <td>13.3-inch LED-backlit display with IPS</td>
+            </tr>
+            <tr>
+              <th>Processor capacity:</th>
+              <td>2.3GHz dual-core Intel Core i5</td>
+            </tr>
+            <tr>
+              <th>Camera quality:</th>
+              <td>720p FaceTime HD camera</td>
+            </tr>
+            <tr>
+              <th>Memory</th>
+              <td>8 GB RAM or 16 GB RAM</td>
+            </tr>
+            <tr>
+              <th>Graphics</th>
+              <td>Intel Iris Plus Graphics 640</td>
+            </tr>
+          </table>
+        </article>
+        <!-- tab-content.// -->
+        <article *ngIf="activeTab === IProductDetailsTab.WARRANTY" id="tab_warranty" class="card-body">
+          A product warranty serves as a shield against unexpected malfunctions or defects, offering consumers assurance
+          and peace of mind. It's a commitment from the manufacturer or seller to stand behind their product's quality
+          and durability. This contract outlines the terms, duration, and conditions under which repairs, replacements,
+          or refunds are provided if the product fails to meet expectations within a specified period. A robust warranty
+          not only safeguards the consumer's investment but also reflects the manufacturer's confidence in their
+          product's reliability. Clear communication and transparency regarding warranty coverage foster trust and
+          loyalty, enhancing the overall customer experience.
+        </article>
+        <article *ngIf="activeTab === IProductDetailsTab.SHIPPING" id="tab_shipping" class="card-body">
+          Product shipping is the crucial bridge connecting businesses with customers, encompassing the logistical
+          process of delivering goods from seller to recipient. Efficient shipping strategies ensure timely delivery,
+          enhancing customer satisfaction and loyalty. Factors such as shipping speed, cost, and reliability influence
+          purchasing decisions profoundly. Seamless shipping operations encompass order processing, packaging, carrier
+          selection, and tracking mechanisms to provide transparency and peace of mind to buyers. Innovations like
+          same-day delivery and eco-friendly packaging further enrich the shipping experience. Balancing speed,
+          affordability, and sustainability, effective product shipping not only fulfills orders but also leaves a
+          lasting impression, fostering trust and loyalty in today's competitive market landscape.
+        </article>
+        <article *ngIf="activeTab === IProductDetailsTab.SELLER" id="tab_seller" class="card-body">
+
+          A seller profile encapsulates the essence of a business entity, showcasing its identity, expertise, and
+          credibility within an online marketplace. It serves as a digital storefront, offering potential customers
+          insights into the seller's reputation, product range, and customer service standards. Detailed descriptions,
+          accompanied by ratings, reviews, and certifications, establish trust and transparency. A compelling seller
+          profile highlights unique selling propositions, such as competitive pricing, quality assurance, or exceptional
+          customer support. It acts as a virtual handshake, fostering connections between sellers and buyers,
+          facilitating informed purchase decisions, and nurturing long-term relationships based on reliability and
+          satisfaction.
+        </article>
+      </div>
+    </div>
+    <!-- =================== COMPONENT SPECS .// ================== -->
+  </div>
+</ng-template>
+<ng-template #similarItems>
+  <aside class="col-lg-4">
+    <!-- =================== COMPONENT ADDINGS ====================== -->
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">{{"product.product_detail.similar_items" | translate}}</h5>
+        <ng-container *ngFor="let product of similarProducts">
+          <article class="itemside mb-3">
+            <a href="#" class="aside">
+              <img alt="thumbnail image" src="{{product.mainImage}}" width="96" height="96"
+                class="img-md img-thumbnail" />
+            </a>
+            <div class="info">
+              <a href="#" class="title mb-1">
+                {{product.productBrief}}
+              </a>
+              <strong class="price">{{product.price}}</strong>
+            </div>
+          </article>
+        </ng-container>
+
+      </div>
+    </div>
+  </aside>
+</ng-template>

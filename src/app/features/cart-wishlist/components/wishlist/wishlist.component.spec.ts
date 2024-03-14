@@ -3,6 +3,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 
 import { WishlistComponent } from './wishlist.component';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 describe('WishlistComponent', () => {
   let component: WishlistComponent;
@@ -10,10 +13,16 @@ describe('WishlistComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HttpClientModule, RouterTestingModule],
-      declarations: [ WishlistComponent ]
-    })
-    .compileComponents();
+      imports: [
+        HttpClientModule,
+        RouterTestingModule,
+        StoreModule.forRoot({}),
+        EffectsModule.forRoot(),
+        TranslateModule.forRoot(),
+      ],
+      providers: [TranslateService],
+      declarations: [WishlistComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(WishlistComponent);
     component = fixture.componentInstance;

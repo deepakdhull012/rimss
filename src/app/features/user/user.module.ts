@@ -14,6 +14,7 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { userFeatureKey, userReducer } from './store/users.reducers';
 import { UserEffect } from './store/users.effects';
+import { CoreModule } from 'src/app/core/core.module';
 
 @NgModule({
   declarations: [UserComponent, AddressComponent, AddressCardComponent],
@@ -26,6 +27,7 @@ import { UserEffect } from './store/users.effects';
     UserRoutingModule,
     StoreModule.forFeature(userFeatureKey, userReducer),
     EffectsModule.forFeature(UserEffect),
+    CoreModule
   ],
   exports: [AddressComponent, AddressCardComponent],
   providers: [UserService],

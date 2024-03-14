@@ -10,6 +10,7 @@ describe('CartWishlistService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientModule, RouterTestingModule],
+      providers: [CartWishlistService]
     });
     service = TestBed.inject(CartWishlistService);
   });

@@ -17,26 +17,35 @@
                         <li class="scroll-to-section"><a [routerLink]="['/']" class="active">{{"core.header.home" |
                                 translate}}</a></li>
                         <li class="submenu" *ngFor="let category of categories"
+                            (keyup)="navigateTo(['products', 'list'], [category.catId])" tabindex="0"
                             (click)="navigateTo(['products', 'list'], [category.catId])">
                             <a>{{category.name}}</a>
                             <ul>
-                                <li (click)="navigateTo(['products', 'list'], [category.catId, subcategory.catId]);$event.stopPropagation()"
-                                    *ngFor="let subcategory of category.child"><a>{{subcategory.name}}</a></li>
+                                <li (keyup)="navigateTo(['products', 'list'], [category.catId, subcategory.catId]); $event.stopPropagation()"
+                                    (click)="navigateTo(['products', 'list'], [category.catId, subcategory.catId]);$event.stopPropagation()"
+                                    tabindex="1" *ngFor="let subcategory of category.child"><a>{{subcategory.name}}</a>
+                                </li>
                             </ul>
                         </li>
                         <li class="submenu">
                             <a>{{"core.header.menu.account.label" | translate}}</a>
                             <ul>
-                                <li [routerLink]="['user', 'cart']"><a>{{"core.header.menu.account.cart" | translate}}</a></li>
-                                <li [routerLink]="['orders']"><a>{{"core.header.menu.account.orders" | translate}}</a></li>
-                                <li [routerLink]="['profile']"><a>{{"core.header.menu.account.profile" | translate}}</a></li>
-                                <li [routerLink]="['user', 'wish-list']"><a>{{"core.header.menu.account.wish-list" | translate}}</a></li>
-                                <li *ngIf="isLoggedIn" (click)="logout()"><a>{{"core.header.menu.account.logout" | translate}}</a></li>
-                                <li *ngIf="!isLoggedIn" (click)="login()"><a>{{"core.header.menu.account.login" | translate}}</a></li>
+                                <li [routerLink]="['user', 'cart']"><a>{{"core.header.menu.account.cart" |
+                                        translate}}</a></li>
+                                <li [routerLink]="['orders']"><a>{{"core.header.menu.account.orders" | translate}}</a>
+                                </li>
+                                <li [routerLink]="['profile']"><a>{{"core.header.menu.account.profile" | translate}}</a>
+                                </li>
+                                <li [routerLink]="['user', 'wish-list']"><a>{{"core.header.menu.account.wish-list" |
+                                        translate}}</a></li>
+                                <li *ngIf="isLoggedIn" (keyup)="logout()"  (click)="logout()" tabindex="2"><a>{{"core.header.menu.account.logout" |
+                                        translate}}</a></li>
+                                <li *ngIf="!isLoggedIn" (keyup)="login()" (click)="login()" tabindex="3"><a>{{"core.header.menu.account.login" |
+                                        translate}}</a></li>
                             </ul>
                         </li>
                     </ul>
-                    <a class='menu-trigger' (click)="openSideNav()">
+                    <a class='menu-trigger' (keyup)="openSideNav()" (click)="openSideNav()" tabindex="4">
                         <span>{{"core.header.menu.label" | translate}}</span>
                     </a>
                     <!-- ***** Menu End ***** -->

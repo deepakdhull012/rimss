@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { takeUntil } from 'rxjs';
+import { Router } from '@angular/router';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { PASSWORD_MIN_LENGTH } from '../../consts/auth.const';
 import { IUser } from '../../interfaces/user.interface';
@@ -49,7 +48,6 @@ export class SignupComponent extends BaseComponent implements OnInit {
     const hasError = this.isControlTouched(controlName) ? this.signupForm.get(controlName)?.invalid || false : false;
     if (hasError) {
       const errors = this.signupForm.get(controlName)?.errors;
-      console.error("errors", errors)
       if (errors && errors["required"]) {
         return `${controlName} is reuired`;
       } else if (errors && errors["email"]) {

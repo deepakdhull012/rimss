@@ -3,9 +3,7 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { Observable, of, Subject, takeUntil } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import {
-  IBrand,
-  IFilterObject,
-  IPriceRange,
+  IBrand
 } from '../features/filter/interfaces/filter-config.interface';
 
 @Injectable()

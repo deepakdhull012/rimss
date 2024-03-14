@@ -1,6 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
-import { min, takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { IFilterRating } from '../../interfaces/filter-config.interface';
 import { IAppState } from 'src/app/core/store/app.state';
@@ -27,7 +26,7 @@ export class RatingFilterComponent extends BaseComponent implements OnInit {
     this.initRatingOptions();
   }
 
-  onRatingChange(event: MatCheckboxChange): void {
+  public onRatingChange(event: MatCheckboxChange): void {
     const minRating = +event.source.value;
     if (event.checked) {
       this.selectedRatingOptions = [...this.selectedRatingOptions, minRating];

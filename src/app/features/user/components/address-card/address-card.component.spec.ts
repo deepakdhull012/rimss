@@ -4,6 +4,9 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { UserService } from '../../../../api/user.service';
 
 import { AddressCardComponent } from './address-card.component';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 describe('AddressCardComponent', () => {
   let component: AddressCardComponent;
@@ -11,11 +14,16 @@ describe('AddressCardComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HttpClientModule, RouterTestingModule],
-      providers: [UserService],
-      declarations: [ AddressCardComponent ]
-    })
-    .compileComponents();
+      imports: [
+        HttpClientModule,
+        RouterTestingModule,
+        StoreModule.forRoot({}),
+        EffectsModule.forRoot(),
+        TranslateModule.forRoot(),
+      ],
+      providers: [UserService, TranslateService],
+      declarations: [AddressCardComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(AddressCardComponent);
     component = fixture.componentInstance;

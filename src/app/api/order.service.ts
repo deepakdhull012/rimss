@@ -4,9 +4,7 @@ import { Observable, Subject, takeUntil } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { IOrder } from '../shared/interfaces/client/order.interface';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class OrderService implements OnDestroy {
 
   private BASE_URL = environment.BASE_API_URL;

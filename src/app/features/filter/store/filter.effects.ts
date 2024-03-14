@@ -4,6 +4,7 @@ import { EMPTY, of } from 'rxjs';
 import { map, catchError, mergeMap } from 'rxjs/operators';
 import * as FiltersActions from './filter.actions';
 import { FilterService } from 'src/app/api/filter.service';
+import { NGXLogger } from 'ngx-logger';
 
 @Injectable()
 export class FiltersEffect {
@@ -16,54 +17,86 @@ export class FiltersEffect {
         FiltersActions.fetchSizes
       ),
       mergeMap((action) => {
-        console.error('Filter Effect for ', action.type);
+        this.logger.log(`Filter effect: received action ${action.type}`);
         switch (action.type) {
           case FiltersActions.fetchBrands.type:
             return this.filterService.getBrands().pipe(
               map((brands) => {
+                this.logger.log(
+                  `Filter effect: Success for action: ${action.type} with response ${brands}`
+                );
                 return {
                   type: FiltersActions.loadBrands.type,
                   brands,
                 };
               }),
-              catchError(() => EMPTY)
+              catchError(() => {
+                this.logger.error(
+                  'Filter effect: Error in action: ' + action.type
+                );
+                return EMPTY;
+              })
             );
           case FiltersActions.fetchPriceBreakPoints.type:
             return this.filterService.getPriceBreakPoint().pipe(
               map((priceBreakPoints) => {
+                this.logger.log(
+                  `Filter effect: Success for action: ${action.type} with response ${priceBreakPoints}`
+                );
                 return {
                   type: FiltersActions.loadPriceBreakpoints.type,
                   priceBreakPoints,
                 };
               }),
-              catchError(() => EMPTY)
+              catchError(() => {
+                this.logger.error(
+                  'Filter effect: Error in action: ' + action.type
+                );
+                return EMPTY;
+              })
             );
 
           case FiltersActions.fetchDiscountBreakpoints.type:
             return this.filterService.getDiscountBreakPoints().pipe(
               map((discountBreakPoints) => {
+                this.logger.log(
+                  `Filter effect: Success for action: ${action.type} with response ${discountBreakPoints}`
+                );
                 return {
                   type: FiltersActions.loadDiscountBreakpoints.type,
                   discountBreakPoints,
                 };
               }),
-              catchError(() => EMPTY)
+              catchError(() => {
+                this.logger.error(
+                  'Filter effect: Error in action: ' + action.type
+                );
+                return EMPTY;
+              })
             );
 
           case FiltersActions.fetchSizes.type:
             return this.filterService.getSizes().pipe(
               map((sizes) => {
+                this.logger.log(
+                  `Filter effect: Success for action: ${action.type} with response ${sizes}`
+                );
                 return {
                   type: FiltersActions.loadSizes.type,
                   sizes,
                 };
               }),
-              catchError(() => EMPTY)
+              catchError(() => {
+                this.logger.error(
+                  'Filter effect: Error in action: ' + action.type
+                );
+                return EMPTY;
+              })
             );
 
           default:
             return of(null).pipe(
-              map((_) => ({
+              map(() => ({
                 type: FiltersActions.loadBrands.type,
                 brands: [],
               })),
@@ -76,6 +109,7 @@ export class FiltersEffect {
 
   constructor(
     private actions$: Actions,
-    private filterService: FilterService
+    private filterService: FilterService,
+    private logger: NGXLogger
   ) {}
 }

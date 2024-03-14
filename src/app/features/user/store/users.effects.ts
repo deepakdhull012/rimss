@@ -4,6 +4,7 @@ import { EMPTY, of } from 'rxjs';
 import { map, catchError, mergeMap } from 'rxjs/operators';
 import * as UsersActions from './users.actions';
 import { UserService } from 'src/app/api/user.service';
+import { NGXLogger } from 'ngx-logger';
 
 @Injectable()
 export class UserEffect {
@@ -17,57 +18,97 @@ export class UserEffect {
         UsersActions.fetchAddresses
       ),
       mergeMap((action) => {
-        console.error('User Effect for ', action.type);
+        this.logger.log(`Users effect: received action: ${action.type}`);
         switch (action.type) {
           case UsersActions.createAddress.type:
             return this.userService.addAddress(action.address).pipe(
-              map((_) => {
+              map(() => {
+                this.logger.log(
+                  `Users effect: Success for action: ${action.type}`
+                );
                 return {
                   type: UsersActions.fetchAddresses.type,
                 };
               }),
-              catchError(() => EMPTY)
+              catchError(() => {
+                this.logger.error(
+                  'Users effect: Error in action: ' + action.type
+                );
+                return EMPTY;
+              })
             );
           case UsersActions.updateAddress.type:
             return this.userService.updateAddress(action.address).pipe(
-              map((_) => {
+              map(() => {
+                this.logger.log(
+                  `Users effect: Success for action: ${action.type}`
+                );
                 return {
                   type: UsersActions.fetchAddresses.type,
                 };
               }),
-              catchError(() => EMPTY)
+              catchError(() => {
+                this.logger.error(
+                  'Users effect: Error in action: ' + action.type
+                );
+                return EMPTY;
+              })
             );
           case UsersActions.deleteAddress.type:
             return this.userService.deleteAddress(action.addressId).pipe(
-              map((_) => {
+              map(() => {
+                this.logger.log(
+                  `Users effect: Success for action: ${action.type}`
+                );
                 return {
                   type: UsersActions.fetchAddresses.type,
                 };
               }),
-              catchError(() => EMPTY)
+              catchError(() => {
+                this.logger.error(
+                  'Users effect: Error in action: ' + action.type
+                );
+                return EMPTY;
+              })
             );
           case UsersActions.makePrimaryAddress.type:
             return this.userService.markAsPrimaryAddress(action.addressId).pipe(
-              map((_) => {
+              map(() => {
+                this.logger.log(
+                  `Users effect: Success for action: ${action.type}`
+                );
                 return {
                   type: UsersActions.fetchAddresses.type,
                 };
               }),
-              catchError(() => EMPTY)
+              catchError(() => {
+                this.logger.error(
+                  'Users effect: Error in action: ' + action.type
+                );
+                return EMPTY;
+              })
             );
           case UsersActions.fetchAddresses.type:
             return this.userService.getUserAddresses().pipe(
               map((addresses) => {
+                this.logger.log(
+                  `Users effect: Success for action: ${action.type} with response ${addresses}`
+                );
                 return {
                   type: UsersActions.loadAddresses.type,
                   addresses,
                 };
               }),
-              catchError(() => EMPTY)
+              catchError(() => {
+                this.logger.error(
+                  'Users effect: Error in action: ' + action.type
+                );
+                return EMPTY;
+              })
             );
           default:
             return of(null).pipe(
-              map((_) => ({
+              map(() => ({
                 type: UsersActions.loadAddresses.type,
                 addresses: [],
               })),
@@ -78,5 +119,9 @@ export class UserEffect {
     )
   );
 
-  constructor(private actions$: Actions, private userService: UserService) {}
+  constructor(
+    private actions$: Actions,
+    private userService: UserService,
+    private logger: NGXLogger
+  ) {}
 }

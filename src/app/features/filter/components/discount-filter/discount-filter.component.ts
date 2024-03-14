@@ -17,9 +17,6 @@ import { Store } from '@ngrx/store';
 export class DiscountFilterComponent extends BaseComponent implements OnInit {
   public discounts: Array<number> = [];
   public selectedDiscounts: Array<number> = [];
-  @Output() discountChange: EventEmitter<Array<number>> = new EventEmitter<
-    Array<number>
-  >();
 
   constructor(private store: Store<IAppState>) {
     super();
@@ -36,7 +33,11 @@ export class DiscountFilterComponent extends BaseComponent implements OnInit {
       const index = this.selectedDiscounts.indexOf(+event.source.value);
       this.selectedDiscounts.splice(index, 1);
     }
-    this.discountChange.next(this.selectedDiscounts);
+    this.store.dispatch(
+      FiltersActions.discountRangeChanged({
+        discountRange: this.selectedDiscounts,
+      })
+    );
   }
 
   private fetchDiscountBreakPoints(): void {

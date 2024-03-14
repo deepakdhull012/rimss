@@ -3,6 +3,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 
 import { CheckoutComponent } from './checkout.component';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 describe('CheckoutComponent', () => {
   let component: CheckoutComponent;
@@ -10,10 +13,16 @@ describe('CheckoutComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HttpClientModule, RouterTestingModule],
-      declarations: [ CheckoutComponent ]
-    })
-    .compileComponents();
+      imports: [
+        HttpClientModule,
+        RouterTestingModule,
+        StoreModule.forRoot({}),
+        EffectsModule.forRoot(),
+        TranslateModule.forRoot(),
+      ],
+      providers: [TranslateService],
+      declarations: [CheckoutComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(CheckoutComponent);
     component = fixture.componentInstance;

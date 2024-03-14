@@ -93,6 +93,7 @@ export class ProductListComponent extends BaseComponent implements OnInit {
 
   public onSortByChange(sortEvent: Event) {
     if (sortEvent.target) {
+       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const sortBy: SortBy = (sortEvent.target as any).value;
       this.sortByValue = sortBy;
       this.fetchproductsBasedOnCriteria();

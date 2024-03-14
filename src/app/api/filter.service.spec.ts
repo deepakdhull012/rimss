@@ -10,6 +10,7 @@ describe('FilterService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientModule, RouterTestingModule],
+      providers: [FilterService]
     });
     service = TestBed.inject(FilterService);
   });

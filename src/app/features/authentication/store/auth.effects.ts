@@ -4,6 +4,7 @@ import { EMPTY, of } from 'rxjs';
 import { map, catchError, mergeMap } from 'rxjs/operators';
 import * as AuthActions from './auth.actions';
 import { AuthService } from 'src/app/api/auth.service';
+import { NGXLogger } from 'ngx-logger';
 
 @Injectable()
 export class AuthEffect {
@@ -11,35 +12,49 @@ export class AuthEffect {
     this.actions$.pipe(
       ofType(AuthActions.login, AuthActions.signUp),
       mergeMap((action) => {
-        console.error('Auth Effect for ', action.type);
+        this.logger.log(`Auth effect: received action ${action.type}`);
         switch (action.type) {
           case AuthActions.login.type:
             return this.authService.login(action.credentials).pipe(
               map((loginStatus) => {
-                console.error("returning login status", loginStatus)
+                this.logger.log(
+                  `Auth effect: Success for action: ${action.type} with response ${loginStatus}`
+                );
                 return {
                   type: AuthActions.updateLoginStatus.type,
                   isLoggedIn: loginStatus,
                 };
               }),
-              catchError(() => EMPTY)
+              catchError(() => {
+                this.logger.error(
+                  'Auth effect: Error in action: ' + action.type
+                );
+                return EMPTY;
+              })
             );
           case AuthActions.signUp.type:
             return this.authService.signup(action.user).pipe(
-              map((_) => {
+              map(() => {
+                this.logger.log(
+                  `Auth effect: Success for action: ${action.type}`
+                );
                 return {
                   type: AuthActions.updateLoginStatus.type,
                   isLoggedIn: false,
                 };
               }),
-              catchError(() => EMPTY)
+              catchError(() => {
+                this.logger.error(
+                  'Auth effect: Error in action: ' + action.type
+                );
+                return EMPTY;
+              })
             );
           default:
-            console.error("default action")
             return of(null).pipe(
-              map((_) => ({
+              map(() => ({
                 type: AuthActions.updateLoginStatus.type,
-                  isLoggedIn: false,
+                isLoggedIn: false,
               })),
               catchError(() => EMPTY)
             );
@@ -48,5 +63,9 @@ export class AuthEffect {
     )
   );
 
-  constructor(private actions$: Actions, private authService: AuthService) {}
+  constructor(
+    private actions$: Actions,
+    private authService: AuthService,
+    private logger: NGXLogger
+  ) {}
 }

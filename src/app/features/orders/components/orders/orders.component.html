@@ -36,16 +36,16 @@
           <tbody>
             <tr *ngFor="let order of orderProducts">
                 <th class="order-image-holder">
-                    <img class="order-image" src="{{order.productImage}}">
+                    <img alt="product image" class="order-image" src="{{order.productImage}}">
                 </th>
               <th scope="row">{{order.productSummary}}</th>
               <td>{{ order.orderDate | date}}</td>
-              <td>{{"orders.order.order_accepted" | translate}}</td>
+              <td>{{"orders.order.order_info.order_accepted" | translate}}</td>
               <td>{{order.discountedPrice}} Rs\-</td>
               <td>
-                <div><a routerLink="/order" class="btn btn-dark btn-small">{{"orders.order.order_info.actions.view_product" | translate}}</a></div>
-                <div><a routerLink="/order" class="btn btn-dark btn-small">{{"orders.order.order_info.actions.track_order" | translate}}</a></div>
-                <div><a routerLink="/order" class="btn btn-dark btn-small">{{"orders.order.order_info.actions.cancel_order" | translate}}</a></div>
+                <div class="mb-1"><a routerLink="/order" class="btn btn-info btn-small">{{"orders.order.order_info.actions.view_product" | translate}}</a></div>
+                <div class="mb-1"><a routerLink="/order" class="btn btn-success btn-small">{{"orders.order.order_info.actions.track_order" | translate}}</a></div>
+                <div class="mb-1"><a routerLink="/order" class="btn btn-danger btn-small">{{"orders.order.order_info.actions.cancel_order" | translate}}</a></div>
               </td>
             </tr>
             <tr *ngIf="!orderProducts.length">

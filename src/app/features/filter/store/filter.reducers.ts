@@ -35,7 +35,7 @@ export const filterReducer = createReducer(
     ...state,
     sizes: payload.sizes,
   })),
-  on(FiltersActions.clearAllFilters, (state, payload) => ({
+  on(FiltersActions.clearAllFilters, (state) => ({
     ...state,
     selectedBrands: [],
     selectedDiscountRanges: [],

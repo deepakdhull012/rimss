@@ -11,7 +11,8 @@ import { coreFeatureKey, coreReducer } from './store/app.reducers';
 import { CoreEffects } from './store/app.effects';
 import { TranslateModule } from '@ngx-translate/core';
 
-const components: Array<any> = [HeaderComponent, FooterComponent];
+const components = [HeaderComponent, FooterComponent];
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const directives: Array<any> = [BaseComponent];
 
 @NgModule({
@@ -20,13 +21,13 @@ const directives: Array<any> = [BaseComponent];
     CommonModule,
     RouterModule,
     LoggerModule.forRoot({
-      level: NgxLoggerLevel.DEBUG,
+      level: NgxLoggerLevel.LOG,
       serverLogLevel: NgxLoggerLevel.ERROR,
     }),
     TranslateModule,
     StoreModule.forFeature(coreFeatureKey, coreReducer),
     EffectsModule.forFeature(CoreEffects),
   ],
-  exports: [...components],
+  exports: [...components, TranslateModule],
 })
 export class CoreModule {}

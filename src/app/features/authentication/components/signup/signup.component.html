@@ -5,7 +5,7 @@
           <div class="login-form border p-5">
             <div class="text-center heading">
               <h2 class="mb-2">{{"auth.signup.label" | translate}}</h2>
-              <p class="lead">{{"auth.signup.already_have_account" | translate}}<a (click)="navigateTo(['auth'])">{{"auth.signup.login_now" | translate}}</a></p>
+              <p class="lead">{{"auth.signup.already_have_account" | translate}}<a [routerLink]="['auth']">{{"auth.signup.login_now" | translate}}</a></p>
             </div>
   
             <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">

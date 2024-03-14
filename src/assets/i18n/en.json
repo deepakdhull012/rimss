@@ -45,7 +45,7 @@
     "cart": {
       "label": "Shopping cart",
       "your_cart": "Your shopping cart",
-      "remove": "Remove",
+      "remove": "Remove from cart",
       "delivery_time": "Free Delivery within 1-2 weeks",
       "delivery_instruction": "Delivery instruction goes here.",
       "have_coupon": "Have coupon?",
@@ -103,6 +103,7 @@
         "provide_address": "Please provide delivery address",
         "add_new_address": "Add new address"
       },
+      "payment_method": "Choose payment method.",
       "payment": {
         "cash": "Cash on delivery",
         "card": "Pay via credit/debit card",
@@ -196,7 +197,7 @@
       "default_address": "The following addresses will be used on the checkout page by default."
     }
   },
-  "thank-you": {
+  "thank_you": {
     "thank": "Thank you for order",
     "msg": "We are pleased to serve you.",
     "order_received": "Order received",

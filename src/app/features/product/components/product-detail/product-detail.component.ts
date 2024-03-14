@@ -32,6 +32,7 @@ import { AuthUtilService } from 'src/app/utils/auth-util.service';
   providers: [],
 })
 export class ProductDetailComponent extends BaseComponent implements OnInit {
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   @Input() product: IProductInfo = null as any as IProductInfo;
   public similarProducts: Array<IProductInfo> = [];
   public noOfUnitsInStock = 0;
@@ -72,7 +73,6 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
       });
 
     this.store.select(getSimilarProducts).subscribe((similarProducts) => {
-      console.error('similarProducts', similarProducts);
       this.similarProducts = similarProducts || [];
     });
     this.store.dispatch(CartWishlistActions.fetchCartProducts());
@@ -119,7 +119,7 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
       couponDiscount: 0,
       fromcart: false,
     };
-    this.router.navigate(['checkout'], {
+    this.router.navigate(['orders','checkout'], {
       state: {
         orderSummary: this.orderSummary,
       },
@@ -149,7 +149,7 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
         .select(selectCartProducts)
         .pipe(takeUntil(this.componentDestroyed$))
         .subscribe({
-          next: (_) => {
+          next: () => {
             this.bannerService.displayBanner.next({
               closeIcon: true,
               closeTime: 1000,
@@ -207,7 +207,7 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
     if (productInWishList) {
       this.store.dispatch(
         CartWishlistActions.removeFromWishlist({
-          productId: productInWishList.id,
+          productId: productInWishList.wishListId as number,
         })
       );
     }
@@ -227,7 +227,6 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
   }
 
   private fetchSimilarProducts(categories: string[]): void {
-    console.error('fetch similar prod function', categories);
     this.store.dispatch(
       ProductsAction.fetchSimilarProducts({
         filterCriteria: {

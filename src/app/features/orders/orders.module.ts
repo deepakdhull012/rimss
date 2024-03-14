@@ -10,17 +10,21 @@ import { StoreModule } from '@ngrx/store';
 import { orderReducer, ordersFeatureKey } from './store/orders.reducers';
 import { EffectsModule } from '@ngrx/effects';
 import { OrdersEffect } from './store/orders.effects';
+import { CoreModule } from 'src/app/core/core.module';
+import { OrderService } from 'src/app/api/order.service';
 
 @NgModule({
   declarations: [OrdersComponent, CheckoutComponent],
   imports: [
     CommonModule,
+    CoreModule,
     OrdersRoutingModule,
     UserModule,
     MatRadioModule,
     MatButtonModule,
     StoreModule.forFeature(ordersFeatureKey, orderReducer),
-    EffectsModule.forFeature(OrdersEffect),
+    EffectsModule.forFeature(OrdersEffect)
   ],
+  providers: [OrderService]
 })
 export class OrdersModule {}

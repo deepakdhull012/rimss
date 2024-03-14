@@ -71,16 +71,16 @@ export class CheckoutComponent extends BaseComponent implements OnInit {
       this.store
         .select(selectOrders)
         .pipe(takeUntil(this.componentDestroyed$))
-        .subscribe((_) => {
+        .subscribe(() => {
           if (this.orderSummary?.fromcart) {
             this.store.dispatch(CartWishlistActions.clearCartItems());
-            this.store
-              .select(selectCartProducts)
-              .pipe(takeUntil(this.componentDestroyed$))
-              .subscribe((_) => {
-                this.router.navigate(['orders']);
-              });
           }
+          this.store
+            .select(selectCartProducts)
+            .pipe(takeUntil(this.componentDestroyed$))
+            .subscribe(() => {
+              this.router.navigate(['orders']);
+            });
         });
     }
   }

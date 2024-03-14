@@ -107,7 +107,7 @@ export class LandingComponent extends BaseComponent implements OnInit {
           this.loading = false;
           this.bannerSales = bannerSales;
         },
-        error: (err) => {
+        error: () => {
           this.loading = false;
           this.bannerSales = [];
         },
@@ -125,7 +125,8 @@ export class LandingComponent extends BaseComponent implements OnInit {
       .subscribe((wishlistProducts) => {
         this.wishListProducts = wishlistProducts;
         this.newProducts.forEach((product) => {
-          product = { ...product, isInWishList: this.isInWishList(product.id) };
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          product = { ...product, isInWishList: !!this.getWishListId(product.id), wishListId: this.getWishListId(product.id) };
         });
       });
     this.store
@@ -134,16 +135,17 @@ export class LandingComponent extends BaseComponent implements OnInit {
       .subscribe((allProducts) => {
         this.newProducts = allProducts;
         this.newProducts.forEach((product) => {
-          product = { ...product, isInWishList: this.isInWishList(product.id) };
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          product = { ...product, isInWishList: !!this.getWishListId(product.id), wishListId: this.getWishListId(product.id) };
         });
       });
   }
 
-  private isInWishList(productId: number): boolean {
+  private getWishListId(productId: number): number | null {
     const wishListProduct = this.wishListProducts.find((wishList) => {
       return wishList.id === productId;
     });
-    return !!wishListProduct;
+    return wishListProduct && wishListProduct.wishListId ? wishListProduct.wishListId : null;
   }
 
   private initRecommendedProducts(): void {

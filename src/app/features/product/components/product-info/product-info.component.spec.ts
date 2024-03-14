@@ -3,6 +3,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 
 import { ProductInfoComponent } from './product-info.component';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { productsFeatureKey } from '../../store/products.reducers';
 
 describe('ProductInfoComponent', () => {
   let component: ProductInfoComponent;
@@ -10,10 +14,16 @@ describe('ProductInfoComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HttpClientModule, RouterTestingModule],
-      declarations: [ ProductInfoComponent ]
-    })
-    .compileComponents();
+      imports: [
+        HttpClientModule,
+        RouterTestingModule,
+        StoreModule.forRoot({}),
+        EffectsModule.forRoot({}),
+        TranslateModule.forRoot(),
+      ],
+      providers: [TranslateService],
+      declarations: [ProductInfoComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ProductInfoComponent);
     component = fixture.componentInstance;

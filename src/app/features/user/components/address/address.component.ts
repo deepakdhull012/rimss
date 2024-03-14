@@ -47,7 +47,7 @@ export class AddressComponent extends BaseComponent implements OnInit {
         .select(selectAddresses)
         .pipe(takeUntil(this.componentDestroyed$))
         .subscribe({
-          next: (_) => {
+          next: () => {
             if (this.standalone) {
               this.router.navigate(['profile']);
             } else {
@@ -66,7 +66,6 @@ export class AddressComponent extends BaseComponent implements OnInit {
       : false;
     if (hasError) {
       const errors = this.addressForm.get(controlName)?.errors;
-      console.error('errors', errors);
       if (errors && errors['required']) {
         return `${controlName} is reuired`;
       } else if (errors && errors['email']) {
