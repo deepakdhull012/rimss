@@ -76,8 +76,10 @@ export class OrdersComponent extends BaseComponent implements OnInit {
     }
   }
 
+
   private mapToOrderProductsUI(): void {
     this.orderProducts = [];
+    console.error(this.orders)
     this.orders.forEach((order) => {
       order.productOrders.forEach((productOrder) => {
         const orderProductUI: IOrderProductUI = {
