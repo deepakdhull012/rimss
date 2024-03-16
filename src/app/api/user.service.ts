@@ -13,7 +13,10 @@ export class UserService implements OnDestroy {
   private BASE_URL = environment.BASE_API_URL;
   public addressUpdated$ = new Subject<void>();
 
-  constructor(private authUtilService: AuthUtilService, private http: HttpClient) {
+  constructor(
+    private authUtilService: AuthUtilService,
+    private http: HttpClient
+  ) {
     this.userEmail = this.authUtilService.getLoggedInEmail();
   }
 
@@ -26,47 +29,61 @@ export class UserService implements OnDestroy {
   public addAddress(addressPayload: IAddress): Observable<void> {
     return this.http
       .post<void>(`${this.BASE_URL}/addresses`, addressPayload)
-      .pipe(takeUntil(this.serviceDestroyed$),
-      tap(() => {
-        this.addressUpdated$.next();
-      }));
+      .pipe(
+        takeUntil(this.serviceDestroyed$),
+        tap(() => {
+          this.addressUpdated$.next();
+        })
+      );
   }
 
   public deleteAddress(addressId: number): Observable<void> {
     return this.http
       .delete<void>(`${this.BASE_URL}/addresses/${addressId}`)
-      .pipe(takeUntil(this.serviceDestroyed$),
-      tap(() => {
-        this.addressUpdated$.next();
-      }));
+      .pipe(
+        takeUntil(this.serviceDestroyed$),
+        tap(() => {
+          this.addressUpdated$.next();
+        })
+      );
   }
 
   public updateAddress(addressPayload: IAddress): Observable<void> {
     return this.http
-      .put<void>(`${this.BASE_URL}/addresses/${addressPayload.id}`, addressPayload)
-      .pipe(takeUntil(this.serviceDestroyed$),
-      tap(() => {
-        this.addressUpdated$.next();
-      }));
+      .put<void>(
+        `${this.BASE_URL}/addresses/${addressPayload.id}`,
+        addressPayload
+      )
+      .pipe(
+        takeUntil(this.serviceDestroyed$),
+        tap(() => {
+          this.addressUpdated$.next();
+        })
+      );
   }
 
   public markAsPrimaryAddress(addressId: number): Observable<void> {
     const user: IUser | undefined = this.authUtilService.getUser();
     if (user) {
       return this.http
-      .patch<void>(`${this.BASE_URL}/users/${user.id}`, {
-        primaryAddressId: addressId
-      })
-      .pipe(takeUntil(this.serviceDestroyed$),
-      tap(() => {
-        this.addressUpdated$.next();
-      }));
+        .patch<void>(`${this.BASE_URL}/users/${user.id}`, {
+          primaryAddressId: addressId,
+        })
+        .pipe(
+          takeUntil(this.serviceDestroyed$),
+          tap(() => {
+            const currentUser = this.authUtilService.getUser();
+            if (currentUser) {
+              currentUser.primaryAddressId = addressId;
+            }
+            localStorage.setItem('loggedInUser', JSON.stringify(currentUser));
+            this.addressUpdated$.next();
+          })
+        );
     } else {
       return of(undefined);
     }
-    
   }
-
 
   public ngOnDestroy(): void {
     this.serviceDestroyed$.next();

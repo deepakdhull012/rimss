@@ -7,7 +7,7 @@ import { Store } from '@ngrx/store';
 import { IAppState } from 'src/app/core/store/app.state';
 import * as AuthActions from './../../store/auth.actions';
 import { selectLoginStatus } from '../../store/auth.selectors';
-import { skip, takeUntil } from 'rxjs';
+import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 
 @Component({
@@ -43,24 +43,27 @@ export class LoginComponent extends BaseComponent implements OnInit {
           },
         })
       );
-      this.store
-        .select(selectLoginStatus)
-        .pipe(takeUntil(this.componentDestroyed$), skip(1))
-        .subscribe((success: boolean) => {
-          if (success) {
-            const redirectionPage = sessionStorage.getItem('redirectionPage');
-            if (!redirectionPage) {
-              this.router.navigate(['products', 'list']);
+
+      setTimeout(() => {
+        this.store
+          .select(selectLoginStatus)
+          .pipe(takeUntil(this.componentDestroyed$))
+          .subscribe((success: boolean) => {
+            if (success) {
+              const redirectionPage = sessionStorage.getItem('redirectionPage');
+              if (!redirectionPage) {
+                this.router.navigate(['products', 'list']);
+              }
+            } else {
+              this.bannerService.displayBanner.next({
+                closeIcon: true,
+                closeTime: 3000,
+                message: 'Invalid credentials',
+                type: BannerType.ERROR,
+              });
             }
-          } else {
-            this.bannerService.displayBanner.next({
-              closeIcon: true,
-              closeTime: 3000,
-              message: 'Invalid credentials',
-              type: BannerType.ERROR,
-            });
-          }
-        });
+          });
+      }, 1000);
     } else {
       this.bannerService.displayBanner.next({
         closeIcon: true,

@@ -4,7 +4,7 @@ import { takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { IUser } from 'src/app/features/authentication/interfaces/user.interface';
 import { IAddress } from 'src/app/features/user/interfaces/profile.interface';
-import { IOrderSummary } from 'src/app/shared/interfaces/client/order.interface';
+import { IOrderSummary, OrderStatus } from 'src/app/shared/interfaces/client/order.interface';
 import { PaymentMode } from '../../interfaces/payment.interface';
 import { Store } from '@ngrx/store';
 import * as CartWishlistActions from '../../../cart-wishlist/store/cart-wishlist.actions';
@@ -64,7 +64,8 @@ export class CheckoutComponent extends BaseComponent implements OnInit {
             tax: this.orderSummary.tax,
             userId: user.id as number,
             couponCode: this.orderSummary.couponCode,
-            orderDate: new Date()
+            orderDate: new Date(),
+            orderStatus: OrderStatus.ACCEPTED
           },
         })
       );

@@ -6,9 +6,6 @@ import { Router } from '@angular/router';
   providedIn: 'root'
 })
 export class AuthUtilService {
-
-
-
   constructor(private router: Router) { }
 
   public getUser(): IUser | undefined {

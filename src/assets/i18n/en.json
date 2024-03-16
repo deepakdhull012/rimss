@@ -131,7 +131,7 @@
         "product_name": "Product name",
         "order_date": "Order date",
         "status": "Status",
-        "amount": "Amount",
+        "amount": "Order item amount",
         "actions": {
           "label": "Actions",
           "view_product": "View product",

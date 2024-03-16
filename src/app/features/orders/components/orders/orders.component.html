@@ -25,26 +25,32 @@
         <table class="table table-bordered orders-holder">
           <thead>
             <tr>
+              <th scope="col">Order ID:</th>
               <th scope="col">{{"orders.order.order_info.product" | translate}}</th>
               <th scope="col">{{"orders.order.order_info.product_name" | translate}}</th>
               <th scope="col">{{"orders.order.order_info.order_date" | translate}}</th>
               <th scope="col">{{"orders.order.order_info.status" | translate}}</th>
               <th scope="col">{{"orders.order.order_info.amount" | translate}}</th>
+              <th scope="col">Total order amount</th>
+              <th scope="col">Order Status</th>
               <th scope="col">{{"orders.order.order_info.actions.label" | translate}}</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let order of orderProducts">
+              <th>{{order.orderId}}</th>
                 <th class="order-image-holder">
                     <img alt="product image" class="order-image" src="{{order.productImage}}">
                 </th>
               <th scope="row">{{order.productSummary}}</th>
               <td>{{ order.orderDate | date}}</td>
               <td>{{"orders.order.order_info.order_accepted" | translate}}</td>
-              <td>{{order.discountedPrice}} Rs\-</td>
+              <td>{{order.discountedPrice}} Rs/-</td>
+              <td>{{order.totalOrderAmount}} Rs/-</td>
+              <td>{{order.orderStatus}}</td>
               <td>
                 <div class="mb-1"><a routerLink="/orders" class="btn btn-success btn-small">{{"orders.order.order_info.actions.track_order" | translate}}</a></div>
-                <div class="mb-1"><a (keyup)="cancelOrder(order)" tabindex="0" (click)="cancelOrder(order)" class="btn btn-danger btn-small">{{"orders.order.order_info.actions.cancel_order" | translate}}</a></div>
+                <div class="mb-1" *ngIf="order.orderStatus !== 'CANCELLED'"><a (keyup)="cancelOrder(order)" tabindex="0" (click)="cancelOrder(order)" class="btn btn-danger btn-small">{{"orders.order.order_info.actions.cancel_order" | translate}}</a></div>
               </td>
             </tr>
             <tr *ngIf="!orderProducts.length">

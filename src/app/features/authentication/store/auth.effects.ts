@@ -25,8 +25,9 @@ export class AuthEffect {
                   `Auth effect: Success for action: ${action.type} with response ${loginStatus}`
                 );
                 return {
-                  type: AuthActions.updateLoginStatus.type,
-                  isLoggedIn: loginStatus,
+                  type: loginStatus
+                    ? AuthActions.loginSuccess.type
+                    : AuthActions.loginFail.type,
                 };
               }),
               catchError(() => {
@@ -56,13 +57,14 @@ export class AuthEffect {
             );
           case AuthActions.signUp.type:
             return this.authService.signup(action.user).pipe(
-              map(() => {
+              map((signUpStatus) => {
                 this.logger.log(
                   `Auth effect: Success for action: ${action.type}`
                 );
                 return {
-                  type: AuthActions.updateSignupStatus.type,
-                  signupStatus: true,
+                  type: signUpStatus
+                    ? AuthActions.signUpSuccess.type
+                    : AuthActions.signUpFail.type,
                 };
               }),
               catchError(() => {
@@ -75,8 +77,7 @@ export class AuthEffect {
           default:
             return of(null).pipe(
               map(() => ({
-                type: AuthActions.updateLoginStatus.type,
-                isLoggedIn: false,
+                type: AuthActions.loginFail.type
               })),
               catchError(() => EMPTY)
             );

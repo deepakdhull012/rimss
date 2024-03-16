@@ -12,5 +12,5 @@ export const selectLoginStatus = createSelector(
 
 export const selectSignupStatus = createSelector(
   selectAuthState,
-  (state: IAuthState) => state.isLoggedIn
+  (state: IAuthState) => state.signUpStatus
 );

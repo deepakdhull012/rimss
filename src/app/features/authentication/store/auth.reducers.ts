@@ -4,29 +4,43 @@ import * as AuthActions from './auth.actions';
 
 export const authFeatureKey = 'authState';
 export const intialAuthState: IAuthState = {
-  user: localStorage.getItem('loggedInUser') ? JSON.parse(localStorage.getItem('loggedInUser') as string) : null,
+  user: localStorage.getItem('loggedInUser')
+    ? JSON.parse(localStorage.getItem('loggedInUser') as string)
+    : null,
   isLoggedIn: !!localStorage.getItem('loggedInUser'),
 };
 
 export const authReducer = createReducer(
   intialAuthState,
 
-  on(AuthActions.updateLoginStatus, (state, payload) => {
-    return ({
+  on(AuthActions.loginSuccess, (state) => {
+    return {
       ...state,
-      isLoggedIn: payload.isLoggedIn,
-    })
+      isLoggedIn: true,
+    };
   }),
-  on(AuthActions.updateSignupStatus, (state, payload) => {
-    return ({
+  on(AuthActions.loginFail, (state) => {
+    return {
       ...state,
-      signUpStatus: payload.signupStatus,
-    })
+      isLoggedIn: false,
+    };
+  }),
+  on(AuthActions.signUpSuccess, (state) => {
+    return {
+      ...state,
+      signUpStatus: true,
+    };
+  }),
+  on(AuthActions.signUpFail, (state) => {
+    return {
+      ...state,
+      signUpStatus: false,
+    };
   }),
   on(AuthActions.setUserDetails, (state, payload) => {
-    return ({
+    return {
       ...state,
       user: payload.user,
-    })
+    };
   })
 );
