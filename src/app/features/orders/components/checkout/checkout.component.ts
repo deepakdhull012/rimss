@@ -64,7 +64,7 @@ export class CheckoutComponent extends BaseComponent implements OnInit {
             tax: this.orderSummary.tax,
             userId: user.id as number,
             couponCode: this.orderSummary.couponCode,
-            orderDate: new Date(),
+            orderDate: new Date()
           },
         })
       );

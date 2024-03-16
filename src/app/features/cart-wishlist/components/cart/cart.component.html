@@ -27,7 +27,8 @@
                       (click)="goToProductDetailPage(cartProduct)"><img alt="thumbnail"
                         src="{{cartProduct.cartProductImage}}" class="img-lg"></a></div>
                   <figcaption class="product-info">
-                    <a (keyup)="goToProductDetailPage(cartProduct)" tabindex="1" (click)="goToProductDetailPage(cartProduct)" class="title">{{cartProduct.productBrief}}</a>
+                    <a (keyup)="goToProductDetailPage(cartProduct)" tabindex="1"
+                      (click)="goToProductDetailPage(cartProduct)" class="title">{{cartProduct.productBrief}}</a>
                     <p class="text-muted">{{cartProduct.productName}}</p>
                   </figcaption>
                 </figure>
@@ -56,7 +57,7 @@
             </article>
           </div>
           <div class="content-body border-top" *ngIf="cartProducts.length">
-            <p><i class="me-2 text-muted fa-lg fa fa-truck"></i>{{"cart-wishlist.cart.delivery_time" | translate}}</p>
+            <p><i class="me-2 text-muted fa-lg fa fa-truck"></i> {{"cart-wishlist.cart.delivery_time" | translate}}</p>
             <p class="text-muted">{{"cart-wishlist.cart.delivery_instruction" | translate}}</p>
           </div>
         </div>
@@ -67,13 +68,16 @@
         <div class="card mb-3">
           <div class="card-body">
             <div class="form-group">
-              <div class="form-label">{{"cart-wishlist.cart.have_coupon" | translate}}</div>
+              <div class="form-label mb-2">{{"cart-wishlist.cart.have_coupon" | translate}}</div>
               <div class="input-group">
                 <input #couponName type="text" class="form-control coupon-input" name="" placeholder="Coupon code">
                 <button (click)="applyCoupon(couponName.value)" color="primary" mat-button
                   class="mat-button mat-raised-button apply-coupon">{{"cart-wishlist.cart.apply" | translate}}</button>
               </div>
             </div>
+            <ng-container *ngFor="let coupon of coupons">
+              <div class="mb-2"><b>{{coupon.name}}</b> {{coupon.couponLabel}}</div>
+            </ng-container>
           </div>
         </div>
 

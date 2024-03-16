@@ -29,6 +29,15 @@ export class OrderService implements OnDestroy {
   public makeOrder(order: IOrder): Observable<void> {
     return this.http.post<void>(`${this.BASE_URL}/orders`, order).pipe(takeUntil(this.serviceDestroyed$));
   }
+
+  /**
+   * Make the order
+   * @param order : IOrder
+   * @returns void
+   */
+  public deleteOrder(orderId: number): Observable<void> {
+    return this.http.delete<void>(`${this.BASE_URL}/orders/${orderId}`).pipe(takeUntil(this.serviceDestroyed$));
+  }
   /**
    * On destroy life cycle hook
    */

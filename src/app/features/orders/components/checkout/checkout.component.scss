@@ -1,7 +1,8 @@
 ::ng-deep {
   .radio-holder {
-    .mat-radio-label-content {
-      width: 100%;
+    .mdc-label {
+
+      width: 400px;
     }
     .cdk-visually-hidden {
       display: block;

@@ -15,6 +15,7 @@ export interface IOrder {
   productOrders: IOrderProduct[];
   addressId: number;
   userId: number;
+  id?: number | undefined;
   originalPrice: number;
   couponCode?: string;
   discountedPrice: number;
@@ -75,4 +76,5 @@ export interface ICoupon {
   amount: number;
   name: string;
   minAmount: number;
+  couponLabel?: string;
 }
