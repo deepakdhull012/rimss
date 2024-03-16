@@ -59,6 +59,11 @@ export class AddressComponent extends BaseComponent implements OnInit {
     }
   }
 
+  /**
+   * Provide error message control wise
+   * @param controlName : string
+   * @returns 
+   */
   public getError(controlName: string): string | null {
     const hasError = this.isControlTouched(controlName)
       ? this.addressForm.get(controlName)?.invalid || false
@@ -78,6 +83,9 @@ export class AddressComponent extends BaseComponent implements OnInit {
     return null;
   }
 
+  /**
+   * Compose reactive form for address form
+   */
   private composeForm(): void {
     this.addressForm = this.fb.group({
       firstName: ['', Validators.required],
@@ -102,6 +110,10 @@ export class AddressComponent extends BaseComponent implements OnInit {
     return this.addressForm.get(controlName)?.touched || this.isSubmitted;
   }
 
+  /**
+   * Map form values to IAddress type
+   * @returns IAddress
+   */
   private mapToAddressInfo(): IAddress {
     return {
       firstName: this.addressForm.get('firstName')?.value,

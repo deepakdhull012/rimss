@@ -55,6 +55,9 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
   private cartProducts: ICartProduct[] = [];
   private wishListProducts: IProductInfo[] = [];
 
+  /**
+   * Fetch various data from store, product detail, cart status, wishlist status
+   */
   public ngOnInit(): void {
     this.store
       .select(getSelectedProduct)
@@ -103,6 +106,9 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
     }
   }
 
+  /**
+   * Navigate to checkout page
+   */
   public gotoCheckout(): void {
     const preTaxAmount =
       this.product.priceAfterDiscount * this.qty + this.deliveryCharges;
@@ -127,6 +133,9 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
     });
   }
 
+  /**
+   * Add product to cart
+   */
   public addToCart(): void {
     const loggedInUserEmail = this.authUtilService.getLoggedInEmail();
     if (loggedInUserEmail) {
@@ -169,6 +178,10 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
     }
   }
 
+
+  /**
+   * Add product to wishlist
+   */
   public addToWishList(): void {
     const loggedInUserEmail = this.authUtilService.getLoggedInEmail();
     if (loggedInUserEmail) {
@@ -188,6 +201,9 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
     }
   }
 
+  /**
+   * Remove product from cart
+   */
   public removeFromCart(): void {
     const cartProductId = this.cartProducts.find((cartP) => {
       return cartP.productId === this.product.id;
@@ -201,6 +217,9 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
     }
   }
 
+  /**
+   * Remove product from wish list
+   */
   public removeFromWishList(): void {
     const productInWishList = this.wishListProducts.find((wishListProduct) => {
       return wishListProduct.id === this.product.id;
@@ -214,10 +233,18 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
     }
   }
 
+  /**
+   * Activate specific section of product detail
+   * @param tab : IProductDetailsTab
+   */
   public activateTab(tab: IProductDetailsTab): void {
     this.activeTab = tab;
   }
 
+  /**
+   * Update product qty
+   * @param count : number
+   */
   public updateQty(count: number): void {
     if (
       (count === -1 && this.qty > 1) ||
@@ -227,6 +254,10 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
     }
   }
 
+  /**
+   * Fetch similar product based on selected category
+   * @param categories : string[]
+   */
   private fetchSimilarProducts(categories: string[]): void {
     this.store.dispatch(
       ProductsAction.fetchSimilarProducts({
@@ -237,6 +268,9 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
     );
   }
 
+  /**
+   * Update available stock for a product
+   */
   private updateStockQty(): void {
     let noOfQty = 0;
     this.product.sku?.forEach((sku) => {
@@ -245,6 +279,10 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
     this.noOfUnitsInStock = noOfQty;
   }
 
+  /**
+   * Adapter function to create order product
+   * @returns IOrderProduct[]
+   */
   private prepareOrderProducts(): IOrderProduct[] {
     const orderProducts: IOrderProduct[] = [];
     const orderProduct: IOrderProduct = {
@@ -262,6 +300,9 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
     return orderProducts;
   }
 
+  /**
+   * Update cart status for current product
+   */
   private updateCartStatus(): void {
     const productInCart = this.cartProducts.find((p) => {
       return p.id === this.product.id;
@@ -269,6 +310,9 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
     this.product = { ...this.product, isInCart: !!productInCart };
   }
 
+  /**
+   * Update wishlist status for current product
+   */
   private updateWishListStatus(): void {
     const productInWishList = this.wishListProducts.find((p) => {
       return p.id === this.product.id;

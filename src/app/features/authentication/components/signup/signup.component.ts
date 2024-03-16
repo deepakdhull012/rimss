@@ -55,6 +55,9 @@ export class SignupComponent extends BaseComponent implements OnInit {
     this.router.navigate(path);
   }
 
+  /**
+   * call sign up api
+   */
   public onSubmit(): void {
     this.isSubmitted = true;
     if (this.signupForm.valid) {
@@ -67,6 +70,11 @@ export class SignupComponent extends BaseComponent implements OnInit {
     }
   }
 
+  /**
+   * Provides error on a form control
+   * @param controlName : string
+   * @returns string | null
+   */
   public getError(controlName: string): string | null {
     const hasError = this.isControlTouched(controlName)
       ? this.signupForm.get(controlName)?.invalid || false
@@ -86,10 +94,19 @@ export class SignupComponent extends BaseComponent implements OnInit {
     return null;
   }
 
+  /**
+   * Tells if a form control is touched or nor
+   * @param controlName : string
+   * @returns boolean
+   */
   private isControlTouched(controlName: string): boolean {
     return this.signupForm.get(controlName)?.touched || this.isSubmitted;
   }
 
+  /**
+   * Adapter function to map form values to interface
+   * @returns IUser
+   */
   private mapToUserInfo(): IUser {
     return {
       firstName: this.signupForm.get('firstName')?.value,
@@ -100,6 +117,9 @@ export class SignupComponent extends BaseComponent implements OnInit {
     };
   }
 
+  /**
+   * Compose rective form 
+   */
   private composeForm(): void {
     this.signupForm = this.fb.group({
       firstName: ['', Validators.required],

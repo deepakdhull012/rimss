@@ -40,6 +40,11 @@ export class LandingComponent extends BaseComponent implements OnInit {
     this.initRecommendedProducts();
   }
 
+
+  /**
+   * Navigate to product detail page
+   * @param product : IProductInfo
+   */
   public goToDetailPage(product: IProductInfo) {
     this.store.dispatch(
       ProductsActions.selectProduct({ selectedproduct: product })
@@ -47,6 +52,10 @@ export class LandingComponent extends BaseComponent implements OnInit {
     this.router.navigate(['product', `${product.id}`]);
   }
 
+  /**
+   * Display products for a particular sale from banner
+   * @param bannerSale : IBannerSale
+   */
   public goToSalePage(bannerSale: IBannerSale): void {
     this.router.navigate(['products', 'list'], {
       queryParams: {
@@ -56,6 +65,9 @@ export class LandingComponent extends BaseComponent implements OnInit {
     });
   }
 
+  /**
+   * Init the carousel
+   */
   private initCarouselConfig(): void {
     this.options = {
       scroll: {
@@ -96,6 +108,9 @@ export class LandingComponent extends BaseComponent implements OnInit {
     };
   }
 
+  /**
+   * Fetch slide images from ngrx store
+   */
   private initSliderImages(): void {
     this.loading = true;
     this.store.dispatch(ProductsActions.fetchBannerSales());
@@ -114,6 +129,9 @@ export class LandingComponent extends BaseComponent implements OnInit {
       });
   }
 
+  /**
+   * Fetch latest products from ngrx store
+   */
   private initNewProducts(): void {
     this.loading = true;
     this.store.dispatch(ProductsActions.fetchProducts());
@@ -141,6 +159,11 @@ export class LandingComponent extends BaseComponent implements OnInit {
       });
   }
 
+  /**
+   * get wishlist id for a product to display heart icon
+   * @param productId : number
+   * @returns 
+   */
   private getWishListId(productId: number): number | null {
     const wishListProduct = this.wishListProducts.find((wishList) => {
       return wishList.id === productId;
@@ -148,6 +171,9 @@ export class LandingComponent extends BaseComponent implements OnInit {
     return wishListProduct && wishListProduct.wishListId ? wishListProduct.wishListId : null;
   }
 
+  /**
+   * Fetch recommended products from store based on user's gender
+   */
   private initRecommendedProducts(): void {
     const userGender = JSON.parse(
       localStorage.getItem('loggedInUser') || '{}'

@@ -38,9 +38,11 @@
                                 </li>
                                 <li [routerLink]="['user', 'wish-list']"><a>{{"core.header.menu.account.wish-list" |
                                         translate}}</a></li>
-                                <li *ngIf="isLoggedIn" (keyup)="logout()"  (click)="logout()" tabindex="2"><a>{{"core.header.menu.account.logout" |
+                                <li *ngIf="isLoggedIn" (keyup)="logout()" (click)="logout()" tabindex="2">
+                                    <a>{{"core.header.menu.account.logout" |
                                         translate}}</a></li>
-                                <li *ngIf="!isLoggedIn" (keyup)="login()" (click)="login()" tabindex="3"><a>{{"core.header.menu.account.login" |
+                                <li *ngIf="!isLoggedIn" (keyup)="login()" (click)="login()" tabindex="3">
+                                    <a>{{"core.header.menu.account.login" |
                                         translate}}</a></li>
                             </ul>
                         </li>

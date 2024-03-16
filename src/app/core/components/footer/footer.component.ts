@@ -19,6 +19,9 @@ export class FooterComponent extends BaseComponent implements OnInit {
     
   }
 
+  /**
+   * Init footer items
+   */
   private initFooter(): void {
     this.footerColumns = [
       {

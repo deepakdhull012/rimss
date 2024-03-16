@@ -20,7 +20,7 @@ export class AppComponent extends BaseComponent implements OnInit {
 
   private initLocalization(): void {
     this.translate.addLangs(['en', 'de']);
-    this.translate.setDefaultLang('de');
+    this.translate.setDefaultLang('en');
 
     const browserLang = this.translate.getBrowserLang();
     const language: string = browserLang?.match(/en|de/) ? browserLang : 'en';

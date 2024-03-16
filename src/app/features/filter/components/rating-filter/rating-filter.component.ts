@@ -26,6 +26,10 @@ export class RatingFilterComponent extends BaseComponent implements OnInit {
     this.initRatingOptions();
   }
 
+  /**
+   * Dispatch action to fetch products based on selected raings
+   * @param event MatCheckboxChange
+   */
   public onRatingChange(event: MatCheckboxChange): void {
     const minRating = +event.source.value;
     if (event.checked) {
@@ -43,6 +47,9 @@ export class RatingFilterComponent extends BaseComponent implements OnInit {
     );
   }
 
+  /**
+   * Initialize rating options
+   */
   private initRatingOptions(): void {
     this.ratingOptions.length = 0;
     this.ratingOptions = [

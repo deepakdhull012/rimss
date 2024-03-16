@@ -54,6 +54,9 @@ export class CartComponent extends BaseComponent implements OnInit {
     this.fetchCoupons();
   }
 
+  /**
+   * Call the Checkout 
+   */
   public checkout(): void {
     this.orderSummary = {
       deliveryCharges: this.deliveryCharges,
@@ -73,6 +76,10 @@ export class CartComponent extends BaseComponent implements OnInit {
     });
   }
 
+  /**
+   * remove a product from cart
+   * @param cartProduct : ICartProduct
+   */
   public removeFromCart(cartProduct: ICartProduct): void {
     this.store.dispatch(
       CartWishlistActions.removeFromCart({
@@ -81,6 +88,10 @@ export class CartComponent extends BaseComponent implements OnInit {
     );
   }
 
+  /**
+   * Apply the coupon code
+   * @param couponName : string
+   */
   public applyCoupon(couponName: string): void {
     this.appliedCoupon = this.coupons.find((coupon) => {
       return coupon.name === couponName;
@@ -99,6 +110,11 @@ export class CartComponent extends BaseComponent implements OnInit {
     this.bannerService.displayBanner.next(bannerConfig);
   }
 
+  /**
+   * Provide the coupon lebel to display on screen
+   * @param coupon : ICoupon
+   * @returns string
+   */
   private getCouponLabel(coupon: ICoupon): string {
     switch (coupon.type) {
       case 'flat':
@@ -112,10 +128,19 @@ export class CartComponent extends BaseComponent implements OnInit {
     }
   }
 
+  /**
+   * Go to detail page for cart product
+   * @param cartProduct : ICartProduct
+   */
   public goToProductDetailPage(cartProduct: ICartProduct): void {
     this.router.navigate(['products', 'details', cartProduct.id]);
   }
 
+  /**
+   * Update the cart quantity for cart product
+   * @param selectEvent : Event
+   * @param cartItemIndex : number
+   */
   public updateQuantity(selectEvent: Event, cartItemIndex: number) {
     if (selectEvent.target) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -132,6 +157,10 @@ export class CartComponent extends BaseComponent implements OnInit {
     this.updateAmounts();
   }
 
+  /**
+   * Adapter funciton to map cart products to order products
+   * @returns IOrderProduct[]
+   */
   private prepareOrderProducts(): IOrderProduct[] {
     const orderProducts: IOrderProduct[] = [];
     this.cartProducts.forEach((cartProduct) => {
@@ -152,6 +181,9 @@ export class CartComponent extends BaseComponent implements OnInit {
     return orderProducts;
   }
 
+  /**
+   * Fetch cart products from store
+   */
   private fetchCartProducts(): void {
     this.store.dispatch(CartWishlistActions.fetchCartProducts());
     this.store
@@ -165,6 +197,9 @@ export class CartComponent extends BaseComponent implements OnInit {
       });
   }
 
+  /**
+   * fetch coupons from store
+   */
   private fetchCoupons(): void {
     this.store.dispatch(CartWishlistActions.fetchCoupons());
     this.store
@@ -180,6 +215,9 @@ export class CartComponent extends BaseComponent implements OnInit {
       });
   }
 
+  /**
+   * Check coupon discount
+   */
   private checkCoupon(): void {
     if (this.appliedCoupon) {
       if (this.discountedPriceSum >= this.appliedCoupon.minAmount) {
@@ -195,6 +233,9 @@ export class CartComponent extends BaseComponent implements OnInit {
     }
   }
 
+  /**
+   * Update various amounts on UI screen
+   */
   private updateAmounts(): void {
     this.originalPriceSum = 0;
     this.discountedPriceSum = 0;

@@ -11,6 +11,10 @@ export class CategoryService {
 
   constructor(private http: HttpClient) { }
 
+  /**
+   * Fetch all the categories
+   * @returns Observable<Array<ICategory>>
+   */
   public fetchAllCategories(): Observable<Array<ICategory>> {
     return this.http
       .get<Array<ICategory>>(`${this.BASE_URL}/categories`)

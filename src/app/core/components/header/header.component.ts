@@ -49,6 +49,10 @@ export class HeaderComponent extends BaseComponent implements OnInit {
     });
   }
 
+  /**
+   * Search products based on free text
+   * @param searchText : string
+   */
   public searchProducts(searchText: string): void {
     this.router.navigate(['products', 'list'], {
       queryParams: {
@@ -58,6 +62,31 @@ export class HeaderComponent extends BaseComponent implements OnInit {
     });
   }
 
+  /**
+   * Logout
+   */
+  public logout(): void {
+    this.authUtilService.logout();
+    this.isLoggedIn = false;
+  }
+
+  /**
+   * Redirect to login page
+   */
+  public login(): void {
+    this.router.navigate(['auth']);
+  }
+
+  /**
+   * Open side nav menu for mobile screen
+   */
+  public openSideNav() {
+    this.sideNavVisible = !this.sideNavVisible;
+  }
+
+  /**
+   * Fetch all categories from ngrx store
+   */
   private fetchAllCategories(): void {
     this.store.dispatch(RootActions.fetchCategories());
     this.store
@@ -68,18 +97,5 @@ export class HeaderComponent extends BaseComponent implements OnInit {
           this.categories = categories;
         },
       });
-  }
-
-  public logout(): void {
-    this.authUtilService.logout();
-    this.isLoggedIn = false;
-  }
-
-  public login(): void {
-    this.router.navigate(['auth']);
-  }
-
-  public openSideNav() {
-    this.sideNavVisible = !this.sideNavVisible;
   }
 }

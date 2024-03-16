@@ -49,6 +49,9 @@ export class CheckoutComponent extends BaseComponent implements OnInit {
     this.useAddNewAddress = !this.useAddNewAddress;
   }
 
+  /**
+   * Dispatch action to create order
+   */
   public makeOrder(): void {
     const user = this.authUtilService.getUser();
     if (this.orderSummary && this.defaultAddressIdForOrder && user) {
@@ -86,6 +89,9 @@ export class CheckoutComponent extends BaseComponent implements OnInit {
     }
   }
 
+  /**
+   * Fetch user addresses
+   */
   public fetchAddresses(): void {
     this.store.dispatch(UserActions.fetchAddresses());
     this.store
@@ -99,6 +105,9 @@ export class CheckoutComponent extends BaseComponent implements OnInit {
       });
   }
 
+  /**
+   * Set the deafult address flag based on user profile
+   */
   private setDefaultAddressId(): void {
     const defaultAddressOfUser = this.loggedInUser?.primaryAddressId;
     if (!defaultAddressOfUser) {

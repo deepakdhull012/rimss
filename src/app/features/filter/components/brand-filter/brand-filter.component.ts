@@ -25,6 +25,11 @@ export class BrandFilterComponent extends BaseComponent implements OnInit {
     this.fetchBrands();
   }
 
+
+  /**
+   * Dispatch action to fetch products based on selected brands
+   * @param event MatCheckboxChange
+   */
   public onBrandsChange(event: MatCheckboxChange): void {
     if (event.checked) {
       this.selectedBrands = [...this.selectedBrands, +event.source.value]
@@ -37,6 +42,9 @@ export class BrandFilterComponent extends BaseComponent implements OnInit {
     }));
   }
 
+  /**
+   * Fetch brands from ngrx store
+   */
   private fetchBrands(): void {
     this.store.dispatch(FiltersActions.fetchBrands());
     this.store

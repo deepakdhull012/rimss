@@ -38,6 +38,9 @@ export class AddressCardComponent extends BaseComponent implements OnInit {
       });
   }
 
+  /**
+   * Dispatch mark default address action to store 
+   */
   public makeDefault(): void {
     this.store.dispatch(
       UserActions.makePrimaryAddress({
@@ -46,6 +49,9 @@ export class AddressCardComponent extends BaseComponent implements OnInit {
     );
   }
 
+  /**
+   * Dispatch delete address action to store 
+   */
   public deleteAddress(): void {
     this.store.dispatch(
       UserActions.deleteAddress({

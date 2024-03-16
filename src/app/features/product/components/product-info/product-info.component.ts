@@ -57,6 +57,9 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
       });
   }
 
+  /**
+   * Add product to wishlist
+   */
   public addToWishList(): void {
     const loggedInUserEmail = this.authUtilService.getLoggedInEmail();
     const productInWishList = this.wishlistProducts.find((p) => {
@@ -83,6 +86,9 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
     }
   }
 
+  /**
+   * Navigate to detail page
+   */
   public goToDetailPage(productInfo: IProductInfo): void {
     this.store.dispatch(
       ProductsActions.selectProduct({ selectedproduct: productInfo })
@@ -90,6 +96,9 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
     this.router.navigate([`products`, `details`, `${productInfo.id}`]);
   }
 
+  /**
+   * Add product to cart
+   */
   public addToCart(): void {
     const loggedInUserEmail = this.authUtilService.getLoggedInEmail();
     if (loggedInUserEmail) {
@@ -132,6 +141,9 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
     }
   }
 
+  /**
+   * Remove product from cart
+   */
   public removeFromCart(): void {
     const cartProductId = this.cartProducts.find(
       (cartP) => {
@@ -145,6 +157,9 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
     }
   }
 
+  /**
+   * Update cart status for current product
+   */
   private updateCartStatus(): void {
     const productInCart = this.cartProducts.find((p) => {
       return p.productId === this.productInfo.id;
@@ -152,6 +167,9 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
     this.productInfo = { ...this.productInfo, isInCart: !!productInCart };
   }
 
+  /**
+   * Update wishlist status for current product
+   */
   private updateWishListStatus(): void {
     const productInWishList = this.wishlistProducts.find(
       (wishListProduct) => {
@@ -165,6 +183,9 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
     };
   }
 
+  /**
+   * Remove product from wishlist
+   */
   private removeFromWishList(): void {
     const productInWishList = this.wishlistProducts.find(
       (wishListProduct) => {

@@ -20,12 +20,21 @@ export class UserService implements OnDestroy {
     this.userEmail = this.authUtilService.getLoggedInEmail();
   }
 
+  /**
+   * Fetch user addresses
+   * @returns Observable<IAddress[]>
+   */
   public getUserAddresses(): Observable<IAddress[]> {
     return this.http
       .get<IAddress[]>(`${this.BASE_URL}/addresses?userEmail=${this.userEmail}`)
       .pipe(takeUntil(this.serviceDestroyed$));
   }
 
+  /**
+   * Add new address
+   * @param addressPayload : IAddress
+   * @returns Observable<void>
+   */
   public addAddress(addressPayload: IAddress): Observable<void> {
     return this.http
       .post<void>(`${this.BASE_URL}/addresses`, addressPayload)
@@ -37,6 +46,11 @@ export class UserService implements OnDestroy {
       );
   }
 
+  /**
+   * Delete an address
+   * @param addressId : number
+   * @returns Observable<void>
+   */
   public deleteAddress(addressId: number): Observable<void> {
     return this.http
       .delete<void>(`${this.BASE_URL}/addresses/${addressId}`)
@@ -48,6 +62,11 @@ export class UserService implements OnDestroy {
       );
   }
 
+  /**
+   * Update an address
+   * @param addressPayload : IAddress
+   * @returns Observable<void>
+   */
   public updateAddress(addressPayload: IAddress): Observable<void> {
     return this.http
       .put<void>(
@@ -62,6 +81,11 @@ export class UserService implements OnDestroy {
       );
   }
 
+  /**
+   * Set as primary address for current user
+   * @param addressId : number
+   * @returns Observable<void>
+   */
   public markAsPrimaryAddress(addressId: number): Observable<void> {
     const user: IUser | undefined = this.authUtilService.getUser();
     if (user) {
@@ -85,6 +109,9 @@ export class UserService implements OnDestroy {
     }
   }
 
+  /**
+   * Life cycle hook to clean up resources
+   */
   public ngOnDestroy(): void {
     this.serviceDestroyed$.next();
   }

@@ -27,6 +27,10 @@ export class PriceFilterComponent extends BaseComponent implements OnInit {
     this.fetchPriceBreakPoints();
   }
 
+  /**
+   * Dispatch action to fetch products based on selected price range
+   * @param event MatCheckboxChange
+   */
   public onPriceChange(event: MatCheckboxChange): void {
     const index = +event.source.value;
     if (event.checked) {
@@ -50,6 +54,9 @@ export class PriceFilterComponent extends BaseComponent implements OnInit {
     );
   }
 
+  /**
+   * Fetch price breakpoints from ngrx store
+   */
   private fetchPriceBreakPoints(): void {
     this.store.dispatch(FiltersAction.fetchPriceBreakPoints());
     this.store
@@ -63,6 +70,9 @@ export class PriceFilterComponent extends BaseComponent implements OnInit {
       });
   }
 
+  /**
+   * Update price range based on price breakpoints
+   */
   private updateRange(): void {
     this.priceRange = this.priceBreakPoints.map((priceBreakPoint, index) => {
       if (index === 0) {

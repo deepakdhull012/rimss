@@ -27,6 +27,9 @@ export class WishlistComponent extends BaseComponent implements OnInit {
     this.getWishListProducts();
   }
 
+  /**
+   * Fetch wishlist products from ngrx store
+   */
   private getWishListProducts(): void {
     this.store.dispatch(CartWishlistActions.fetchWishlistProducts());
     this.store.select(selectWishlistProducts)

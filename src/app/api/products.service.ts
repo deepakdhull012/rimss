@@ -15,6 +15,10 @@ export class ProductsService implements OnDestroy {
 
   constructor(private http: HttpClient) {}
 
+  /**
+   * Fetch top products from server
+   * @returns Observable<Array<IProductInfo>>
+   */
   public fetchAllProducts(): Observable<Array<IProductInfo>> {
     return this.http
       .get<Array<IProductInfo>>(`${this.BASE_URL}/products`)
@@ -22,6 +26,12 @@ export class ProductsService implements OnDestroy {
       map((productsFromServer: Array<IProductServer>) => this.mapServerToClient(productsFromServer)));
   }
 
+  /**
+   * Filter products based on criteria
+   * @param filterCriteria : IFilterCriteria,
+   * @param sortBy : SortBy
+   * @returns Observable<Array<IProductInfo>>
+   */
   public filterProductsByCriteria(
     filterCriteria: IFilterCriteria,
     sortBy?: SortBy
@@ -36,22 +46,43 @@ export class ProductsService implements OnDestroy {
       .pipe(takeUntil(this.serviceDestroyed$));
   }
 
+  /**
+   * Fetch information about specific product
+   * @param pId : number
+   * @returns Observable<IProductInfo>
+   */
   public fetchProductById(pId: number): Observable<IProductInfo> {
     return this.http
       .get<IProductInfo>(`${this.BASE_URL}/products/${pId}`)
       .pipe(takeUntil(this.serviceDestroyed$));
   }
 
+  /**
+   * Fetch products based on search text
+   * @param searchText : string
+   * @returns Observable<Array<IProductInfo>>
+   */
   public fetchProductsBySearchCriteria(searchText: string): Observable<Array<IProductInfo>> {
     return this.http
       .get<Array<IProductInfo>>(`${this.BASE_URL}/products?q=${searchText}`)
       .pipe(takeUntil(this.serviceDestroyed$));
   }
 
+  /**
+   * Adapter to map products
+   * @param products : Array<IProductServer>
+   * @returns Array<IProductInfo>
+   */
   private mapServerToClient(products: Array<IProductServer>): Array<IProductInfo> {
     return products as Array<IProductInfo>;
   }
 
+  /**
+   * generate filter string to pass to server
+   * @param filterCriteria : IFilterCriteria
+   * @param sortBy : SortBy
+   * @returns string
+   */
   private getFilterSortString(
     filterCriteria: IFilterCriteria,
     sortBy?: SortBy
@@ -77,6 +108,12 @@ export class ProductsService implements OnDestroy {
     return filterString;
   }
 
+  /**
+   * appends sort by information to url
+   * @param filterString : string
+   * @param sortBy : SortBy
+   * @returns string
+   */
   private appendSort(filterString: string, sortBy: SortBy): string {
     filterString = this.appendNext(filterString);
     switch (sortBy) {
@@ -93,6 +130,11 @@ export class ProductsService implements OnDestroy {
     return filterString;
   }
 
+  /**
+   * append & to url for multiple query params
+   * @param filterString : string
+   * @returns string
+   */
   private appendNext(filterString: string): string {
     if (filterString.length) {
       filterString += '&';
@@ -100,6 +142,9 @@ export class ProductsService implements OnDestroy {
     return filterString;
   }
 
+  /**
+   * Hook to clean up resources
+   */
   public ngOnDestroy(): void {
     this.serviceDestroyed$.next();
   }

@@ -26,11 +26,18 @@ export class CartWishlistService implements OnDestroy {
   public wishListUpdated: Subject<void> = new Subject<void>();
 
   private BASE_URL = environment.BASE_API_URL;
+
   constructor(
     private httpClient: HttpClient,
     private authUtilService: AuthUtilService
   ) {}
 
+  /**
+   * Adds the product to wishlist and return the server response
+   * @param productId : number
+   * @param email : string
+   * @returns Observable<IWishListProduct>
+   */
   public addProductToWishList(
     productId: number,
     email: string
@@ -48,6 +55,11 @@ export class CartWishlistService implements OnDestroy {
       );
   }
 
+  /**
+   * Add product to cart
+   * @param cartProduct : ICartProduct
+   * @returns Observable<ICartProduct>
+   */
   public addProductToCart(cartProduct: ICartProduct): Observable<ICartProduct> {
     return this.httpClient
       .post<ICartProduct>(`${this.BASE_URL}/cart`, cartProduct)
@@ -59,6 +71,10 @@ export class CartWishlistService implements OnDestroy {
       );
   }
 
+  /**
+   * Fetch all wishlist products
+   * @returns Observable<IProductInfo[]>
+   */
   public getWishListProducts(): Observable<IProductInfo[]> {
     const loggedInUserEmail = this.authUtilService.getLoggedInEmail();
     return this.httpClient
@@ -90,6 +106,12 @@ export class CartWishlistService implements OnDestroy {
       );
   }
 
+  /**
+   * Set wish list id to each product - to display wishlist status on UI
+   * @param products : IProductInfo[]
+   * @param wishlistProducts : IWishListProduct[]
+   * @returns IProductInfo[]
+   */
   private setWishListId(
     products: IProductInfo[],
     wishlistProducts: IWishListProduct[]
@@ -103,6 +125,12 @@ export class CartWishlistService implements OnDestroy {
     return products;
   }
 
+  /**
+   * Get wish list id for product (used as internal function )
+   * @param product : IProductInfo
+   * @param wishListProducts : IWishListProduct[]
+   * @returns number | null
+   */
   private getWishListIdForProduct(
     product: IProductInfo,
     wishListProducts: IWishListProduct[]
@@ -113,6 +141,10 @@ export class CartWishlistService implements OnDestroy {
     return matchingWishlistProduct ? matchingWishlistProduct.id : null;
   }
 
+  /**
+   * Fetch cart products of current user
+   * @returns Observable<Array<ICartProduct>>
+   */
   public getCartProducts(): Observable<Array<ICartProduct>> {
     const loggedInUserEmail = this.authUtilService.getLoggedInEmail();
     return this.httpClient.get<Array<ICartProduct>>(
@@ -120,18 +152,32 @@ export class CartWishlistService implements OnDestroy {
     );
   }
 
+  /**
+   * Remove a specific product from cart
+   * @param cartProductId : number
+   * @returns Observable<void>
+   */
   public removeFromCart(cartProductId: number): Observable<void> {
     return this.httpClient
       .delete(`${this.BASE_URL}/cart/${cartProductId}`)
       .pipe(map(() => {}));
   }
 
+  /**
+   * Remove product from wishlist
+   * @param wishListProductId : number
+   * @returns Observable<void>
+   */
   public removeFromWishList(wishListProductId: number): Observable<void> {
     return this.httpClient
       .delete(`${this.BASE_URL}/wish-list/${wishListProductId}`)
       .pipe(map(() => {}));
   }
 
+  /**
+   * Clear cart
+   * @returns Observable<void>
+   */
   public clearCart(): Observable<void> {
     return this.getCartProducts().pipe(
       switchMap((cartProducts) => {
@@ -145,6 +191,9 @@ export class CartWishlistService implements OnDestroy {
     );
   }
 
+  /**
+   * On destroy emits an subject which can be used to unsubscribe from observables (This hook can be used for resource cleaning purpose)
+   */
   public ngOnDestroy(): void {
     this.serviceDestroyed$.next();
   }

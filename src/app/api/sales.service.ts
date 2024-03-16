@@ -14,12 +14,20 @@ export class SalesService {
 
   constructor(private http: HttpClient) { }
 
+  /**
+   * Fetch all banner sales from server
+   * @returns Observable<Array<IBannerSale>>
+   */
   public fetchAllBannerSales(): Observable<Array<IBannerSale>> {
     return this.http
       .get<Array<IBannerSale>>(`${this.BASE_URL}/banner-sales`)
       .pipe(takeUntil(this.serviceDestroyed$));
   }
 
+  /**
+   * Fetch active coupons from server
+   * @returns  Observable<ICoupon[]>
+   */
   public fetchCoupons(): Observable<ICoupon[]> {
     return this.http
       .get<Array<ICoupon>>(`${this.BASE_URL}/coupons`)

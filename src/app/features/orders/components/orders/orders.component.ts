@@ -34,6 +34,10 @@ export class OrdersComponent extends BaseComponent implements OnInit {
     this.fetchOrders();
   }
 
+  /**
+   * Cancel the order
+   * @param order : IOrderProductUI
+   */
   public cancelOrder(order: IOrderProductUI): void {
     if (
       confirm(
@@ -49,6 +53,9 @@ export class OrdersComponent extends BaseComponent implements OnInit {
     }
   }
 
+  /**
+   * Fetch user's orders from store
+   */
   private fetchOrders(): void {
     const userId = this.authUtilService.getUser()?.id;
     if (userId) {
@@ -77,6 +84,9 @@ export class OrdersComponent extends BaseComponent implements OnInit {
   }
 
 
+  /**
+   * Adapter function to map order to order products
+   */
   private mapToOrderProductsUI(): void {
     this.orderProducts = [];
     console.error(this.orders)

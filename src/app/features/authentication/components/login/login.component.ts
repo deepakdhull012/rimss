@@ -32,6 +32,9 @@ export class LoginComponent extends BaseComponent implements OnInit {
     this.composeForm();
   }
 
+  /**
+   * call login api try login 
+   */
   public login(): void {
     this.isSubmitted = true;
     if (this.loginForm.valid) {
@@ -74,6 +77,11 @@ export class LoginComponent extends BaseComponent implements OnInit {
     }
   }
 
+  /**
+   * Provides error on a form control
+   * @param controlName : string
+   * @returns string | null
+   */
   public getError(controlName: string): string | null {
     const hasError = this.isControlTouched(controlName)
       ? this.loginForm.get(controlName)?.invalid || false
@@ -91,6 +99,10 @@ export class LoginComponent extends BaseComponent implements OnInit {
     return null;
   }
 
+
+  /**
+   * Compose the form
+   */
   private composeForm(): void {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -98,6 +110,11 @@ export class LoginComponent extends BaseComponent implements OnInit {
     });
   }
 
+  /**
+   * Tells if a control has been touched or not
+   * @param controlName : string
+   * @returns boolean
+   */
   private isControlTouched(controlName: string): boolean {
     return this.loginForm.get(controlName)?.touched || this.isSubmitted;
   }

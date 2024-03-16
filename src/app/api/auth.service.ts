@@ -19,7 +19,7 @@ export class AuthService {
   /**
    * Save the user to db and update the status
    * @param user : IUser
-   * @returns booleans
+   * @returns Observable<boolean>
    */
   public signup(user: IUser): Observable<boolean> {
     return this.http.post(`${this.BASE_URL}/users`, user).pipe(
@@ -32,12 +32,17 @@ export class AuthService {
   /**
    * Provide user details of selected user
    * @param userId : number
-   * @returns : Observable<v>
+   * @returns : Observable<IUser>
    */
   public getUserById(userId: number): Observable<IUser> {
     return this.http.get<IUser>(`${this.BASE_URL}/users/${userId}`);
   }
 
+  /**
+   * Login and return true or false based on status
+   * @param credentials : ILoginCredentials
+   * @returns Observable<boolean>
+   */
   public login(credentials: ILoginCredentials): Observable<boolean> {
     return this.http
       .get<Array<IUser>>(

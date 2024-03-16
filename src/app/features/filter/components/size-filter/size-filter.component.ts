@@ -27,6 +27,10 @@ export class SizeFilterComponent extends BaseComponent implements OnInit {
     this.fetchSizes();
   }
 
+  /**
+   * Dispatch action to fetch products based on selected sizes
+   * @param event MatCheckboxChange
+   */
   public onSizeChange(event: MatCheckboxChange): void {
     const size = event.source.value;
     if (event.checked) {
@@ -44,6 +48,9 @@ export class SizeFilterComponent extends BaseComponent implements OnInit {
     );
   }
 
+  /**
+   * Fetch sizes from ngrx store
+   */
   private fetchSizes(): void {
     this.store.dispatch(FiltersActions.fetchSizes());
     this.store

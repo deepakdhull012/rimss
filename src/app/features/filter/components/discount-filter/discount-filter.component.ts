@@ -26,6 +26,10 @@ export class DiscountFilterComponent extends BaseComponent implements OnInit {
     this.fetchDiscountBreakPoints();
   }
 
+  /**
+   * Dispatch action to fetch products based on selected discounts
+   * @param event MatCheckboxChange
+   */
   public onDiscountChange(event: MatCheckboxChange): void {
     if (event.checked) {
       this.selectedDiscounts.push(+event.source.value);
@@ -40,6 +44,9 @@ export class DiscountFilterComponent extends BaseComponent implements OnInit {
     );
   }
 
+  /**
+   * Fetch discount breakpoints from ngrx store
+   */
   private fetchDiscountBreakPoints(): void {
     this.store.dispatch(FiltersActions.fetchDiscountBreakpoints());
     this.store
