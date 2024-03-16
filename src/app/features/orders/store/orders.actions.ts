@@ -15,3 +15,8 @@ export const loadOrders = createAction(
   '[Orders] Load Orders',
   props<{ orders: IOrder[] }>()
 );
+
+export const deleteOrder = createAction(
+  '[Orders] Delete Order',
+  props<{ orderId: number }>()
+);

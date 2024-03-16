@@ -16,6 +16,11 @@ import {
   selectCoupons,
 } from '../../store/cart-wishlist.selectors';
 import { IAppState } from 'src/app/core/store/app.state';
+import { BannerService } from 'src/app/shared/services/banner.service';
+import {
+  BannerType,
+  IBannerConfig,
+} from 'src/app/shared/interfaces/client/banner.interface';
 
 @Component({
   selector: 'rimss-cart',
@@ -23,7 +28,11 @@ import { IAppState } from 'src/app/core/store/app.state';
   styleUrls: ['./cart.component.scss'],
 })
 export class CartComponent extends BaseComponent implements OnInit {
-  constructor(private router: Router, private store: Store<IAppState>) {
+  constructor(
+    private router: Router,
+    private store: Store<IAppState>,
+    private bannerService: BannerService
+  ) {
     super();
   }
   public cartProducts: Array<ICartProduct> = [];
@@ -35,7 +44,7 @@ export class CartComponent extends BaseComponent implements OnInit {
   public orderSummary?: IOrderSummary;
   public orderAmount: number = 0;
   public couponDiscount = 0;
-  private coupons: ICoupon[] = [];
+  public coupons: ICoupon[] = [];
   public appliedCoupon?: ICoupon;
   public currencyLabel = 'Rs/-';
   private taxRate = 10;
@@ -76,7 +85,31 @@ export class CartComponent extends BaseComponent implements OnInit {
     this.appliedCoupon = this.coupons.find((coupon) => {
       return coupon.name === couponName;
     });
-    this.updateAmounts();
+    const bannerConfig: IBannerConfig = {
+      closeIcon: true,
+      closeTime: 2000,
+      message: this.appliedCoupon
+        ? `Coupon applied successfully`
+        : `Invalid coupon code`,
+      type: this.appliedCoupon ? BannerType.SUCCESS : BannerType.ERROR,
+    };
+    if (this.appliedCoupon) {
+      this.updateAmounts();
+    }
+    this.bannerService.displayBanner.next(bannerConfig);
+  }
+
+  private getCouponLabel(coupon: ICoupon): string {
+    switch (coupon.type) {
+      case 'flat':
+        return `Flat ${coupon.amount} Rs/- off ${
+          coupon.minAmount > 0 && 'on min amount of'
+        } ${coupon.minAmount}`;
+      case 'percentage':
+        return `${coupon.amount}% off  ${
+          coupon.minAmount > 0 ? `on min amount of ${coupon.minAmount}` : ''
+        } `;
+    }
   }
 
   public goToProductDetailPage(cartProduct: ICartProduct): void {
@@ -87,7 +120,14 @@ export class CartComponent extends BaseComponent implements OnInit {
     if (selectEvent.target) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const qty: number = (selectEvent.target as any).value;
-      this.cartProducts = this.cartProducts.map((cartProduct, index) => index === cartItemIndex ? {...cartProduct,  quantity: qty} : cartProduct)
+      this.cartProducts = this.cartProducts.map((cartProduct, index) => {
+        if (index === cartItemIndex) {
+          cartProduct = { ...cartProduct, quantity: qty };
+          return cartProduct;
+        } else {
+          return cartProduct;
+        }
+      });
     }
     this.updateAmounts();
   }
@@ -132,7 +172,10 @@ export class CartComponent extends BaseComponent implements OnInit {
       .pipe(takeUntil(this.componentDestroyed$))
       .subscribe({
         next: (coupons) => {
-          this.coupons = coupons;
+          this.coupons = coupons.map((c) => {
+            c = { ...c, couponLabel: this.getCouponLabel(c) };
+            return c;
+          });
         },
       });
   }
@@ -159,7 +202,7 @@ export class CartComponent extends BaseComponent implements OnInit {
       this.originalPriceSum += product.unitPrice * product.quantity;
       this.discountedPriceSum += product.discountedPrice * product.quantity;
     });
-    this.tax = this.discountedPriceSum * this.taxRate / 100;
+    this.tax = (this.discountedPriceSum * this.taxRate) / 100;
     this.checkCoupon();
     this.orderAmount =
       this.discountedPriceSum +

@@ -10,7 +10,7 @@ import { NGXLogger } from 'ngx-logger';
 export class OrdersEffect {
   orderEffect$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(OrdersActions.fetchOrders, OrdersActions.createOrder),
+      ofType(OrdersActions.fetchOrders, OrdersActions.createOrder, OrdersActions.deleteOrder),
       mergeMap((action) => {
         this.logger.log(`Order effect: received action: ${action.type}`);
         switch (action.type) {
@@ -34,6 +34,24 @@ export class OrdersEffect {
             );
           case OrdersActions.createOrder.type:
             return this.orderService.makeOrder(action.order).pipe(
+              map(() => {
+                this.logger.log(
+                  `Order effect: Success for action: ${action.type}`
+                );
+                return {
+                  type: OrdersActions.fetchOrders.type,
+                };
+              }),
+              catchError(() => {
+                this.logger.error(
+                  'Order effect: Error in action: ' + action.type
+                );
+                return EMPTY;
+              })
+            );
+
+          case OrdersActions.deleteOrder.type:
+            return this.orderService.deleteOrder(action.orderId).pipe(
               map(() => {
                 this.logger.log(
                   `Order effect: Success for action: ${action.type}`

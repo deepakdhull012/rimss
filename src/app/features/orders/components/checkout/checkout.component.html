@@ -32,7 +32,7 @@
           <div class="form-group radio-holder">
             <mat-radio-group [value]="defaultAddressIdForOrder" aria-label="Select address">
               <div class="row">
-                <div class="col-md-6" *ngFor="let address of addresses">
+                <div class="col-md-12" *ngFor="let address of addresses">
                   <mat-radio-button [value]="address.id" class="item">
                     <rimss-address-card class="mt-32" [address]="address" [readMode]="true"></rimss-address-card>
                   </mat-radio-button>
