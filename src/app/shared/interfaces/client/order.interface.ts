@@ -8,6 +8,7 @@ export interface IOrderSummary {
   orderAmount: number;
   couponDiscount?: number;
   fromcart: boolean;
+  qtyIfDirectOrder?: number;
 }
 
 export interface IOrder {
@@ -23,6 +24,7 @@ export interface IOrder {
   deliveryCharges: number;
   orderAmount: number;
   orderDate: Date;
+  orderStatus: OrderStatus;
 }
 
 export interface IOrderProductUI {
@@ -32,6 +34,8 @@ export interface IOrderProductUI {
   productImage: string;
   orderDate: Date;
   deliveryInfo: IOrderDeliveryInfo;
+  totalOrderAmount: number;
+  orderStatus: OrderStatus;
 }
 
 
@@ -68,6 +72,7 @@ export enum OrderStatus {
   RETURN_APPROVED = 'RETURN_APPROVED',
   RETURN_IN_TRANSIT = 'RETURN_IN_TRANSIT',
   RETURN_COMPLETED = 'RETURN_COMPLETED',
+  CANCELLED = 'CANCELLED'
 }
 
 export interface ICoupon {

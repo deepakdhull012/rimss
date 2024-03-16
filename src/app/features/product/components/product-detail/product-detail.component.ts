@@ -118,6 +118,7 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
       couponCode: '',
       couponDiscount: 0,
       fromcart: false,
+      qtyIfDirectOrder: this.qty
     };
     this.router.navigate(['orders','checkout'], {
       state: {

@@ -88,11 +88,24 @@
                 <dt>{{"orders.checkout.order_info.products_price" | translate}}</dt>
                 <dd class="text-end"> {{ orderSummary?.originalPrice }} Rs/-</dd>
               </dl>
-              <dl class="dlist-align">
+              <dl class="dlist-align" *ngIf="!orderSummary?.fromcart">
+                <dt>Qty:</dt>
+                <dd class="text-end"> {{orderSummary?.qtyIfDirectOrder}}</dd>
+              </dl>
+              <dl class="dlist-align" *ngIf="orderSummary?.fromcart">
                 <dt>{{"orders.checkout.order_info.discount" | translate}}</dt>
                 <dd class="text-end text-success"> {{(orderSummary?.originalPrice || 0) - (orderSummary?.discountedPrice
                   || 0) }} Rs/-</dd>
               </dl>
+              <dl class="dlist-align" *ngIf="!orderSummary?.fromcart">
+                <dt>{{"orders.checkout.order_info.discount" | translate}}</dt>
+                <dd class="text-end text-success"> {{
+                  
+                    ((orderSummary?.originalPrice || 0) * (orderSummary?.qtyIfDirectOrder || 0)) -
+                 (orderSummary?.discountedPrice || 0) * (orderSummary?.qtyIfDirectOrder || 0)
+                  }} Rs/-</dd>
+              </dl>
+
               <dl class="dlist-align">
                 <dt>{{"orders.checkout.order_info.tax" | translate}}</dt>
                 <dd class="text-end"> {{ orderSummary?.tax }} Rs/-</dd>

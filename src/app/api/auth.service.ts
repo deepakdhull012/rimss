@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import {
   ILoginCredentials,
@@ -8,21 +8,32 @@ import {
 } from '../features/authentication/interfaces/user.interface';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
+  // Base url refers to hosted sever endpoint, it can be different for different environments and can point to localhost for local
   private BASE_URL = environment.BASE_API_URL;
 
   constructor(private http: HttpClient) {}
 
+  /**
+   * Save the user to db and update the status
+   * @param user : IUser
+   * @returns booleans
+   */
   public signup(user: IUser): Observable<boolean> {
     return this.http.post(`${this.BASE_URL}/users`, user).pipe(
       map(() => {
         return true;
-      })
-    );
+      }),
+      catchError(() => of(false)));
   }
 
+  /**
+   * Provide user details of selected user
+   * @param userId : number
+   * @returns : Observable<v>
+   */
   public getUserById(userId: number): Observable<IUser> {
     return this.http.get<IUser>(`${this.BASE_URL}/users/${userId}`);
   }

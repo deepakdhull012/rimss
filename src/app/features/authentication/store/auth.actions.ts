@@ -8,13 +8,21 @@ export const login = createAction(
   props<{ credentials: ILoginCredentials }>()
 );
 
-export const updateLoginStatus = createAction(
-  '[Auth] Update Login Status',
-  props<{ isLoggedIn: boolean }>()
+export const loginSuccess = createAction(
+  '[Auth] Login Success'
 );
 
-export const updateSignupStatus = createAction(
-  '[Auth] Update Signup Status',
+export const loginFail = createAction(
+  '[Auth] Login Fail'
+);
+
+export const signUpSuccess = createAction(
+  '[Auth] Signup success',
+  props<{ signupStatus: boolean }>()
+);
+
+export const signUpFail = createAction(
+  '[Auth] Sign up fail',
   props<{ signupStatus: boolean }>()
 );
 

@@ -3,7 +3,8 @@ import { createAction, props } from '@ngrx/store';
 import { IOrder } from 'src/app/shared/interfaces/client/order.interface';
 
 export const fetchOrders = createAction(
-  '[Orders] Fetch Orders'
+  '[Orders] Fetch Orders',
+  props<{ userId: number}>()
 );
 
 export const createOrder = createAction(

@@ -15,7 +15,7 @@ export class OrdersEffect {
         this.logger.log(`Order effect: received action: ${action.type}`);
         switch (action.type) {
           case OrdersActions.fetchOrders.type:
-            return this.orderService.fetchOrder().pipe(
+            return this.orderService.fetchOrder(action.userId).pipe(
               map((orders) => {
                 this.logger.log(
                   `Order effect: Success for action: ${action.type} with response ${orders}`
@@ -51,7 +51,7 @@ export class OrdersEffect {
             );
 
           case OrdersActions.deleteOrder.type:
-            return this.orderService.deleteOrder(action.orderId).pipe(
+            return this.orderService.cancel(action.orderId).pipe(
               map(() => {
                 this.logger.log(
                   `Order effect: Success for action: ${action.type}`
