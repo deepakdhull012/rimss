@@ -36,6 +36,7 @@ export interface IOrderProductUI {
   deliveryInfo: IOrderDeliveryInfo;
   totalOrderAmount: number;
   orderStatus: OrderStatus;
+  productQty: number;
 }
 
 

@@ -27,7 +27,6 @@ export class AddressCardComponent extends BaseComponent implements OnInit {
       .pipe(takeUntil(this.componentDestroyed$))
       .subscribe((authState) => {
         const user = authState?.user;
-        console.log("user state is", user, authState)
         if (this.address) {
           this.address = {
             ...this.address,

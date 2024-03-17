@@ -3,11 +3,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BannerType } from 'src/app/shared/interfaces/client/banner.interface';
 import { BannerService } from 'src/app/shared/services/banner.service';
-import { Store } from '@ngrx/store';
+import { ActionsSubject, Store } from '@ngrx/store';
 import { IAppState } from 'src/app/core/store/app.state';
 import * as AuthActions from './../../store/auth.actions';
-import { selectLoginStatus } from '../../store/auth.selectors';
-import { takeUntil } from 'rxjs';
+import { filter, takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 
 @Component({
@@ -23,17 +22,19 @@ export class LoginComponent extends BaseComponent implements OnInit {
     private router: Router,
     private fb: FormBuilder,
     private store: Store<IAppState>,
-    private bannerService: BannerService
+    private bannerService: BannerService,
+    private actionsSubject$: ActionsSubject
   ) {
     super();
   }
 
   public ngOnInit(): void {
     this.composeForm();
+    this.listenToActionsResponse();
   }
 
   /**
-   * call login api try login 
+   * call login api try login
    */
   public login(): void {
     this.isSubmitted = true;
@@ -46,27 +47,6 @@ export class LoginComponent extends BaseComponent implements OnInit {
           },
         })
       );
-
-      setTimeout(() => {
-        this.store
-          .select(selectLoginStatus)
-          .pipe(takeUntil(this.componentDestroyed$))
-          .subscribe((success: boolean) => {
-            if (success) {
-              const redirectionPage = sessionStorage.getItem('redirectionPage');
-              if (!redirectionPage) {
-                this.router.navigate(['products', 'list']);
-              }
-            } else {
-              this.bannerService.displayBanner.next({
-                closeIcon: true,
-                closeTime: 3000,
-                message: 'Invalid credentials',
-                type: BannerType.ERROR,
-              });
-            }
-          });
-      }, 1000);
     } else {
       this.bannerService.displayBanner.next({
         closeIcon: true,
@@ -99,6 +79,35 @@ export class LoginComponent extends BaseComponent implements OnInit {
     return null;
   }
 
+  /**
+   * Listen to actions response, such as login success, login failuer and display message accordingly
+   */
+  private listenToActionsResponse(): void {
+    this.actionsSubject$
+      .pipe(
+        takeUntil(this.componentDestroyed$),
+        filter((action) => action.type === AuthActions.loginSuccess.type)
+      )
+      .subscribe(() => {
+        const redirectionPage = sessionStorage.getItem('redirectionPage');
+        if (!redirectionPage) {
+          this.router.navigate(['products', 'list']);
+        }
+      });
+    this.actionsSubject$
+      .pipe(
+        takeUntil(this.componentDestroyed$),
+        filter((action) => action.type === AuthActions.loginFail.type)
+      )
+      .subscribe(() => {
+        this.bannerService.displayBanner.next({
+          closeIcon: true,
+          closeTime: 3000,
+          message: 'Invalid credentials',
+          type: BannerType.ERROR,
+        });
+      });
+  }
 
   /**
    * Compose the form

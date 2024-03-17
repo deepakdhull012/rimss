@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { takeUntil } from 'rxjs';
+import { filter, takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import {
   ICoupon,
@@ -9,7 +9,7 @@ import {
 } from 'src/app/shared/interfaces/client/order.interface';
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
 import { ICartProduct } from '../../interfaces/cart-product.interface';
-import { Store } from '@ngrx/store';
+import { ActionsSubject, Store } from '@ngrx/store';
 import * as CartWishlistActions from './../../store/cart-wishlist.actions';
 import {
   selectCartProducts,
@@ -31,7 +31,8 @@ export class CartComponent extends BaseComponent implements OnInit {
   constructor(
     private router: Router,
     private store: Store<IAppState>,
-    private bannerService: BannerService
+    private bannerService: BannerService,
+    private actionsSubject$: ActionsSubject
   ) {
     super();
   }
@@ -50,12 +51,13 @@ export class CartComponent extends BaseComponent implements OnInit {
   private taxRate = 10;
 
   public ngOnInit(): void {
+    this.listenToActionsResponse();
     this.fetchCartProducts();
     this.fetchCoupons();
   }
 
   /**
-   * Call the Checkout 
+   * Call the Checkout
    */
   public checkout(): void {
     this.orderSummary = {
@@ -158,6 +160,30 @@ export class CartComponent extends BaseComponent implements OnInit {
   }
 
   /**
+   * Listen to actions response, such as cart success, coupons load success etc.
+   */
+  private listenToActionsResponse(): void {
+    this.actionsSubject$
+      .pipe(
+        takeUntil(this.componentDestroyed$),
+        filter(
+          (action) => action.type === CartWishlistActions.loadCartProducts.type
+        )
+      )
+      .subscribe(() => {
+        this.loadCartproductsFromStore();
+      });
+    this.actionsSubject$
+      .pipe(
+        takeUntil(this.componentDestroyed$),
+        filter((action) => action.type === CartWishlistActions.loadCoupons.type)
+      )
+      .subscribe(() => {
+        this.loadCouponsFromStore();
+      });
+  }
+
+  /**
    * Adapter funciton to map cart products to order products
    * @returns IOrderProduct[]
    */
@@ -186,6 +212,12 @@ export class CartComponent extends BaseComponent implements OnInit {
    */
   private fetchCartProducts(): void {
     this.store.dispatch(CartWishlistActions.fetchCartProducts());
+  }
+
+  /**
+   * Load Cart products from store
+   */
+  private loadCartproductsFromStore(): void {
     this.store
       .select(selectCartProducts)
       .pipe(takeUntil(this.componentDestroyed$))
@@ -202,14 +234,20 @@ export class CartComponent extends BaseComponent implements OnInit {
    */
   private fetchCoupons(): void {
     this.store.dispatch(CartWishlistActions.fetchCoupons());
+  }
+
+  /**
+   * Load coupons from store
+   */
+  private loadCouponsFromStore(): void {
     this.store
       .select(selectCoupons)
       .pipe(takeUntil(this.componentDestroyed$))
       .subscribe({
         next: (coupons) => {
-          this.coupons = coupons.map((c) => {
-            c = { ...c, couponLabel: this.getCouponLabel(c) };
-            return c;
+          this.coupons = coupons.map((coupon) => {
+            coupon = { ...coupon, couponLabel: this.getCouponLabel(coupon) };
+            return coupon;
           });
         },
       });

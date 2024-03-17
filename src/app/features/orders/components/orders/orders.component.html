@@ -27,6 +27,7 @@
             <tr>
               <th scope="col">Order ID:</th>
               <th scope="col">{{"orders.order.order_info.product" | translate}}</th>
+              <th scope="col">Qty</th>
               <th scope="col">{{"orders.order.order_info.product_name" | translate}}</th>
               <th scope="col">{{"orders.order.order_info.order_date" | translate}}</th>
               <th scope="col">{{"orders.order.order_info.status" | translate}}</th>
@@ -42,6 +43,7 @@
                 <th class="order-image-holder">
                     <img alt="product image" class="order-image" src="{{order.productImage}}">
                 </th>
+              <th>{{order.productQty}}</th>
               <th scope="row">{{order.productSummary}}</th>
               <td>{{ order.orderDate | date}}</td>
               <td>{{"orders.order.order_info.order_accepted" | translate}}</td>

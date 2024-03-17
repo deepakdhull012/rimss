@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
-import { takeUntil } from 'rxjs';
+import { filter, takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { IPriceRange } from '../../interfaces/filter-config.interface';
-import { Store } from '@ngrx/store';
+import { ActionsSubject, Store } from '@ngrx/store';
 import { IAppState } from 'src/app/core/store/app.state';
-import * as FiltersAction from './../../store/filter.actions';
+import * as FiltersActions from './../../store/filter.actions';
 import { selectPriceBreakPoints } from '../../store/filter.selectors';
 
 @Component({
@@ -19,11 +19,15 @@ export class PriceFilterComponent extends BaseComponent implements OnInit {
 
   public selectedPriceRange: Array<IPriceRange> = [];
 
-  constructor(private store: Store<IAppState>) {
+  constructor(
+    private store: Store<IAppState>,
+    private actionsSubject$: ActionsSubject
+  ) {
     super();
   }
 
   public ngOnInit(): void {
+    this.listenToActionsResponse();
     this.fetchPriceBreakPoints();
   }
 
@@ -48,17 +52,40 @@ export class PriceFilterComponent extends BaseComponent implements OnInit {
       );
     }
     this.store.dispatch(
-      FiltersAction.priceRangeChanged({
+      FiltersActions.priceRangeChanged({
         priceRange: this.selectedPriceRange,
       })
     );
   }
 
   /**
+   * Listen to actions response, such as load discount success
+   */
+  private listenToActionsResponse(): void {
+    this.actionsSubject$
+      .pipe(
+        takeUntil(this.componentDestroyed$),
+        filter(
+          (action) =>
+            action.type === FiltersActions.loadDiscountBreakpoints.type
+        )
+      )
+      .subscribe(() => {
+        this.loadPriceBreakPointsFromStore();
+      });
+  }
+
+  /**
    * Fetch price breakpoints from ngrx store
    */
   private fetchPriceBreakPoints(): void {
-    this.store.dispatch(FiltersAction.fetchPriceBreakPoints());
+    this.store.dispatch(FiltersActions.fetchPriceBreakPoints());
+  }
+
+  /**
+   * Load price breakpoints points from store
+   */
+  private loadPriceBreakPointsFromStore(): void {
     this.store
       .select(selectPriceBreakPoints)
       .pipe(takeUntil(this.componentDestroyed$))

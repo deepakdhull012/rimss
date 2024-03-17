@@ -4,13 +4,10 @@ import { Router } from '@angular/router';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { PASSWORD_MIN_LENGTH } from '../../consts/auth.const';
 import { IUser } from '../../interfaces/user.interface';
-import { Store } from '@ngrx/store';
+import { ActionsSubject, Store } from '@ngrx/store';
 import { IAppState } from 'src/app/core/store/app.state';
 import * as AuthActions from './../../store/auth.actions';
-import {
-  selectSignupStatus,
-} from '../../store/auth.selectors';
-import { takeUntil } from 'rxjs';
+import { filter, takeUntil } from 'rxjs';
 import { BannerService } from 'src/app/shared/services/banner.service';
 import { BannerType } from 'src/app/shared/interfaces/client/banner.interface';
 
@@ -27,28 +24,15 @@ export class SignupComponent extends BaseComponent implements OnInit {
     private router: Router,
     private fb: FormBuilder,
     private store: Store<IAppState>,
-    private bannerService: BannerService
+    private bannerService: BannerService,
+    private actionsSubject$: ActionsSubject
   ) {
     super();
   }
 
   public ngOnInit(): void {
     this.composeForm();
-    this.store
-      .select(selectSignupStatus)
-      .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe(() => {
-        if (this.isSubmitted) {
-          this.bannerService.displayBanner.next({
-            type: BannerType.SUCCESS,
-            message: 'Sign up success',
-            closeIcon: true,
-            closeTime: 3000,
-          });
-          this.router.navigate(['auth']);
-        }
-      });
-    
+    this.listenToActionsResponse();
   }
 
   public navigateTo(path: Array<string>): void {
@@ -92,6 +76,39 @@ export class SignupComponent extends BaseComponent implements OnInit {
       }
     }
     return null;
+  }
+
+  /**
+   * Listen to actions response, such as signup success, signup failure and display message accordingly
+   */
+  private listenToActionsResponse(): void {
+    this.actionsSubject$
+      .pipe(
+        takeUntil(this.componentDestroyed$),
+        filter((action) => action.type === AuthActions.signUpSuccess.type)
+      )
+      .subscribe(() => {
+        this.bannerService.displayBanner.next({
+          type: BannerType.SUCCESS,
+          message: 'Sign up success',
+          closeIcon: true,
+          closeTime: 3000,
+        });
+        this.router.navigate(['auth']);
+      });
+    this.actionsSubject$
+      .pipe(
+        takeUntil(this.componentDestroyed$),
+        filter((action) => action.type === AuthActions.signUpFail.type)
+      )
+      .subscribe(() => {
+        this.bannerService.displayBanner.next({
+          type: BannerType.ERROR,
+          message: 'Sign up faild',
+          closeIcon: true,
+          closeTime: 3000,
+        });
+      });
   }
 
   /**
