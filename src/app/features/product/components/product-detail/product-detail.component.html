@@ -42,7 +42,7 @@
     <article class="ps-lg-3">
       <h4 class="title text-dark">{{ product.productBrief }}</h4>
       <div class="rating-wrap">
-        <star-rating [starType]="'svg'" [rating]="product.rating"></star-rating>
+        <star-rating [starType]="'svg'" [rating]="product.rating" [disabled]="true"></star-rating>
       </div>
       <span *ngIf="noOfUnitsInStock > 0" class="label-rating text-success">{{"product.product_detail.in_stock" |
         translate}} {{noOfUnitsInStock }} {{"product.product_detail.units" | translate}}</span>
