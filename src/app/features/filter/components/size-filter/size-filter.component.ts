@@ -1,8 +1,8 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
-import { takeUntil } from 'rxjs';
+import { filter, takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
-import { Store } from '@ngrx/store';
+import { ActionsSubject, Store } from '@ngrx/store';
 import { IAppState } from 'src/app/core/store/app.state';
 import * as FiltersActions from './../../store/filter.actions';
 import { selectSizes } from '../../store/filter.selectors';
@@ -19,11 +19,15 @@ export class SizeFilterComponent extends BaseComponent implements OnInit {
     Array<string>
   >();
 
-  constructor(private store: Store<IAppState>) {
+  constructor(
+    private store: Store<IAppState>,
+    private actionsSubject$: ActionsSubject
+  ) {
     super();
   }
 
   public ngOnInit(): void {
+    this.listenToActionsResponse();
     this.fetchSizes();
   }
 
@@ -49,10 +53,27 @@ export class SizeFilterComponent extends BaseComponent implements OnInit {
   }
 
   /**
+   * Listen to actions response, such as load discount success
+   */
+  private listenToActionsResponse(): void {
+    this.actionsSubject$
+      .pipe(
+        takeUntil(this.componentDestroyed$),
+        filter((action) => action.type === FiltersActions.loadSizes.type)
+      )
+      .subscribe(() => {
+        this.loadsizesFromStore();
+      });
+  }
+
+  /**
    * Fetch sizes from ngrx store
    */
   private fetchSizes(): void {
     this.store.dispatch(FiltersActions.fetchSizes());
+  }
+
+  private loadsizesFromStore(): void {
     this.store
       .select(selectSizes)
       .pipe(takeUntil(this.componentDestroyed$))

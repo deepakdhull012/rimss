@@ -15,7 +15,7 @@ export class OrdersEffect {
         this.logger.log(`Order effect: received action: ${action.type}`);
         switch (action.type) {
           case OrdersActions.fetchOrders.type:
-            return this.orderService.fetchOrder(action.userId).pipe(
+            return this.orderService.fetchOrder().pipe(
               map((orders) => {
                 this.logger.log(
                   `Order effect: Success for action: ${action.type} with response ${orders}`

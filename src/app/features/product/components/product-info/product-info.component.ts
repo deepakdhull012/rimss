@@ -1,12 +1,12 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
-import { takeUntil } from 'rxjs';
+import { filter, takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { BannerType } from 'src/app/shared/interfaces/client/banner.interface';
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
 import { BannerService } from 'src/app/shared/services/banner.service';
 import { IProductInfoConfig } from '../../interfaces/product-info.interface';
-import { Store } from '@ngrx/store';
+import { ActionsSubject, Store } from '@ngrx/store';
 import { IAppState } from 'src/app/core/store/app.state';
 import * as ProductsActions from './../../store/products.actions';
 import {
@@ -30,7 +30,8 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
     private authUtilService: AuthUtilService,
     private bannerService: BannerService,
     private router: Router,
-    private store: Store<IAppState>
+    private store: Store<IAppState>,
+    private actionsSubject$: ActionsSubject
   ) {
     super();
   }
@@ -39,22 +40,9 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
   private wishlistProducts: IProductInfo[] = [];
 
   public ngOnInit(): void {
+    this.listenToActionsResponse();
     this.updateCartStatus();
     this.updateWishListStatus();
-    this.store
-      .select(selectCartProducts)
-      .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((cartProducts) => {
-        this.cartProducts = cartProducts;
-        this.updateCartStatus();
-      });
-    this.store
-      .select(selectWishlistProducts)
-      .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((wishlistProducts) => {
-        this.wishlistProducts = wishlistProducts;
-        this.updateWishListStatus();
-      });
   }
 
   /**
@@ -62,8 +50,8 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
    */
   public addToWishList(): void {
     const loggedInUserEmail = this.authUtilService.getLoggedInEmail();
-    const productInWishList = this.wishlistProducts.find((p) => {
-      return p.id === this.productInfo.id;
+    const productInWishList = this.wishlistProducts.find((wishlistProduct) => {
+      return wishlistProduct.id === this.productInfo.id;
     });
     if (productInWishList) {
       this.removeFromWishList();
@@ -118,19 +106,6 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
           },
         })
       );
-      this.store
-        .select(selectCartProducts)
-        .pipe(takeUntil(this.componentDestroyed$))
-        .subscribe({
-          next: () => {
-            this.bannerService.displayBanner.next({
-              closeIcon: true,
-              closeTime: 1000,
-              message: 'Product added to cart',
-              type: BannerType.SUCCESS,
-            });
-          },
-        });
     } else {
       this.bannerService.displayBanner.next({
         closeIcon: true,
@@ -145,15 +120,15 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
    * Remove product from cart
    */
   public removeFromCart(): void {
-    const cartProductId = this.cartProducts.find(
-      (cartP) => {
-        return cartP.productId === this.productInfo.id;
-      }
-    )?.id;
+    const cartProductId = this.cartProducts.find((cartP) => {
+      return cartP.productId === this.productInfo.id;
+    })?.id;
     if (cartProductId) {
-      this.store.dispatch(CartWishlistActions.removeFromCart({
-        productId: cartProductId
-      }));
+      this.store.dispatch(
+        CartWishlistActions.removeFromCart({
+          productId: cartProductId,
+        })
+      );
     }
   }
 
@@ -171,15 +146,14 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
    * Update wishlist status for current product
    */
   private updateWishListStatus(): void {
-    const productInWishList = this.wishlistProducts.find(
-      (wishListProduct) => {
-        return wishListProduct.id === this.productInfo.id;
-      }
-    );
+    const productInWishList = this.wishlistProducts.find((wishListProduct) => {
+      return wishListProduct.id === this.productInfo.id;
+    });
+    console.error("update wishlist status", this.wishlistProducts, this.productInfo, productInWishList)
     this.productInfo = {
       ...this.productInfo,
       isInWishList: !!productInWishList,
-      wishListId: productInWishList?.wishListId
+      wishListId: productInWishList?.wishListId,
     };
   }
 
@@ -187,15 +161,90 @@ export class ProductInfoComponent extends BaseComponent implements OnInit {
    * Remove product from wishlist
    */
   private removeFromWishList(): void {
-    const productInWishList = this.wishlistProducts.find(
-      (wishListProduct) => {
-        return wishListProduct.id === this.productInfo.id;
-      }
-    );
+    const productInWishList = this.wishlistProducts.find((wishListProduct) => {
+      return wishListProduct.id === this.productInfo.id;
+    });
     if (productInWishList) {
-      this.store.dispatch(CartWishlistActions.removeFromWishlist({
-        productId: productInWishList.wishListId as number
-      }));
+      this.store.dispatch(
+        CartWishlistActions.removeFromWishlist({
+          productId: productInWishList.wishListId as number,
+        })
+      );
     }
+  }
+
+  /**
+   * Listen to actions response, such as load products, cart, wishlist success
+   */
+  private listenToActionsResponse(): void {
+    this.actionsSubject$
+      .pipe(
+        takeUntil(this.componentDestroyed$),
+        filter(
+          (action) =>
+            action.type === CartWishlistActions.loadCartProducts.type ||
+            action.type === CartWishlistActions.removeFromCart.type
+        )
+      )
+      .subscribe(() => {
+        this.loadCartProductsFromStore();
+      });
+
+    this.actionsSubject$
+      .pipe(
+        takeUntil(this.componentDestroyed$),
+        filter(
+          (action) => action.type === CartWishlistActions.addProductToCart.type
+        )
+      )
+      .subscribe(() => {
+        this.bannerService.displayBanner.next({
+          closeIcon: true,
+          closeTime: 1000,
+          message: 'Product added to cart successfully',
+          type: BannerType.SUCCESS,
+        });
+        this.loadCartProductsFromStore();
+      });
+
+    this.actionsSubject$
+      .pipe(
+        takeUntil(this.componentDestroyed$),
+        filter(
+          (action) =>
+            action.type === CartWishlistActions.removeFromWishlist.type ||
+            action.type === CartWishlistActions.loadWishListProducts.type ||
+            action.type === CartWishlistActions.addProductToWishlist.type
+        )
+      )
+      .subscribe(() => {
+        this.loadWishlistProductsFromStore();
+      });
+  }
+
+  /**
+   * Load cart products from store
+   */
+  private loadCartProductsFromStore(): void {
+    this.store
+      .select(selectCartProducts)
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe((cartProducts) => {
+        this.cartProducts = cartProducts;
+        this.updateCartStatus();
+      });
+  }
+
+  /**
+   * Load wishlist products from store
+   */
+  private loadWishlistProductsFromStore(): void {
+    this.store
+      .select(selectWishlistProducts)
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe((wishlistProducts) => {
+        this.wishlistProducts = wishlistProducts;
+        this.updateWishListStatus();
+      });
   }
 }

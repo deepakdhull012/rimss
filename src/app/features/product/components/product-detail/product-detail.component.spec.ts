@@ -10,6 +10,7 @@ import { IProductInfo } from './../../../../shared/interfaces/client/product.int
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { AuthUtilService } from 'src/app/utils/auth-util.service';
 import { IProductDetailsTab } from '../../interfaces/product-info.interface';
+import { LoggerModule, NgxLoggerLevel } from 'ngx-logger';
 
 describe('ProductDetailComponent', () => {
   let component: ProductDetailComponent;
@@ -28,6 +29,9 @@ describe('ProductDetailComponent', () => {
         StoreModule.forRoot({}),
         EffectsModule.forRoot(),
         TranslateModule.forRoot(),
+        LoggerModule.forRoot({
+          level: NgxLoggerLevel.LOG
+        }),
       ],
       providers: [
         TranslateService,

@@ -1,17 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { takeUntil } from 'rxjs';
+import { filter, takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import {
   IOrder,
   IOrderProductUI,
 } from 'src/app/shared/interfaces/client/order.interface';
 import { IAppState } from 'src/app/core/store/app.state';
-import { Store } from '@ngrx/store';
+import { ActionsSubject, Store } from '@ngrx/store';
 import { selectOrders } from '../../store/orders.selectors';
 import * as OrdersActions from './../../store/orders.actions';
-import { AuthUtilService } from 'src/app/utils/auth-util.service';
-import { BannerService } from 'src/app/shared/services/banner.service';
-import { BannerType } from 'src/app/shared/interfaces/client/banner.interface';
 
 @Component({
   selector: 'rimss-orders',
@@ -24,14 +21,22 @@ export class OrdersComponent extends BaseComponent implements OnInit {
 
   constructor(
     private store: Store<IAppState>,
-    private authUtilService: AuthUtilService,
-    private bannerService: BannerService
+    private actionsSubject$: ActionsSubject
   ) {
     super();
   }
 
   public ngOnInit(): void {
-    this.fetchOrders();
+    this.actionsSubject$
+      .pipe(
+        takeUntil(this.componentDestroyed$),
+        filter((action) => action.type === OrdersActions.deleteOrder.type)
+      )
+      .subscribe(() => {
+        this.selectOrders();
+      });
+      this.selectOrders();
+      this.fetchOrders();
   }
 
   /**
@@ -49,7 +54,6 @@ export class OrdersComponent extends BaseComponent implements OnInit {
           orderId: order.orderId as number,
         })
       );
-      this.fetchOrders();
     }
   }
 
@@ -57,14 +61,14 @@ export class OrdersComponent extends BaseComponent implements OnInit {
    * Fetch user's orders from store
    */
   private fetchOrders(): void {
-    const userId = this.authUtilService.getUser()?.id;
-    if (userId) {
-      this.store.dispatch(
-        OrdersActions.fetchOrders({
-          userId,
-        })
-      );
-      this.store
+    this.store.dispatch(OrdersActions.fetchOrders());
+  }
+
+  /**
+   * Update orders from ngrx store
+   */
+  private selectOrders(): void {
+    this.store
         .select(selectOrders)
         .pipe(takeUntil(this.componentDestroyed$))
         .subscribe({
@@ -73,23 +77,13 @@ export class OrdersComponent extends BaseComponent implements OnInit {
             this.mapToOrderProductsUI();
           },
         });
-    } else {
-      this.bannerService.displayBanner.next({
-        closeIcon: true,
-        closeTime: 2000,
-        message: `No logged in user found`,
-        type: BannerType.ERROR,
-      });
-    }
   }
-
 
   /**
    * Adapter function to map order to order products
    */
   private mapToOrderProductsUI(): void {
     this.orderProducts = [];
-    console.error(this.orders)
     this.orders.forEach((order) => {
       order.productOrders.forEach((productOrder) => {
         const orderProductUI: IOrderProductUI = {
@@ -101,6 +95,7 @@ export class OrdersComponent extends BaseComponent implements OnInit {
           orderId: order.id,
           totalOrderAmount: order.orderAmount,
           orderStatus: order.orderStatus,
+          productQty: productOrder.qty
         };
         this.orderProducts.push(orderProductUI);
       });

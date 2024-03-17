@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { takeUntil } from 'rxjs';
+import { filter, takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { BannerType } from 'src/app/shared/interfaces/client/banner.interface';
 import {
@@ -10,9 +10,9 @@ import {
 import { IProductInfo } from 'src/app/shared/interfaces/client/product.interface';
 import { BannerService } from 'src/app/shared/services/banner.service';
 import { IProductDetailsTab } from '../../interfaces/product-info.interface';
-import { Store } from '@ngrx/store';
+import { ActionsSubject, Store } from '@ngrx/store';
 import { IAppState } from 'src/app/core/store/app.state';
-import * as ProductsAction from './../../store/products.actions';
+import * as ProductActions from './../../store/products.actions';
 import {
   getSelectedProduct,
   getSimilarProducts,
@@ -32,7 +32,7 @@ import { AuthUtilService } from 'src/app/utils/auth-util.service';
   providers: [],
 })
 export class ProductDetailComponent extends BaseComponent implements OnInit {
-   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   @Input() product: IProductInfo = null as any as IProductInfo;
   public similarProducts: Array<IProductInfo> = [];
   public noOfUnitsInStock = 0;
@@ -47,7 +47,8 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
     private bannerService: BannerService,
     private route: ActivatedRoute,
     private router: Router,
-    private store: Store<IAppState>
+    private store: Store<IAppState>,
+    private actionsSubject$: ActionsSubject
   ) {
     super();
   }
@@ -59,47 +60,14 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
    * Fetch various data from store, product detail, cart status, wishlist status
    */
   public ngOnInit(): void {
-    this.store
-      .select(getSelectedProduct)
-      .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((selectedProduct) => {
-        if (selectedProduct) {
-          this.product = selectedProduct;
-          this.updateCartStatus();
-          this.updateWishListStatus();
-          this.updateStockQty();
-          const categories = this.product.productCategory?.length
-            ? [this.product.productCategory[0]]
-            : [];
-          this.fetchSimilarProducts(categories);
-        }
-      });
-
-    this.store.select(getSimilarProducts).subscribe((similarProducts) => {
-      this.similarProducts = similarProducts || [];
-    });
+    this.listenToActionsResponse();
     this.store.dispatch(CartWishlistActions.fetchCartProducts());
     this.store.dispatch(CartWishlistActions.fetchWishlistProducts());
-    this.store
-      .select(selectCartProducts)
-      .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((cartProducts) => {
-        this.cartProducts = cartProducts;
-        this.updateCartStatus();
-      });
-
-    this.store
-      .select(selectWishlistProducts)
-      .pipe(takeUntil(this.componentDestroyed$))
-      .subscribe((wishlistProducts) => {
-        this.wishListProducts = wishlistProducts;
-        this.updateWishListStatus();
-      });
 
     if (!this.product?.id) {
       const productId: number = this.route.snapshot.params['id'];
       this.store.dispatch(
-        ProductsAction.fetchProductById({
+        ProductActions.fetchProductById({
           productId: productId,
         })
       );
@@ -124,9 +92,9 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
       couponCode: '',
       couponDiscount: 0,
       fromcart: false,
-      qtyIfDirectOrder: this.qty
+      qtyIfDirectOrder: this.qty,
     };
-    this.router.navigate(['orders','checkout'], {
+    this.router.navigate(['orders', 'checkout'], {
       state: {
         orderSummary: this.orderSummary,
       },
@@ -155,19 +123,6 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
           },
         })
       );
-      this.store
-        .select(selectCartProducts)
-        .pipe(takeUntil(this.componentDestroyed$))
-        .subscribe({
-          next: () => {
-            this.bannerService.displayBanner.next({
-              closeIcon: true,
-              closeTime: 1000,
-              message: 'Product added to cart successfully',
-              type: BannerType.SUCCESS,
-            });
-          },
-        });
     } else {
       this.bannerService.displayBanner.next({
         closeIcon: true,
@@ -177,7 +132,6 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
       });
     }
   }
-
 
   /**
    * Add product to wishlist
@@ -260,7 +214,7 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
    */
   private fetchSimilarProducts(categories: string[]): void {
     this.store.dispatch(
-      ProductsAction.fetchSimilarProducts({
+      ProductActions.fetchSimilarProducts({
         filterCriteria: {
           category: categories,
         },
@@ -304,8 +258,8 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
    * Update cart status for current product
    */
   private updateCartStatus(): void {
-    const productInCart = this.cartProducts.find((p) => {
-      return p.id === this.product.id;
+    const productInCart = this.cartProducts.find((cartProduct) => {
+      return cartProduct.productId === this.product?.id;
     });
     this.product = { ...this.product, isInCart: !!productInCart };
   }
@@ -314,9 +268,122 @@ export class ProductDetailComponent extends BaseComponent implements OnInit {
    * Update wishlist status for current product
    */
   private updateWishListStatus(): void {
-    const productInWishList = this.wishListProducts.find((p) => {
-      return p.id === this.product.id;
+    const productInWishList = this.wishListProducts.find((wishlListProduct) => {
+      return wishlListProduct.id === this.product?.id;
     });
     this.product = { ...this.product, isInWishList: !!productInWishList };
+  }
+
+  /**
+   * Listen to actions response, such as load discount success
+   */
+  private listenToActionsResponse(): void {
+    this.actionsSubject$
+      .pipe(
+        takeUntil(this.componentDestroyed$),
+        filter((action) => action.type === ProductActions.fetchProductById.type)
+      )
+      .subscribe(() => {
+        this.loadSelectedProductFromStore();
+      });
+
+    this.actionsSubject$
+      .pipe(
+        takeUntil(this.componentDestroyed$),
+        filter(
+          (action) =>
+            action.type === ProductActions.loadRecommendedProducts.type
+        )
+      )
+      .subscribe(() => {
+        this.loadSimilarProductsFromStore();
+      });
+
+    this.actionsSubject$
+      .pipe(
+        takeUntil(this.componentDestroyed$),
+        filter(
+          (action) =>
+            action.type === CartWishlistActions.loadCartProducts.type ||
+            action.type === CartWishlistActions.addProductToCart.type ||
+            action.type === CartWishlistActions.removeFromCart.type
+        )
+      )
+      .subscribe(() => {
+        this.loadCartProductsFromStore();
+      });
+
+    this.actionsSubject$
+      .pipe(
+        takeUntil(this.componentDestroyed$),
+        filter(
+          (action) =>
+            action.type === CartWishlistActions.loadWishListProducts.type ||
+            action.type === CartWishlistActions.addProductToWishlist.type ||
+            action.type === CartWishlistActions.removeFromWishlist.type
+        )
+      )
+      .subscribe(() => {
+        this.loadWishlistProductsFromStore();
+      });
+  }
+
+  /**
+   * Load selected products from store
+   */
+  private loadSelectedProductFromStore(): void {
+    this.store
+      .select(getSelectedProduct)
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe((selectedProduct) => {
+        if (selectedProduct) {
+          this.product = selectedProduct;
+          this.updateCartStatus();
+          this.updateWishListStatus();
+          this.updateStockQty();
+          const categories = this.product.productCategory?.length
+            ? [this.product.productCategory[0]]
+            : [];
+          this.fetchSimilarProducts(categories);
+        }
+      });
+  }
+
+  /**
+   * Load similar products from store
+   */
+  private loadSimilarProductsFromStore(): void {
+    this.store
+      .select(getSimilarProducts)
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe((similarProducts) => {
+        this.similarProducts = similarProducts || [];
+      });
+  }
+
+  /**
+   * Load cart products from store
+   */
+  private loadCartProductsFromStore(): void {
+    this.store
+      .select(selectCartProducts)
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe((cartProducts) => {
+        this.cartProducts = cartProducts;
+        this.updateCartStatus();
+      });
+  }
+
+  /**
+   * Load wishlist products from store
+   */
+  private loadWishlistProductsFromStore(): void {
+    this.store
+      .select(selectWishlistProducts)
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe((wishlistProducts) => {
+        this.wishListProducts = wishlistProducts;
+        this.updateWishListStatus();
+      });
   }
 }

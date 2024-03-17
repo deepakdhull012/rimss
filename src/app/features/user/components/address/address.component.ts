@@ -1,11 +1,11 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { takeUntil } from 'rxjs';
+import { filter, takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/core/components/base/base.component';
 import { IAddress } from '../../interfaces/profile.interface';
 import { AuthUtilService } from 'src/app/utils/auth-util.service';
-import { Store } from '@ngrx/store';
+import { ActionsSubject, Store } from '@ngrx/store';
 import { IAppState } from 'src/app/core/store/app.state';
 import * as UserActions from './../../store/users.actions';
 import { selectAddresses } from '../../store/users.selectors';
@@ -25,12 +25,14 @@ export class AddressComponent extends BaseComponent implements OnInit {
     private fb: FormBuilder,
     private authUtilService: AuthUtilService,
     private router: Router,
-    private store: Store<IAppState>
+    private store: Store<IAppState>,
+    private actionsSubject$: ActionsSubject
   ) {
     super();
   }
 
   public ngOnInit(): void {
+    this.listenToActionsResponse();
     this.composeForm();
   }
 
@@ -43,26 +45,13 @@ export class AddressComponent extends BaseComponent implements OnInit {
           address: addressToPost,
         })
       );
-      this.store
-        .select(selectAddresses)
-        .pipe(takeUntil(this.componentDestroyed$))
-        .subscribe({
-          next: () => {
-            if (this.standalone) {
-              this.router.navigate(['profile']);
-            } else {
-              this.isSubmitted = false;
-              this.composeForm();
-            }
-          },
-        });
     }
   }
 
   /**
    * Provide error message control wise
    * @param controlName : string
-   * @returns 
+   * @returns
    */
   public getError(controlName: string): string | null {
     const hasError = this.isControlTouched(controlName)
@@ -81,6 +70,39 @@ export class AddressComponent extends BaseComponent implements OnInit {
       }
     }
     return null;
+  }
+
+  /**
+   * Listen to actions response, such as load address success
+   */
+  private listenToActionsResponse(): void {
+    this.actionsSubject$
+      .pipe(
+        takeUntil(this.componentDestroyed$),
+        filter((action) => action.type === UserActions.createAddress.type)
+      )
+      .subscribe(() => {
+        this.loadAddressesFromStore();
+      });
+  }
+
+  /**
+   * Load addresses from store
+   */
+  private loadAddressesFromStore(): void {
+    this.store
+      .select(selectAddresses)
+      .pipe(takeUntil(this.componentDestroyed$))
+      .subscribe({
+        next: () => {
+          if (this.standalone) {
+            this.router.navigate(['profile']);
+          } else {
+            this.isSubmitted = false;
+            this.composeForm();
+          }
+        },
+      });
   }
 
   /**
